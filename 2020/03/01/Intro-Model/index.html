@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="pyro, python," />
 
 
 
@@ -81,14 +81,15 @@
 
 <meta name="description" content="Pyro模型介绍概率编程的基础单元是随机函数Stochastic function。它是一种随机的Python可调用函数，由以下两个组成：  确定性的Python代码 原始随机函数，他们会调用一个随机数生成器  简单的来说，随机函数可以是任意一个拥有 __call__()函数的对象，比如一个函数function，一个方法method，或者像PyTorch的一个nn.Module. 在教程和文档中，">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Intro_Model">
+<meta property="og:title" content="Pyro模型简介">
 <meta property="og:url" content="http://humberthumbert.github.io/2020/03/01/Intro-Model/index.html">
 <meta property="og:site_name" content="Lifan&#39;s Note">
 <meta property="og:description" content="Pyro模型介绍概率编程的基础单元是随机函数Stochastic function。它是一种随机的Python可调用函数，由以下两个组成：  确定性的Python代码 原始随机函数，他们会调用一个随机数生成器  简单的来说，随机函数可以是任意一个拥有 __call__()函数的对象，比如一个函数function，一个方法method，或者像PyTorch的一个nn.Module. 在教程和文档中，">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-03-01T17:32:50.000Z">
-<meta property="article:modified_time" content="2020-03-01T23:28:32.217Z">
+<meta property="article:modified_time" content="2020-03-01T23:31:45.398Z">
 <meta property="article:author" content="Lifan Zhao">
+<meta property="article:tag" content="pyro, python">
 <meta name="twitter:card" content="summary">
 
 
@@ -125,7 +126,7 @@
 
 
 
-  <title>Intro_Model | Lifan's Note</title>
+  <title>Pyro模型简介 | Lifan's Note</title>
   
 
 
@@ -249,7 +250,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Intro_Model</h1>
+          <h1 class="post-title" itemprop="name headline">Pyro模型简介</h1>
         
 
         <div class="post-meta">
@@ -308,18 +309,18 @@
 <p>在教程和文档中，因为随机函数可以用来简化地或者抽象地描述一个数据生成的过程，我们将会调用随机函数<strong>模型</strong>。将随机函数表述成模型意味着该模型可以像普通Python可调用函数一样，被创造composed，重用reused，引用import，和序列化serialized。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> pyro</span><br><span class="line"></span><br><span class="line">pyro.set_rng_seed(<span class="number">101</span>)</span><br></pre></td></tr></table></figure>
 
-<h2 id="原始随机函数"><a href="#原始随机函数" class="headerlink" title="原始随机函数"></a>原始随机函数</h2><p><strong>原始随机函数</strong>，或者说分布，是随机函数中重要的一个类。给定输入，我们可以通过它们明确地计算并输出概率。就像PyTorch 0.4和Pyro 0.2，Pyro使用PyTorch的<a href="http://pytorch.org/docs/master/distributions.html" target="_blank" rel="noopener">distribution library</a>。你也可以通过<a href="http://pytorch.org/docs/master/distributions.html#module-torch.distributions.transforms" target="_blank" rel="noopener">transforms</a>创建一个自己的分布。</p>
+<h1 id="原始随机函数"><a href="#原始随机函数" class="headerlink" title="原始随机函数"></a>原始随机函数</h1><p><strong>原始随机函数</strong>，或者说分布，是随机函数中重要的一个类。给定输入，我们可以通过它们明确地计算并输出概率。就像PyTorch 0.4和Pyro 0.2，Pyro使用PyTorch的<a href="http://pytorch.org/docs/master/distributions.html" target="_blank" rel="noopener">distribution library</a>。你也可以通过<a href="http://pytorch.org/docs/master/distributions.html#module-torch.distributions.transforms" target="_blank" rel="noopener">transforms</a>创建一个自己的分布。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">loc = <span class="number">0.</span>   <span class="comment"># mean zero</span></span><br><span class="line">scale = <span class="number">1.</span> <span class="comment"># unit variance</span></span><br><span class="line">normal = torch.distributions.Normal(loc, scale) <span class="comment"># create a normal distribution object</span></span><br><span class="line">x = normal.rsample() <span class="comment"># draw a sample from N(0,1)</span></span><br><span class="line">print(<span class="string">"sample"</span>, x)</span><br><span class="line">print(<span class="string">"log prob"</span>, normal.log_prob(x)) <span class="comment"># score the sample from N(0,1)</span></span><br></pre></td></tr></table></figure>
 <p>输出为：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sample tensor(-1.3095)</span><br><span class="line">log prob tensor(-1.8857)</span><br></pre></td></tr></table></figure>
 <p>在这里，<code>torch.distributions.Normal</code>是一个<code>Distribution</code>类的例子，展示他们可以接受参数，提供取样，并给方法method打分。Pyro的分布函数库<code>pyro.distributions</code>是一个轻量化的<code>torch.distributions</code>，因为我们希望在<strong>推断inference</strong>的过程中，可以使用PyTorch的tensor计算和autograd的能力。</p>
-<h2 id="一个简单的模型"><a href="#一个简单的模型" class="headerlink" title="一个简单的模型"></a>一个简单的模型</h2><p>所有的概率编程程序都通过组合原始随机函数和确定性的计算而得到的。既然我们的最终目标是用概率编程来模拟真实世界的事物，那我们就来一个实例的模型吧。</p>
+<h1 id="一个简单的模型"><a href="#一个简单的模型" class="headerlink" title="一个简单的模型"></a>一个简单的模型</h1><p>所有的概率编程程序都通过组合原始随机函数和确定性的计算而得到的。既然我们的最终目标是用概率编程来模拟真实世界的事物，那我们就来一个实例的模型吧。</p>
 <p>假设我们由一堆关于每日平均温度(daily mean temperature)和云层覆盖(cloud cover)的数据。我们希望找到温度是否受当天是晴是阴的影响。一个简单的描述数据是如何生成的随机函数如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">weather</span><span class="params">()</span>:</span></span><br><span class="line">    cloudy = torch.distributions.Bernoulli(<span class="number">0.3</span>).sample()</span><br><span class="line">    cloudy = <span class="string">'cloudy'</span> <span class="keyword">if</span> cloudy.item() == <span class="number">1.0</span> <span class="keyword">else</span> <span class="string">'sunny'</span></span><br><span class="line">    mean_temp = &#123;<span class="string">'cloudy'</span>: <span class="number">55.0</span>, <span class="string">'sunny'</span>: <span class="number">75.0</span>&#125;[cloudy]</span><br><span class="line">    scale_temp = &#123;<span class="string">'cloudy'</span>: <span class="number">10.0</span>, <span class="string">'sunny'</span>: <span class="number">15.0</span>&#125;[cloudy]</span><br><span class="line">    temp = torch.distributions.Normal(mean_temp, scale_temp).rsample()</span><br><span class="line">    <span class="keyword">return</span> cloudy, temp.item()</span><br></pre></td></tr></table></figure>
 <p>让我们一行一行看。首先，在第二行中，我们定义了一个二元随机变量‘cloudy’。它服从伯努利分布，其p值为0.3。因为伯努利分布返回0或者1，在第三行中，我们将<code>cloudy</code>的值转变为string，方便<code>weather</code>的返回值易于处理。那么根据这个模型，30%的时间它将是多云的阴天，而70%的时间将是晴天。</p>
 <p>在第4-5行，我们定义了一些我们将在第6行中来取样温度的参数。这些参数由我们在第二行取样的<code>cloudy</code>的值决定。比如说，如果取样到阴天，平均温度是55华氏度，若晴天则为75度。最后，在第7行中我们返回两个值，<code>cloudy</code>和<code>temp</code>。</p>
 <p>但是，目前<code>weather</code>完全独立于Pyro，因为它只用到了PyTorch的函数。如果我们希望将该模型用作除了生成假数据以外的他途的话，我们需要把它转变为Pyro的程序。</p>
-<h2 id="pyro-sample原始类型"><a href="#pyro-sample原始类型" class="headerlink" title="pyro.sample原始类型"></a><code>pyro.sample</code>原始类型</h2><p>要将<code>weather</code>转变为Pyro程序，我们需要将<code>torch.distribution</code>替换成<code>pyro.distribution</code>，同时<code>.sample()</code>和<code>.rsample</code>的调用替换成<code>pyro.sample</code>的调用。<code>pyro.sample</code>是Pyro的原始类型之一。使用<code>pyro.sample</code>就像调用原始随机函数一样简单，除了一处重要的不同：</p>
+<h1 id="pyro-sample原始类型"><a href="#pyro-sample原始类型" class="headerlink" title="pyro.sample原始类型"></a><code>pyro.sample</code>原始类型</h1><p>要将<code>weather</code>转变为Pyro程序，我们需要将<code>torch.distribution</code>替换成<code>pyro.distribution</code>，同时<code>.sample()</code>和<code>.rsample</code>的调用替换成<code>pyro.sample</code>的调用。<code>pyro.sample</code>是Pyro的原始类型之一。使用<code>pyro.sample</code>就像调用原始随机函数一样简单，除了一处重要的不同：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = pyro.sample(<span class="string">"my_sample"</span>, pyro.distributions.Normal(loc, scale))</span><br><span class="line">print(x)</span><br></pre></td></tr></table></figure>
 <p>输出：<code>tensor(-0.8152)</code></p>
 <p>就像是直接调用<code>torch.distributions.Normal().rsample()</code>，上述将返回一个服从正太分布的取样。重要的不同在于这个取样是被命名乐的。Pyro的后段用这些名字来各个识别取样的表述statement，且在运行时根据相关的随机函数是如何被使用的从而来改变他们的表现behavior。这就是Pyro如何完成对于推断算法实现的各种操作。<a href="http://pyro.ai/examples/intro_part_i.html#The-pyro.sample-Primitive" target="_blank" rel="noopener">[原文]</a></p>
@@ -327,7 +328,7 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">weather</span><span class="params">()</span>:</span></span><br><span class="line">    cloudy = pyro.sample(<span class="string">'cloudy'</span>, pyro.distributions.Bernoulli(<span class="number">0.3</span>))</span><br><span class="line">    cloudy = <span class="string">'cloudy'</span> <span class="keyword">if</span> cloudy.item() == <span class="number">1.0</span> <span class="keyword">else</span> <span class="string">'sunny'</span></span><br><span class="line">    mean_temp = &#123;<span class="string">'cloudy'</span>: <span class="number">55.0</span>, <span class="string">'sunny'</span>: <span class="number">75.0</span>&#125;[cloudy]</span><br><span class="line">    scale_temp = &#123;<span class="string">'cloudy'</span>: <span class="number">10.0</span>, <span class="string">'sunny'</span>: <span class="number">15.0</span>&#125;[cloudy]</span><br><span class="line">    temp = pyro.sample(<span class="string">'temp'</span>, pyro.distributions.Normal(mean_temp, scale_temp))</span><br><span class="line">    <span class="keyword">return</span> cloudy, temp.item()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">    print(weather())</span><br></pre></td></tr></table></figure>
 
 <p>程序上，<code>weather()</code>依旧是一个非确定性的将返回两个随机取样的Python函数。因为随机值现在是由<code>pyro.sample</code>产生的，但是它可以比现在做的更多。特别的，<code>weather()</code>描述了一个对于两个命名变量<code>cloudy</code>和<code>temp</code>的关联概率分布joint probability distribution。就像这样，它定义了一个概率模型，在此之上我们可以用概率论的技巧来搞事情了。比如，我们可能会问，如果我观测到当前温度70华氏度，那么现在有多大概率是阴天？如何编写和解答这类问题将在下一章教程中。</p>
-<h2 id="普遍性：随机递归，高阶随机函数和随机流程控制语句"><a href="#普遍性：随机递归，高阶随机函数和随机流程控制语句" class="headerlink" title="普遍性：随机递归，高阶随机函数和随机流程控制语句"></a>普遍性：随机递归，高阶随机函数和随机流程控制语句</h2><p>我们已经讲过了如何定义一个简单的模型。从此之上建立其他的模型是简单的，比如：</p>
+<h1 id="普遍性：随机递归，高阶随机函数和随机流程控制语句"><a href="#普遍性：随机递归，高阶随机函数和随机流程控制语句" class="headerlink" title="普遍性：随机递归，高阶随机函数和随机流程控制语句"></a>普遍性：随机递归，高阶随机函数和随机流程控制语句</h1><p>我们已经讲过了如何定义一个简单的模型。从此之上建立其他的模型是简单的，比如：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ice_cream_sales</span><span class="params">()</span>:</span></span><br><span class="line">    cloudy, temp = weather()</span><br><span class="line">    expected_sales = <span class="number">200.</span> <span class="keyword">if</span> cloudy == <span class="string">'sunny'</span> <span class="keyword">and</span> temp &gt; <span class="number">80.0</span> <span class="keyword">else</span> <span class="number">50.</span></span><br><span class="line">    ice_cream = pyro.sample(<span class="string">'ice_cream'</span>, pyro.distributions.Normal(expected_sales, <span class="number">10.0</span>))</span><br><span class="line">    <span class="keyword">return</span> ice_cream</span><br></pre></td></tr></table></figure>
 
 <p>这种模块化，对于任何程序员是熟悉且明显十分强大的。但是它是否强大到能够覆盖我们想表达的所有不同类型的模型了呢？</p>
@@ -341,7 +342,7 @@
 <p>这里<code>make_normal_normal()</code>就是一个接受一个参数，且产生三个命名随机变量的随机函数。</p>
 <p>事实上，Pyro支持任意Python代码比如遍历，递归，高阶函数等等。与随机流程控制语句结合意味着Pyro的随机函数是普遍的，比方说，他们可以被用来表达任意可计算的概率分布。在之后的教程中，我们可以看到其强大之处。</p>
 <p>关于为什么Pyro建立在PyTorch基础之上，值得强调的一点原因是：动态计算图(dynamic computational graphs)是对于普遍的模型而言是一个重要的元素，使得我们可以使用GPU加速的tensor计算。</p>
-<h2 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h2><p>我们已经展示了如何在Pyro使用随机函数和原始分布来表达模型。为了从数据中学习模型并理解他们，我们需要实现<strong>推断inference</strong>。请见下一章教程。</p>
+<h1 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h1><p>我们已经展示了如何在Pyro使用随机函数和原始分布来表达模型。为了从数据中学习模型并理解他们，我们需要实现<strong>推断inference</strong>。请见下一章教程。</p>
 
       
     </div>
@@ -356,6 +357,12 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/pyro-python/" rel="tag"># pyro, python</a>
+          
+        </div>
       
 
       
@@ -464,7 +471,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>
@@ -497,7 +504,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Pyro模型介绍"><span class="nav-number">1.</span> <span class="nav-text">Pyro模型介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#原始随机函数"><span class="nav-number">1.1.</span> <span class="nav-text">原始随机函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一个简单的模型"><span class="nav-number">1.2.</span> <span class="nav-text">一个简单的模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pyro-sample原始类型"><span class="nav-number">1.3.</span> <span class="nav-text">pyro.sample原始类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#普遍性：随机递归，高阶随机函数和随机流程控制语句"><span class="nav-number">1.4.</span> <span class="nav-text">普遍性：随机递归，高阶随机函数和随机流程控制语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下一步"><span class="nav-number">1.5.</span> <span class="nav-text">下一步</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Pyro模型介绍"><span class="nav-number">1.</span> <span class="nav-text">Pyro模型介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#原始随机函数"><span class="nav-number">2.</span> <span class="nav-text">原始随机函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一个简单的模型"><span class="nav-number">3.</span> <span class="nav-text">一个简单的模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pyro-sample原始类型"><span class="nav-number">4.</span> <span class="nav-text">pyro.sample原始类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#普遍性：随机递归，高阶随机函数和随机流程控制语句"><span class="nav-number">5.</span> <span class="nav-text">普遍性：随机递归，高阶随机函数和随机流程控制语句</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#下一步"><span class="nav-number">6.</span> <span class="nav-text">下一步</span></a></li></ol></div>
             
 
           </div>
