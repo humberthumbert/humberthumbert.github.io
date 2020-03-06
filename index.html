@@ -314,8 +314,8 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> pyro</span><br><span class="line"><span class="keyword">import</span> pyro.infer</span><br><span class="line"><span class="keyword">import</span> pyro.optim</span><br><span class="line"><span class="keyword">import</span> pyro.distributions <span class="keyword">as</span> dist</span><br><span class="line"></span><br><span class="line">pyro.set_rng_seed(<span class="number">101</span>)</span><br></pre></td></tr></table></figure>
 
 <h1 id="一个简单的例子"><a href="#一个简单的例子" class="headerlink" title="一个简单的例子"></a>一个简单的例子</h1><p>假设我们想要知道某个物体的重量，但是我们手头上的秤并不可靠，每次称重时我们都会得到稍微不同的结果。我们可以通过整合噪音和对这个物体的重量的已知知识（比如它的密度，或者物质构成）来构建这个变量。下面的模型展示了这个过程：</p>
-<p>$$ weight | guess ~ Normal(guess, l) $$</p>
-<p>$$ measurement | guess, weight ~ Normal(weight, 0.75) $$</p>
+<p>$$ weight | guess - Normal(guess, l) $$</p>
+<p>$$ measurement | guess, weight - Normal(weight, 0.75) $$</p>
 <p>注意，这个模型不仅是我们对于重量的确性程度，也是测量的结果。这个模型对应者下面这个随机函数：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">scale</span><span class="params">(guess)</span>:</span></span><br><span class="line">    weight = pyro.sample(<span class="string">"weight"</span>, dist.Normal(guess, <span class="number">1.0</span>))</span><br><span class="line">    <span class="keyword">return</span> pyro.sample(<span class="string">"measurement"</span>, dist.Normal(weight, <span class="number">0.75</span>))</span><br></pre></td></tr></table></figure>
 
@@ -363,7 +363,7 @@
 <p><img src="http://pyro.ai/examples/_images/intro_part_ii_23_0.png" alt=""></p>
 <p><strong>注意，SVI包括参数非常相近到所求条件分布的真实的参数。这是可以预见的，因为我们的引导函数也是从同一个族中出来的。</strong></p>
 <p>注意，优化将会更新引导函数参数在参数储存中的值，所以一旦我们找到了好的参数值，我们可以拿从引导函数后验取样重的取样用于后面的任务。</p>
-<p>#下一步<br>在<a href="http://pyro.ai/examples/vae.html" target="_blank" rel="noopener">变分自动编码器</a>的教程中，我们将见到如何使用深度神经网络来增强类似于<code>scale</code>的模型，如何使用随机变分推断来创建图片的生成模型。</p>
+<h1 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h1><p>在<a href="http://pyro.ai/examples/vae.html" target="_blank" rel="noopener">变分自动编码器</a>的教程中，我们将见到如何使用深度神经网络来增强类似于<code>scale</code>的模型，如何使用随机变分推断来创建图片的生成模型。</p>
 
           
         
