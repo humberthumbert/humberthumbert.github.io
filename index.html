@@ -239,6 +239,165 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/14/FNN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/03/14/FNN/" itemprop="url">FNN</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-14T21:23:32+00:00">
+                2020-03-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前情提要：机器学习"><a href="#前情提要：机器学习" class="headerlink" title="前情提要：机器学习"></a>前情提要：机器学习</h1><h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>对于某类任务 T 和性能度量<br>P，一个计算机程序被认为可以从经验 E 中学习是指，通过经验 E 改进后，它在任务 T 上由性能度量 P 衡量的性能有所提升。</p>
+<ul>
+<li>T：指我们想要完成的任务，如分类，回归，合成采样等等</li>
+<li>P：一般指准确率accuarcy</li>
+<li>E：经验，我们的数据集。对于supervised，我们的数据集包含特征和标签。对于unsupervised，只包含特征，学习特征的结构关系，如聚类。</li>
+</ul>
+<h2 id="拟合中的问题"><a href="#拟合中的问题" class="headerlink" title="拟合中的问题"></a>拟合中的问题</h2><p>这过程是我们希望通过学习的方式拟合真实世界中未知的函数，那么因为我们只有有限的数据集，我们一方面希望生成的函数可以贴近真实的函数underfitting（即减少training error），另一方面也希望生成的函数不要太贴合测试集（毕竟只是对真实世界一部分的采样）overfitting，也即希望泛化误差（generalization error）较低。</p>
+<p>我们用测试集来评估泛化误差 $\frac{1}{m^{(test)} }||X^{(test)}w-y^{(test)}||^{2}_{2}$</p>
+<p>我们可以通过调整模型的容量（capacity），一种控制训练算法容量的方法是选择假设空间（hypothesis space），即扩大函数族比如在线性回归中，使用多项式函数替代。</p>
+<p>使用K-fold的方法可以准确度量泛化误差，即每次取 $\frac{N}{K}$ 的数据作为测试集，剩下的其他为训练集，K次的平均误差就是我们要的泛化误差</p>
+<p>均方差也是一个度量方法，<br>$$<br>\begin{align}<br>MSE&amp;=E[(\hat\theta_m-\theta)^2] \<br>&amp;= Bias(\hat\theta_m)^2 + Var(\hat\theta_m)<br>\end{align}<br>$$<br>容量增大时，bias减小，variance增大。</p>
+<h2 id="最大似然估计"><a href="#最大似然估计" class="headerlink" title="最大似然估计"></a>最大似然估计</h2><p>设 $p_{model}(x;\theta)$ 是我们的模型，对应的有个真实的模型 $p_{data}(x)$</p>
+<p>对 $\theta$ 的最大似然估计就是<br>$$<br>\begin{align}<br>\theta_{ML} &amp;= \underset{\theta}{argmax}:p_{model}(\mathbb{X};\theta)\<br>&amp;=\underset{\theta}{argmax}:\prod_{i=1}^{m}p_{model}(x^{(i)};\theta)\<br>&amp;=\underset{\theta}{argmax}:\sum_{i=1}^{m}log:p_{model}(x^{(i)};\theta)\<br>&amp;=\underset{\theta}{argmax}:\mathbb{E}<em>{x \sim \hat{p}</em>{data}} log: p_{model}(x;\theta)<br>\end{align}<br>$$</p>
+<p>那么KL散度<br>$$<br>D_{KL}(\hat{p}<em>{data}||p</em>{model})=\mathbb{E}<em>{x\sim\hat{p}</em>{data}}[log:\hat{p}<em>{data}(x)-log:p</em>{model}(x)]<br>$$<br>又因为 $p_{data}$ 那一项和数据生成无关，所以只需要最小化 $-\mathbb{E}<em>{x\sim\hat{p}</em>{data}}[log:p_{model}(x)]$</p>
+<p>【具体的机器学习算法如PCA, SVM另外一篇文章里再写】</p>
+<h1 id="前馈神经网络Feedforward-Neural-Netweork"><a href="#前馈神经网络Feedforward-Neural-Netweork" class="headerlink" title="前馈神经网络Feedforward  Neural Netweork"></a>前馈神经网络Feedforward  Neural Netweork</h1><p>在机器学习中，我们碰到一个难题，那就是线性模型虽然可以高效且可靠的拟合，但是其能力居现在线性函数之中。<br>为了拓展他，我们使用核kernel来将x变换成非线性。那么如何选择这个核 (\phi) 呢？</p>
+<ol>
+<li>选择一个无限维的 (\phi)。理想状态是只有维度足够高，我们就可以拟合训练集。但是其对测试集的泛化能力不够。</li>
+<li>手动设计 (\phi) ，但是每个任务都需要人工手动，且每个 (\phi) 都只对应那个任务，无法迁移</li>
+<li>而深度学习的策略是去学习 (\phi) 。比如我们有一个模型$y=f(x;\theta,w)=\phi(x;\theta)^{T}w$，我们有两种参数：用于学习 (\phi) 的 (\theta)，和用于将 (\phi(x)) 映射到所需的输出的参数$w$。其中 (\phi) 定义了一个隐藏层。</li>
+</ol>
+<p>深度学习的方法，既有第一种方法中可以拟合训练集的能力，也有第二种方法中，可以人工设计函数族 (\phi(x;\theta)) 的好处，而没必要找到准确的某个函数。</p>
+<p>举例来说，要拟合XOR异或函数 (f(x;W,c,w,b))，我们可以构建一层隐函数。<br>[ f(x;W,c,w,b) = w^T max{0,W^Tx+c}+b]</p>
+<h2 id="基于梯度的学习"><a href="#基于梯度的学习" class="headerlink" title="基于梯度的学习"></a>基于梯度的学习</h2><p>因为神经网络是非线性的，所以其代价函数是非凸的，也就意味着，我们不可能像线性回归或SVM那样保证全局的收敛（也就是找到全局最优解），所以对初始值敏感（即初始点导致我们只能到达局部最优解）。<br>训练算法就是基于使用梯度来使得损失函数下降的各种方法。</p>
+<ul>
+<li><p>Approximation Error:基于 生成函数 $\hat\phi$ 与实际函数 $\phi$ 之间差异产生的误差，可以通过增加层数来减少</p>
+</li>
+<li><p>Estimation Error:由于通过训练集习得损失和实际损失函数之间的误差产生，用更大的数据量可以减少，但如果我们增加更多的层或神经元，反而会引起overfitting</p>
+</li>
+<li><p>Optimisation Error:因为非凸性导致无法达到全局最优解，更多的计算可以降低error</p>
+</li>
+</ul>
+<h3 id="输出单元"><a href="#输出单元" class="headerlink" title="输出单元"></a>输出单元</h3><h4 id="Sigmoid"><a href="#Sigmoid" class="headerlink" title="Sigmoid"></a>Sigmoid</h4><p>用于Bernoulli输出分布的sigmoid<br>$$<br>\hat{y}=\sigma(w^Th+b)<br>$$<br>$\sigma$就是logistic sigmoid，这样我们生成 $\hat{y}$ 服从bernoulli分布 $$</p>
+<p>sigmoid 激活函数在 z 取非常小的负值时会饱和到 0，当 z 取非常大的正值时<br>会饱和到 1。这种情况一旦发生，梯度会变得非常小以至于不能用来学习，无论此时<br>模型给出的是正确还是错误的答案。</p>
+<h4 id="Softmax"><a href="#Softmax" class="headerlink" title="Softmax"></a>Softmax</h4><p>用于Multinoulli输出分布的softmax<br>如果我们的问题不再是二元的（如判断这张图是否是狗），而是分类（如判断这张图属于那种动物），可以使用softmax函数。<br>Softmax是sigmoid的扩展。</p>
+<h3 id="隐藏单元"><a href="#隐藏单元" class="headerlink" title="隐藏单元"></a>隐藏单元</h3><h4 id="Sigmoid-和-tanh"><a href="#Sigmoid-和-tanh" class="headerlink" title="Sigmoid 和 tanh"></a>Sigmoid 和 tanh</h4><p>当 z 取绝对值很大的正值时，它们饱和到一个高值，当 z 取绝对值很大的负值时，它们饱和到一个低值，并且仅仅当 z 接近 0 时它们才对输入强烈敏感。sigmoid 单元的广泛饱和性会使得基于梯度的学习变得非常困难。因为这个原因，现在不鼓励将它们用作前馈网络中的隐藏单元。</p>
+<p>当必须要使用 sigmoid 激活函数时，双曲正切激活函数通常要比 logistic sigmoid 函数表现更好。在 $tanh(0) = 0$ 而 $\sigma(0) = \frac{1}{2}$ 的意义上，它更像是单位函数。</p>
+<h4 id="RELU"><a href="#RELU" class="headerlink" title="RELU"></a>RELU</h4><p>$$g(z) = max{0,z}$$<br>易于优化，梯度大且已知，使用 ReLU得到的SGD的收敛速度会比 sigmoid/tanh 快。这是因为它是linear，而且ReLU只需要一个阈值就可以得到激活值，不用去计算复杂的运算。</p>
+<p>但是训练过程该函数不适应较大梯度输入，因为在参数更新以后，ReLU的神经元不会再有激活的功能，导致梯度永远都是零。</p>
+<h4 id="Leaky-RELU"><a href="#Leaky-RELU" class="headerlink" title="Leaky RELU"></a>Leaky RELU</h4><p>解决了左侧为零的情况，使得负轴的信息不会全部丢失</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/05/Intro-Inference/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -311,6 +470,7 @@
         
           
             <h1 id="Pyro推断介绍"><a href="#Pyro推断介绍" class="headerlink" title="Pyro推断介绍"></a>Pyro推断介绍</h1><p>许多现代的机器学习可以转变为概率推断，继而用像Pyro这样的语言来表达。本章教程的目的，是为一个简单的物理问题创建一个生成模型，使得我们可以用Pyro的推断机制来解决这个问题。不过，我们先来引入本章所需到的模块</p>
+<!-- ore -->
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> pyro</span><br><span class="line"><span class="keyword">import</span> pyro.infer</span><br><span class="line"><span class="keyword">import</span> pyro.optim</span><br><span class="line"><span class="keyword">import</span> pyro.distributions <span class="keyword">as</span> dist</span><br><span class="line"></span><br><span class="line">pyro.set_rng_seed(<span class="number">101</span>)</span><br></pre></td></tr></table></figure>
 
 <h1 id="一个简单的例子"><a href="#一个简单的例子" class="headerlink" title="一个简单的例子"></a>一个简单的例子</h1><p>假设我们想要知道某个物体的重量，但是我们手头上的秤并不可靠，每次称重时我们都会得到稍微不同的结果。我们可以通过整合噪音和对这个物体的重量的已知知识（比如它的密度，或者物质构成）来构建这个变量。下面的模型展示了这个过程：</p>
@@ -701,7 +861,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -714,7 +874,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
