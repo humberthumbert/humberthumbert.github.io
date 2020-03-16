@@ -79,20 +79,25 @@
 
 
 
-<meta name="description" content="数据形式 Cryptographic Hash Functions  输入任意长数据，输出固定长hash，且计算容易 安全性： 防碰撞Collision Resistance:  很难找到一堆x,y满足 $x \neq y$ and $H(x)&#x3D;H(y)$ Second pre-image resistance(more constrained than collision resistance)">
+<meta name="description" content="TxProbe探测nodes之间的拓扑关系，即node A和node B是否连接。从CoinScope中同时给A和B发送txp和txf，然后双花一次txf，记作txm发送给node A，如果两者有通讯，那么txm将会出现在txm的孤儿列表里。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="区块链基础知识">
-<meta property="og:url" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Background/index.html">
+<meta property="og:title" content="区块链隐私">
+<meta property="og:url" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Privacy/index.html">
 <meta property="og:site_name" content="Lifan&#39;s Note">
-<meta property="og:description" content="数据形式 Cryptographic Hash Functions  输入任意长数据，输出固定长hash，且计算容易 安全性： 防碰撞Collision Resistance:  很难找到一堆x,y满足 $x \neq y$ and $H(x)&#x3D;H(y)$ Second pre-image resistance(more constrained than collision resistance)">
+<meta property="og:description" content="TxProbe探测nodes之间的拓扑关系，即node A和node B是否连接。从CoinScope中同时给A和B发送txp和txf，然后双花一次txf，记作txm发送给node A，如果两者有通讯，那么txm将会出现在txm的孤儿列表里。">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Background/Opcode.png">
-<meta property="article:published_time" content="2020-03-16T13:59:05.000Z">
-<meta property="article:modified_time" content="2020-03-16T14:22:19.113Z">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Privacy/TxProbe.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Privacy/StealthAddress1.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Privacy/StealthAddress2.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Privacy/StealthAddress3.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Privacy/BloomFilter.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Privacy/BloomFilter_Structure.png">
+<meta property="article:published_time" content="2020-03-16T17:54:53.000Z">
+<meta property="article:modified_time" content="2020-03-16T19:26:42.632Z">
 <meta property="article:author" content="Lifan Zhao">
 <meta property="article:tag" content="Blockchain">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Background/Opcode.png">
+<meta name="twitter:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Privacy/TxProbe.png">
 
 
 
@@ -122,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Background/"/>
+  <link rel="canonical" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Privacy/"/>
 
 
 
 
 
-  <title>区块链基础知识 | Lifan's Note</title>
+  <title>区块链隐私 | Lifan's Note</title>
   
 
 
@@ -245,7 +250,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Background/">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Privacy/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Lifan Zhao">
@@ -262,7 +267,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">区块链基础知识</h1>
+          <h1 class="post-title" itemprop="name headline">区块链隐私</h1>
         
 
         <div class="post-meta">
@@ -274,7 +279,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T13:59:05+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T17:54:53+00:00">
                 2020-03-16
               </time>
             
@@ -312,79 +317,44 @@
       
 
       
-        <h1 id="数据形式"><a href="#数据形式" class="headerlink" title="数据形式"></a>数据形式</h1><ol>
-<li><p>Cryptographic Hash Functions</p>
+        <h1 id="TxProbe"><a href="#TxProbe" class="headerlink" title="TxProbe"></a>TxProbe</h1><p>探测nodes之间的拓扑关系，即node A和node B是否连接。从CoinScope中同时给A和B发送txp和txf，然后双花一次txf，记作txm发送给node A，如果两者有通讯，那么txm将会出现在txm的孤儿列表里。<br><a id="more"></a><br><img src="/2020/03/16/BlockChain-Privacy/TxProbe.png" alt></p>
+<h1 id="CoinJoin"><a href="#CoinJoin" class="headerlink" title="CoinJoin"></a>CoinJoin</h1><p>Blockchain保护隐私的难点在于：</p>
 <ul>
-<li>输入任意长数据，输出固定长hash，且计算容易</li>
-<li>安全性：<ul>
-<li>防碰撞Collision Resistance:<br>  很难找到一堆x,y满足 $x \neq y$ and $H(x)=H(y)$</li>
-<li>Second pre-image resistance(more constrained than collision resistance)<br>  对于x，很难找到一个y，满足：$x \neq y$ and $H(x) = H(y)$</li>
-<li>Pre-image resistance<br>  对于任意h，在hash函数的输出中，很难找到对应的x，即 $H(x)=h$</li>
-<li>Hiding<br>  当从高低熵概率分布中选择一个秘密值r，再有 $H(r||x)$ 的结果，我们很难找到对应的x，这样的情况下我们可以说hash函数H是hiding<br>  就是说，对密码加hash H和salt r，这样即使有人黑了数据库知道了加密后的密码，也无法倒推出我们的原来的密码</li>
-<li>Puzzle-friendly<br>  对于一个输出n个字节h值的哈希函数H，如果选择一个k，那么他应该很难在$2^n$时间内找到一个x使得$H(k||x)=h$<br>  就是说最佳方法是brute force，使得挖矿变得可能<br>  A solution to the puzzle is a value x, s.t. $H(id||x) \in Y$</li>
+<li>Linkability</li>
+<li>Traceability</li>
 </ul>
-</li>
-</ul>
-</li>
-<li><p>Markle Tree</p>
-<ul>
-<li>比如有四组Transaction，Hash每个Transcation得到4个hash值，两两hash得到两个hash值，最后再hash一次，得到Merkle Root。<ul>
-<li>如果有奇数的，则自己和自己组hash</li>
-</ul>
-</li>
-<li>如果一个Transcation变动，那么Merkle root会变</li>
-<li>可以通过O(log(n))时间找到变动的地方</li>
-<li>Simple Payment Verification目的是用户不需要下载所有交易部分，只需要有header就可以</li>
-<li>步骤如下，假设有Transcation T_k要验证<br>  1) H_k = Hash(T_k)<br>  2) 节点从区块链网络上获取最长链的Header<br>  3) 从区块链获取带验证支付对应的Merkle tree哈希认证路径<br>  4) 从认证路径，与H_k一起重新计算Hash<br>  5) 如果最后结果与Root相同则支付有效。</li>
-</ul>
-</li>
-</ol>
-<pre><code>![](BlockChain-Background/MerkleTree.png)
-要验证HK，则需要知道HL、HIJ、HMNOP 和 HABCDEFGH
-</code></pre><ol>
-<li>Elliptic Curve Signature Algorithm(ECDSA)<ul>
-<li>用来对transaction签名</li>
-<li>验证Transaction的签名</li>
-</ul>
-</li>
-</ol>
-<h1 id="地址"><a href="#地址" class="headerlink" title="地址"></a>地址</h1><ul>
-<li>唯一身份</li>
-<li>公钥的Hash</li>
-<li>0 &lt; Balance &lt; 21 Million Bitcoin</li>
-<li>1 Satoshi == $10^{-8}$ Bitcoin</li>
-<li>地址的第一位表示需要几个秘钥来</li>
-</ul>
-<h1 id="交易Transaction"><a href="#交易Transaction" class="headerlink" title="交易Transaction"></a>交易Transaction</h1><p>当Alice将她拥有的一个比特币发送0.25个比特币给Bob时，0.25个BTC将会有一个新的地址，而Alice剩下的0.75个BTC的地址也会改变。</p>
-<p>$\sum inputs \geq \sum outputs$ 大于等于是因为中间会收取一定的费用给矿工。</p>
-<h2 id="比特币脚本Scripts"><a href="#比特币脚本Scripts" class="headerlink" title="比特币脚本Scripts"></a>比特币脚本<a href="https://happypeter.github.io/binfo/bitcoin-scripts" target="_blank" rel="noopener">Scripts</a></h2><p><img src="/2020/03/16/BlockChain-Background/Opcode.png" alt></p>
-<ul>
-<li>Stack based programming language，即根据opcode，对stack顶的数据进行计算，这样增快了速度</li>
-<li>如果验证为真，则交易是正确的</li>
-<li>用许多操作码来减少时间，防止DoS攻击</li>
-</ul>
-<h1 id="Transcation的种类"><a href="#Transcation的种类" class="headerlink" title="Transcation的种类"></a>Transcation的种类</h1><ul>
-<li>P2PKH Pay to Public Key Hash如上图所示</li>
-<li>P2SH Pay to Script Hash</li>
-<li>Multisignature(m-n)</li>
-</ul>
-<h2 id="Block"><a href="#Block" class="headerlink" title="Block"></a>Block</h2><p>由Header和List of transactions组成</p>
-<p>Header以下这些组成</p>
+<p>所以CoinJoin把两个同时发生的交易合并了起来，再重新按比发送给接受者。<br>问题：</p>
 <ol>
-<li>版本信息</li>
-<li>上一个block的header的hash，</li>
-<li>merkle root</li>
-<li>Unix时间戳</li>
-<li>Target（代表挖矿的难度）</li>
-<li>Nonce</li>
+<li>需要信任的第三方来完成混合</li>
+<li>很难同时发生两笔交易</li>
+<li>因为价格不能隐藏，两笔混合的交易数量可能被倒推出来</li>
+<li>参与的人只有两组，50对50的几率</li>
 </ol>
-<h1 id="如何挖矿"><a href="#如何挖矿" class="headerlink" title="如何挖矿"></a>如何挖矿</h1><ol>
-<li>加入网络，监听交易，验证所有进来的交易tx，并收集成List of tx</li>
-<li>监听新的block，区块连会每隔多少时间自动生成一个新的区块<br> 其中包含前一个区块头的hash，交易的merkle root，和一个target<br> 这个target控制挖矿难度，每隔固定周期会调整target是他不会太难或太易</li>
-<li>建立Block模版，即创建header</li>
-<li>找到一个Nonce，使其满足条件<br> Hash( Hash(prev_block_header) | txs | N ) &lt; target，只能brute force</li>
-<li>告诉其他的矿工 gossip P2P</li>
-<li>接受奖励</li>
+<h1 id="Stealth-Address"><a href="#Stealth-Address" class="headerlink" title="Stealth Address"></a>Stealth Address</h1><p>比如说你是一家店的老板，你选择收取比特币，但是如果大家都直接打钱给你的账户，那么大家都知道你的账户且知道你每天赚了多少钱。</p>
+<p>当然你可以通过开很多账户的方式来收钱，但是你太懒了。所以可以用Stealth Address，也就是你可以生成两个私钥，一个spend key，一个scan key，组成一个stealth address：scan_pubkey(spend_pubkey)给客户，你的客户在随机生成一个私钥ephem_key和公钥ephem_pubkey，用ephem_pubkey(scan_pubkey(spend_pubkey))生成Stealth_Pubkey给你。同时还有ephem_key传给你。</p>
+<p><img src="/2020/03/16/BlockChain-Privacy/StealthAddress1.png" alt></p>
+<p>于是当是收到了Stealth_Pubkey了以后，可以用ephem_key,scan_key,stealth_address得到bitcoin_address。</p>
+<p><img src="/2020/03/16/BlockChain-Privacy/StealthAddress2.png" alt></p>
+<p>有了bitcoin_address后，再用spend_key就可以花出去了。</p>
+<p><img src="/2020/03/16/BlockChain-Privacy/StealthAddress3.png" alt></p>
+<h1 id="LightWeight-Client’s-Privacy"><a href="#LightWeight-Client’s-Privacy" class="headerlink" title="LightWeight Client’s Privacy"></a>LightWeight Client’s Privacy</h1><h2 id="Bloom-Filter"><a href="#Bloom-Filter" class="headerlink" title="Bloom Filter"></a>Bloom Filter</h2><p>轻量客户端的存在是为了让普通用户不用像全节点那样，记录上百GB的数据。同时，每天有那么多交易，我们也不希望全部监听这么多交易信息，我们当然可以把自己的地址告诉节点，让节点在只接受到发给我自己地址的消息时才发送。但是这样的话节点或者其他黑客就能知道我的地址，为了我的隐私，如何让节点既能只告知我们需要的信息，又不让节点知道这些地址对应着我呢？</p>
+<p><img src="/2020/03/16/BlockChain-Privacy/BloomFilter.png" alt></p>
+<p>Bloom Filter针对每个输入的address，做加密哈希，这样他们就会映射在长度为n的一串bits上，并把位上的bit翻转成1。</p>
+<p>那么在验证某个address时，只要同样做加密哈希，如果有映射的位上bit为零，则这个address一定不在。而如果得到的bits全部为1，我们只能说可能存在在我们的输入中。我们在创造Bloom Filter时需要输入一个False Positive Rate(FPR)，保证不会有太多的错误address被判断正确的。</p>
+<p><img src="/2020/03/16/BlockChain-Privacy/BloomFilter_Structure.png" alt></p>
+<p>于是我们自己的SPV client创建了Bloom Filter把我们自己的addresses输入进去，然后发给全节点。在全节点中，记录着所有的地址。如果在全节点端，有黑客试图搞清我们的地址，他有全部的地址和我们的Bloom Filter，那么他可以通过暴力方法得到所有True Positive和False Positive的地址，但他不能辨别。这样我们的地址就被保护了起来。</p>
+<h3 id="Stair-Stepping阶梯"><a href="#Stair-Stepping阶梯" class="headerlink" title="Stair Stepping阶梯"></a>Stair Stepping阶梯</h3><p>随着越加越多的address， bloom filter需要扩容，否则就无法满足我们设定的FPR。但我们不想每加一个就扩容一次，所以一般定在每增加五十个就扩容一次。</p>
+<p>这就导致了另一个问题，在每次扩容的开始，我们实际的FPR比设定的FPR要小。已知FPR是我们保护隐私的关键，如果FPR变小，那么意味着保护变弱。</p>
+<h3 id="Resizing扩容-Restarting重启"><a href="#Resizing扩容-Restarting重启" class="headerlink" title="Resizing扩容 Restarting重启"></a>Resizing扩容 Restarting重启</h3><p>当扩容或者刷新hash的种子时，我们需要重新设计filter，我们输入的address会被重新映射，但是这个新的filter和旧的filter将产生不一样的false positive例子。比如Space:{@1,@2,@3,@4,@5,@6}有输入: {@1,@2,@3}, 旧的Positive{@1,@2,@3,@4,@5}, 新的False Positive{@1,@2,@3,@5,@6}，那么我们就可以知道@4和@6是错误的，从而缩小了Positive的范围。</p>
+<h3 id="Multi-Filters"><a href="#Multi-Filters" class="headerlink" title="Multi Filters"></a>Multi Filters</h3><p>使用多个filters的情况，我们可以得到多组positive的address，在取交集过后也可以判断某些address是false positive，交集是true positive</p>
+<h3 id="应该做的"><a href="#应该做的" class="headerlink" title="应该做的"></a>应该做的</h3><ol>
+<li>Constant FPR</li>
+<li>不要更新seed</li>
+<li>不要使用不同参数的Multiple Filters</li>
+</ol>
+<h2 id="可行的方案"><a href="#可行的方案" class="headerlink" title="可行的方案"></a>可行的方案</h2><ol>
+<li>VPN</li>
+<li>预先设置100个address，直接输入到Bloom Filter，然后慢慢使用其中的一个或者多个address。当不够时，再生成另外100个address，生成另外一个Bloom Filter交给node。避免了stair stepping和resizing</li>
 </ol>
 
       
@@ -416,8 +386,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/03/16/GAN/" rel="next" title="从VAE到GAN">
-                <i class="fa fa-chevron-left"></i> 从VAE到GAN
+              <a href="/2020/03/16/BlockChain-Background/" rel="next" title="区块链基础知识">
+                <i class="fa fa-chevron-left"></i> 区块链基础知识
               </a>
             
           </div>
@@ -425,10 +395,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/03/16/BlockChain-Privacy/" rel="prev" title="区块链隐私">
-                区块链隐私 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -555,7 +521,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#数据形式"><span class="nav-number">1.</span> <span class="nav-text">数据形式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#地址"><span class="nav-number">2.</span> <span class="nav-text">地址</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#交易Transaction"><span class="nav-number">3.</span> <span class="nav-text">交易Transaction</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#比特币脚本Scripts"><span class="nav-number">3.1.</span> <span class="nav-text">比特币脚本Scripts</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Transcation的种类"><span class="nav-number">4.</span> <span class="nav-text">Transcation的种类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Block"><span class="nav-number">4.1.</span> <span class="nav-text">Block</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何挖矿"><span class="nav-number">5.</span> <span class="nav-text">如何挖矿</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TxProbe"><span class="nav-number">1.</span> <span class="nav-text">TxProbe</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CoinJoin"><span class="nav-number">2.</span> <span class="nav-text">CoinJoin</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Stealth-Address"><span class="nav-number">3.</span> <span class="nav-text">Stealth Address</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LightWeight-Client’s-Privacy"><span class="nav-number">4.</span> <span class="nav-text">LightWeight Client’s Privacy</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Bloom-Filter"><span class="nav-number">4.1.</span> <span class="nav-text">Bloom Filter</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Stair-Stepping阶梯"><span class="nav-number">4.1.1.</span> <span class="nav-text">Stair Stepping阶梯</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Resizing扩容-Restarting重启"><span class="nav-number">4.1.2.</span> <span class="nav-text">Resizing扩容 Restarting重启</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Multi-Filters"><span class="nav-number">4.1.3.</span> <span class="nav-text">Multi Filters</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应该做的"><span class="nav-number">4.1.4.</span> <span class="nav-text">应该做的</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可行的方案"><span class="nav-number">4.2.</span> <span class="nav-text">可行的方案</span></a></li></ol></li></ol></div>
             
 
           </div>
