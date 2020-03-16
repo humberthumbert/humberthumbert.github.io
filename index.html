@@ -239,6 +239,130 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/03/16/BlockChain-SmartContract/" itemprop="url">区块链：智能合约</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T22:08:03+00:00">
+                2020-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>希望完成一些合约（操作内容大于等于交易），但不借助第三方的力量。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/03/16/BlockChain-SmartContract/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Privacy/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -500,14 +624,60 @@
 <li>Target（代表挖矿的难度）</li>
 <li>Nonce</li>
 </ol>
-<h1 id="如何挖矿"><a href="#如何挖矿" class="headerlink" title="如何挖矿"></a>如何挖矿</h1><ol>
-<li>加入网络，监听交易，验证所有进来的交易tx，并收集成List of tx</li>
+<h1 id="挖矿"><a href="#挖矿" class="headerlink" title="挖矿"></a>挖矿</h1><h2 id="如何挖矿"><a href="#如何挖矿" class="headerlink" title="如何挖矿"></a>如何挖矿</h2><ol>
+<li>加入网络，监听交易，验证所有进来的交易tx，并收集成List of transcation</li>
 <li>监听新的block，区块连会每隔多少时间自动生成一个新的区块<br> 其中包含前一个区块头的hash，交易的merkle root，和一个target<br> 这个target控制挖矿难度，每隔固定周期会调整target是他不会太难或太易</li>
 <li>建立Block模版，即创建header</li>
 <li>找到一个Nonce，使其满足条件<br> Hash( Hash(prev_block_header) | txs | N ) &lt; target，只能brute force</li>
 <li>告诉其他的矿工 gossip P2P</li>
 <li>接受奖励</li>
 </ol>
+<p>因为现在很难靠自己一个人算出结果，所以大家一般都加入一个矿池，Pool Operator按每个人的算力贡献分配所得的。</p>
+<h2 id="Mining-Difficulty-in-Pooling"><a href="#Mining-Difficulty-in-Pooling" class="headerlink" title="Mining Difficulty in Pooling"></a>Mining Difficulty in Pooling</h2><p>Bitcoin Difficulty: Hash(Hash(B3) | txs | N) &lt; Target = 0x000**</p>
+<p>Pool Difficulty: Hash(Hash(B3) | txs | N) &lt; target = 0x00**</p>
+<p>把任务分配给每个矿工，每个矿工的t &lt;&lt; T，难度远小于正常的T</p>
+<h2 id="Merge-Mining"><a href="#Merge-Mining" class="headerlink" title="Merge Mining"></a>Merge Mining</h2><p>如果两种区块链都用了相同的PoW，那么弱的那方（因为参加挖矿的人数不多，所以target比较简单）很容易被大区块链中的矿工池所控制。</p>
+<p>比如Namecoin是对Bitcoin添加了DNS的一个链，其本质算法与Bitcoin相同。那么Bitcoin的矿工计算得到一个随机数，如果随机数满足Namecoin的难度值（Namecoin的难度值一般情况肯定比bitcoin小，或者相等），Namecoin挖矿成功，打包交易成区块，然后上链；</p>
+<p>如果随机数同时满足Bitcoin的难度值，bitcoin挖矿成功，打包交易上链（注意是bitcoin的区块链，bitcoin与namecoin拥有自己独立的区块链）。</p>
+<p>好处：可以利用算力</p>
+<p>缺点：</p>
+<ul>
+<li>方便了黑客</li>
+<li>弱方的链可能不会被validate</li>
+</ul>
+<h2 id="矿池的潜在危害"><a href="#矿池的潜在危害" class="headerlink" title="矿池的潜在危害"></a>矿池的潜在危害</h2><ul>
+<li>可以决定那些transcation添加入blockchain</li>
+<li>可以影响transcation fee或者gas price</li>
+<li>可以相互协作达到51%攻击</li>
+<li>影响PoS的投票机制</li>
+</ul>
+<p>所以要去中心化矿池<br>Bitcoin的方法：P2Pool，重新建一个share链，每个人算shared block，当算到正确解时，发钱。</p>
+<p>Efficiency：A share is set to be found every 30 seconds. The more miners, the higher payout variance</p>
+<p>Security: Many orphan shares (due to short block time) Small P2Pools have weak security. Need to incentivize block submission and validation</p>
+<p>Ethereum的方法：SmartPool</p>
+<h1 id="Fork"><a href="#Fork" class="headerlink" title="Fork"></a>Fork</h1><h2 id="Hard-Fork"><a href="#Hard-Fork" class="headerlink" title="Hard Fork"></a>Hard Fork</h2><p>之前所有的不符合新标准的block都会合规，符合的变不合规。增加了functionality<br>所有的节点都需要升级到最新版本</p>
+<h2 id="Soft"><a href="#Soft" class="headerlink" title="Soft"></a>Soft</h2><p>只有之前合规的block变成不合规，减少了functionality<br>以前的block仍可以用。<br>    比如进阶到了P2SH</p>
+<p><img src="/2020/03/16/BlockChain-Background/Fork.png" alt></p>
+<h1 id="Segregated-Witness-Segwit"><a href="#Segregated-Witness-Segwit" class="headerlink" title="Segregated Witness(Segwit)"></a>Segregated Witness(Segwit)</h1><p>把签名和脚本放到witness block中，链中只保存sender，reciver和value</p>
+<p>好处：</p>
+<ol>
+<li>可以扩容到4mb而不需要hard fork，</li>
+<li>同时也解决了malleable的问题，<br> 即Bob可以改变上一个Alice与Bob的未提交的交易Tx，即改变其 signature，使得Tx不成立，那么Bob和Charlie之间的交易Tx+1，根据UTXO就会不成立，如果Charlie已经给Bob物品，那么就会有损失。</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>Signatures required to validate a block,</li>
+<li>Complex</li>
+</ol>
+<h1 id="用户分类"><a href="#用户分类" class="headerlink" title="用户分类"></a>用户分类</h1><ul>
+<li>Full Node保存了所有的记录的节点</li>
+<li>Miner矿工</li>
+<li>Light Node用户<ul>
+<li>因为不全，所以使用SPV</li>
+<li>小，可以PoW，可以跟全连。</li>
+</ul>
+</li>
+</ul>
 
           
         
@@ -1361,7 +1531,7 @@ label &=  \underset{k}{arg\:max}\;p(C_k|x)\\\\
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

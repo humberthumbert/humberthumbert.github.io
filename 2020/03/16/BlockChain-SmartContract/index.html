@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Blockchain," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="起因希望完成一些合约（操作内容大于等于交易），但不借助第三方的力量。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="区块链：智能合约">
+<meta property="og:url" content="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/index.html">
+<meta property="og:site_name" content="Lifan&#39;s Note">
+<meta property="og:description" content="起因希望完成一些合约（操作内容大于等于交易），但不借助第三方的力量。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/P2PKSH.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/UTXO.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/ETH_transcation.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/ETH_Detail1.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/ETH_Detail2.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/ETH_Detail3.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/ETH_Detail4.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/ETH_function.png">
+<meta property="article:published_time" content="2020-03-16T22:08:03.000Z">
+<meta property="article:modified_time" content="2020-03-16T23:01:51.797Z">
+<meta property="article:author" content="Lifan Zhao">
+<meta property="article:tag" content="Blockchain">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/P2PKSH.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/"/>
+
+
+
+
+
+  <title>区块链：智能合约 | Lifan's Note</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Lifan's Note</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">区块链：智能合约</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T22:08:03+00:00">
+                2020-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>希望完成一些合约（操作内容大于等于交易），但不借助第三方的力量。</p>
+<a id="more"></a>
+<h1 id="Bitcoin"><a href="#Bitcoin" class="headerlink" title="Bitcoin"></a>Bitcoin</h1><p>见<a href="https://humberthumbert.github.io/2020/03/16/BlockChain-Background/#%E6%AF%94%E7%89%B9%E5%B8%81%E8%84%9A%E6%9C%ACScripts">上文</a></p>
+<p>如P2PKSH<br><img src="/2020/03/16/BlockChain-SmartContract/P2PKSH.png" alt></p>
+<p>Bitcoin都是直接使用Opcode来保证速度，他是图灵不完整的。不如直接有一个语言可以来编程。</p>
+<h1 id="Namecoin"><a href="#Namecoin" class="headerlink" title="Namecoin"></a>Namecoin</h1><p>Bitcoin的第一个分支，增加了三个Opcodes</p>
+<ol>
+<li>NAME_NEW: Hash(random_nonce, ‘your_domain_name’)<br>记录你的域名，绑定你的域名和你的私钥<ul>
+<li>加nonce是就是加salt</li>
+<li>加Hash是为了防止有人可以直接知道你的domain name进而顶替你update</li>
+</ul>
+</li>
+<li>NAME_FIRST_UPDATE: random_nonce, ‘your_domain_name’, {‘ip’: ‘234.22.34.23’}</li>
+<li>NAME_UPDATE: random_nonce, ‘your_domain_name’, {‘ip’: “new ip address”}</li>
+</ol>
+<p>问题：</p>
+<ul>
+<li>为什么要先有第一步而不可以直接做第二步：<br>  因为第二步中domain name是明文，这个transcation所有人都可以看到，那么别人就可以抢注你的域名（因为矿工会根据手续费的高低安排先后顺序）<br>所以这么做就是commit-reveal的protocol</li>
+<li>在第一步和第二步之间有什么要考虑的？<br>需要等待12个block来让矿工完成你的注册，以防止提前公布你的域名，而导致被抢注</li>
+</ul>
+<p>出现的问题：<br>绑定但不注册的现象很严重，需要调整注册费</p>
+<p>NameCoin提供给我们可以在区块链中实现账户的概念</p>
+<h1 id="Unspent-Transcation-Output"><a href="#Unspent-Transcation-Output" class="headerlink" title="Unspent Transcation Output"></a>Unspent Transcation Output</h1><p><img src="/2020/03/16/BlockChain-SmartContract/UTXO.png" alt></p>
+<p>Bitcoin中有两种交易，一种是直接奖励给矿工的tx，另一种是普通用户之间的转账。因为一个BTC是不可分割的，引入UTXO来实现小额交易，同时也能防止双花攻击。即每一个交易的结果都是UTXO，一对一，一对多，多对一，多对多都可能发生。<br>其次，如同上文<a href="https://humberthumbert.github.io/2020/03/16/BlockChain-Background/交易Transaction">Transaction</a>一节中所说的，当一个UTXO被花出去时，它自身也会变成一个新的UTXO。比如，在一个TX中，Alice知道自己有0.75BTC，想要给Bob交易0.5BTC，Bob会得到一个0.5BTC的UTXO，而剩下的0.15BTC就是在一个新的UTXO中属于Alice。</p>
+<p>如果要验证这个tx是否合格，那么需要回溯到最早的UTXO即奖励矿工的UTXO，然后将其分化出的各个UTXO的input value（在每个UTXO中，找零给那个人的UTXO就是unspent）相加，再将所有的output value相加，如果两者相减大于等于手续费时则合格。</p>
+<p><img src="/2020/03/16/BlockChain-SmartContract/ETH_transcation.png" alt></p>
+<p>输入：</p>
+<ol>
+<li>上一笔交易的输出方便回溯到之前的UTXO</li>
+<li>解锁脚本是用私钥对上一笔交易的输出加密<Sig>，</Sig></li>
+<li>并加上共钥<Pubkey>，即构造成P2SH形式（同上），矿工可以验证上一笔交易的确属于发送者</Pubkey></li>
+</ol>
+<p>优点是</p>
+<ol>
+<li>计算是在链外的，交易本身既是结果也是证明。节点只做验证即可，不需要对交易进行额外的计算，也没有额外的状态存储。交易本身的输出 UTXO 的计算是在钱包完成的，这样交易的计算负担完全由钱包来承担，一定程度上减少了链的负担。</li>
+<li>除 Coinbase 交易外，交易的 Input 始终是链接在某个 UTXO 后面。交易无法被重放，并且交易的先后顺序和依赖关系容易被验证，交易是否被消费也容易被举证。<br>UTXO 模型是无状态的，更容易并发处理。</li>
+<li>对于 P2SH 类型的交易，具有更好的隐私性。交易中的 Input 是互不相关联的，可以使用 CoinJoin 这样的技术，来增加一定的隐私性。</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>无法实现一些比较复杂的逻辑，可编程性差。对于复杂逻辑，或者需要状态保存的合约，实现难度大，且状态空间利用率比较低。</li>
+<li>当 Input 较多时，见证脚本也会增多。而签名本身是比较消耗 CPU 和存储空间的。</li>
+</ol>
+<h1 id="State-Machines"><a href="#State-Machines" class="headerlink" title="State Machines"></a>State Machines</h1><p>因为在UTXO中我们要余额的话需要回溯整个交易链来计算，同时不支持余额使得每个用户没有账户可言，阻止了向可编程货币的发展。<br>EVM引入了状态机，即在每次transaction后记录state并commit，<br>比如上面的例子，</p>
+<ol>
+<li>A有4个BTC，那么起始阶段 state: {A:4}</li>
+<li>A给B 0.25个BTC，那么经过这个TX state: {A:3.75, B:0.25}</li>
+</ol>
+<p>注意到我们没有了UTXO的回溯机制，如何防止双花攻击呢？<br>引入了nonce，在每次交易后nonce加1。矿工检验交易顺序，如果已有nonce=4，再再次出现nonce=4的交易则为双花。</p>
+<p>这样做的好处：不用回溯所有交易，两个state之间的交易可以快速计算，light client可以快速同步了</p>
+<h1 id="Replicated-State-Machine"><a href="#Replicated-State-Machine" class="headerlink" title="Replicated State Machine"></a>Replicated State Machine</h1><ul>
+<li>Set of possible states: S</li>
+<li>Set of possible inputs: I</li>
+<li>Set of possible outputs: O</li>
+<li>Transition function $f: S \times I \rightarrow S \times O$</li>
+<li>Start state s $\in$ S (genesis block)</li>
+</ul>
+<h1 id="Ethereum"><a href="#Ethereum" class="headerlink" title="Ethereum"></a>Ethereum</h1><h2 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h2><p>State是Account，包括以下信息<br><img src="/2020/03/16/BlockChain-SmartContract/ETH_Detail1.png" alt></p>
+<p>Input就是每个transcation，包括以下信息<br><img src="/2020/03/16/BlockChain-SmartContract/ETH_Detail2.png" alt></p>
+<p><img src="/2020/03/16/BlockChain-SmartContract/ETH_Detail3.png" alt></p>
+<p>最后的区块链如下</p>
+<p><img src="/2020/03/16/BlockChain-SmartContract/ETH_Detail4.png" alt></p>
+<p>其中state root是state组成的merkle patricia tree，transaction root也是。即非满merkle tree，这是因为EVM允许smart contracct来做交易以外的其他操作。</p>
+<p>在Ethereum中，有两种账户，account和contract，他们不同之处在于：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">Account</th>
+<th style="text-align:left">Contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Address</td>
+<td style="text-align:left">Hash(pubkey)</td>
+<td style="text-align:left">Hash(creator,nounce)</td>
+</tr>
+<tr>
+<td style="text-align:left">Code</td>
+<td style="text-align:left">$\emptyset$</td>
+<td style="text-align:left">EVM code</td>
+</tr>
+<tr>
+<td style="text-align:left">Storage</td>
+<td style="text-align:left">$\emptyset$</td>
+<td style="text-align:left">Merkle Storage Root</td>
+</tr>
+<tr>
+<td style="text-align:left">Balance</td>
+<td style="text-align:left">ETH Balance</td>
+<td style="text-align:left">ETH Balance</td>
+</tr>
+<tr>
+<td style="text-align:left">Nonce</td>
+<td style="text-align:left">发送过的交易tx数量</td>
+<td style="text-align:left">发送过的交易tx数量</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="Transaction种类："><a href="#Transaction种类：" class="headerlink" title="Transaction种类："></a>Transaction种类：</h2><p><img src="/2020/03/16/BlockChain-SmartContract/ETH_function.png" alt></p>
+<ul>
+<li>create: 创建合约</li>
+<li>send: 发送以太币</li>
+<li>call: 使用合约</li>
+</ul>
+<h2 id="以太币内存"><a href="#以太币内存" class="headerlink" title="以太币内存"></a>以太币内存</h2><ul>
+<li>Storage: ${\{0,1\}}^{256} —&gt; {\{0,1\}}^{256}$ map (permanent)</li>
+<li>Memory: ${\{0,1\}}^{256} —&gt; {\{0,1\}}^{256}$ map (volatile)</li>
+<li>Storage很贵，Memory限制在256bit</li>
+</ul>
+<h2 id="Gas"><a href="#Gas" class="headerlink" title="Gas"></a>Gas</h2><p>相当于Bitcoin的Transaction Fee</p>
+<ul>
+<li>根据opcode计算基本的gas cost</li>
+<li>限制计算量和防止DOS攻击</li>
+<li>矿工根据Gas Price选择做哪些交易</li>
+<li>较高优先</li>
+<li>每个Block的有Gas Limit上限</li>
+<li>Gas不够会终止执行</li>
+</ul>
+<p>如果GAS_LIMIT ⨉ GAS_PRICE &gt; accounts[from].balance,那么终止</p>
+<p>如果终止，state返回到最初，但是钱还是花了的</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Blockchain/" rel="tag"># Blockchain</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/16/BlockChain-Privacy/" rel="next" title="区块链隐私">
+                <i class="fa fa-chevron-left"></i> 区块链隐私
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Lifan Zhao" />
+            
+              <p class="site-author-name" itemprop="name">Lifan Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#起因"><span class="nav-number">1.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Bitcoin"><span class="nav-number">2.</span> <span class="nav-text">Bitcoin</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Namecoin"><span class="nav-number">3.</span> <span class="nav-text">Namecoin</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Unspent-Transcation-Output"><span class="nav-number">4.</span> <span class="nav-text">Unspent Transcation Output</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#State-Machines"><span class="nav-number">5.</span> <span class="nav-text">State Machines</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Replicated-State-Machine"><span class="nav-number">6.</span> <span class="nav-text">Replicated State Machine</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Ethereum"><span class="nav-number">7.</span> <span class="nav-text">Ethereum</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#细节"><span class="nav-number">7.1.</span> <span class="nav-text">细节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Transaction种类："><span class="nav-number">7.2.</span> <span class="nav-text">Transaction种类：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#以太币内存"><span class="nav-number">7.3.</span> <span class="nav-text">以太币内存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gas"><span class="nav-number">7.4.</span> <span class="nav-text">Gas</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lifan Zhao</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>
