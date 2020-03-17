@@ -239,6 +239,351 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Scaling/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/03/16/BlockChain-Scaling/" itemprop="url">区块链扩容</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T23:52:43+00:00">
+                2020-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Off-Chain-Transcation"><a href="#Off-Chain-Transcation" class="headerlink" title="Off Chain Transcation"></a>Off Chain Transcation</h1>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Security/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/03/16/BlockChain-Security/" itemprop="url">区块链安全</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T23:47:32+00:00">
+                2020-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><img src="/2020/03/16/BlockChain-Security/Overview.png" alt></p>
+<h1 id="Layer-0"><a href="#Layer-0" class="headerlink" title="Layer 0"></a>Layer 0</h1><h2 id="日蚀攻击Eclipse-Attack"><a href="#日蚀攻击Eclipse-Attack" class="headerlink" title="日蚀攻击Eclipse Attack"></a>日蚀攻击Eclipse Attack</h2><p><img src="/2020/03/16/BlockChain-Security/EclipseAttack.png" alt><br>黑客通过僵尸网络把你孤立了起来，然后让你重启，这样就可以实现DoS攻击，和双花</p>
+<p>但是这个攻击要求太高</p>
+<h2 id="Request-Timeouts"><a href="#Request-Timeouts" class="headerlink" title="Request Timeouts"></a>Request Timeouts</h2><p><img src="/2020/03/16/BlockChain-Security/Timeout.png" alt><br>如果黑客只发送Hash给节点，但节点求Block后黑客就不反回任何值，这个节点需要等到timeout才能进行下一个交易。</p>
+<p>如果有足够多的僵尸网络给节点发Hash且不回复，那么就形成了DoS攻击。或者重复发送同一个Hash，也不回复。</p>
+<h3 id="Transaction-Timeout"><a href="#Transaction-Timeout" class="headerlink" title="Transaction Timeout"></a>Transaction Timeout</h3><ol>
+<li>成为第一个发送这个transaction的人<ul>
+<li>如何成为第一人？：增加攻击者的连接数</li>
+</ul>
+</li>
+<li>节点会有timeout机制<br> 对于Transaction：FIFO机制，所有把我们自己全进去</li>
+</ol>
+<h3 id="Block-Time"><a href="#Block-Time" class="headerlink" title="Block Time"></a>Block Time</h3><p>对于Block：因为等待二十分钟后断开连接</p>
+<ul>
+<li>受害者的要求<ol>
+<li>不能接收到Header</li>
+<li>不能接收到version消息(两个节点相互交流，告知对方自己到了多少Block了，如果有差异就请求对方发送给自己所缺的header)</li>
+</ol>
+</li>
+<li>攻击者的要求：<ol>
+<li>第一个返回block的人</li>
+<li>不让受害者接收到其他的peer消息</li>
+</ol>
+</li>
+</ul>
+<p><img src="/2020/03/16/BlockChain-Security/BlockTimeOut.png" alt></p>
+<p>黑客可以找准一个时刻，当受害者没有接到到B+1的时候，发送给他这个B+1的hash，然后就不管他了。然后在第一个timeout结束前，再发送B+2的hash。因为这个较短的时间段，使得受害者无法接收到其他peer发送的version消息。这样循环，受害者就不能动了。</p>
+<p>如果黑客选择在B+2的timeout结束前停手，那么受害者第一个接受到的是B+3的hash，然后是B+2，最后才是B+1，也就是说他还是得等足时间才能从被攻击走出。</p>
+<h3 id="实际操作：双花"><a href="#实际操作：双花" class="headerlink" title="实际操作：双花"></a>实际操作：双花</h3><h4 id="0-Confirmation-Transaction"><a href="#0-Confirmation-Transaction" class="headerlink" title="0 Confirmation Transaction"></a>0 Confirmation Transaction</h4><ol>
+<li>黑客在Bitcoin Network发送了TXd，TXd是TXl的双花。然后他悄悄地在别人之前发送了TXd的hash给商家</li>
+<li>然后黑客不给商家发送TXd这个transcation，形成timeout，这样Bitcoin Network也就联系不上商家。</li>
+<li>黑客去店里，付钱TXl买了杯咖啡，如果这个商家<strong>不检查（0 confirmation）</strong> 就提供了服务，那么只有攻击结束时，他发给Bitcoin Network才知道被骗。<h4 id="1-Confirmation-Transaction"><a href="#1-Confirmation-Transaction" class="headerlink" title="1 Confirmation Transaction"></a>1 Confirmation Transaction</h4></li>
+</ol>
+<p><img src="/2020/03/16/BlockChain-Security/DoubleSpend.png" alt></p>
+<h3 id="如何加强防范"><a href="#如何加强防范" class="headerlink" title="如何加强防范"></a>如何加强防范</h3><ul>
+<li>动态的timeout间隔</li>
+<li>处理transcation传播：<ul>
+<li>过滤IP地址</li>
+<li>随机选择谁送的hash</li>
+</ul>
+</li>
+<li>更新Block传播：<ul>
+<li>广播header而不是Hash，这样就可以验证了</li>
+<li>记录Block的传播者，重复出现可能有问题。</li>
+</ul>
+</li>
+</ul>
+<h1 id="Layer-1"><a href="#Layer-1" class="headerlink" title="Layer 1"></a>Layer 1</h1><p>关键在于共识机制。<br>不同的区块链的PoW不同在两个方面：</p>
+<ul>
+<li>Block Generation</li>
+<li>Block Size</li>
+</ul>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">Bitcoin</th>
+<th style="text-align:left">Ethereum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Generation</td>
+<td style="text-align:left">10分钟</td>
+<td style="text-align:left">15秒</td>
+</tr>
+<tr>
+<td style="text-align:left">Size</td>
+<td style="text-align:left">1 MB</td>
+<td style="text-align:left">根据Gas Limit决定</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>直观上来说，更快的区块生成意味着更快的交易速度，更大的区块，意味着更多输入/更慢的传播。有什么不好的地方么？</p>
+<p>快速的生成，意味着很多矿工会算到同一个区块，但只有一个人能获胜，那么其他人的block就是stale，算力就被浪费了。比如Bitcoin的Stale Rate为0.4%而Ethereum的Rate是6.8%</p>
+<p>所以我们就会有下面的困境：</p>
+<ul>
+<li>生成速度越快可以有更快的支付，区块越大传播更慢，两者都导致security降低</li>
+<li>生成速度越慢就会降低支付速度，区块越小传播越快，两者都导致security提升</li>
+</ul>
+<p><img src="/2020/03/16/BlockChain-Security/SecurityScaling.png" alt></p>
+<p>那么我们就想比较一下，不同的生成和大小组合到底对安全性有什么影响：</p>
+<p>我们设置了Markov Decision Process（MDP）来奖惩黑客的行为：</p>
+<p><img src="/2020/03/16/BlockChain-Security/MDP.png" alt></p>
+<ul>
+<li>黑客的Action：继续挖矿或停止</li>
+<li>黑客的Reward：自己添加的钱，block reward，mining fee</li>
+</ul>
+<p>有了这些我们就可以模拟黑客的行为了，因为如果计算需要话很多时间而reward很小的话，黑客就没有理由去费力气去做双花的计算。</p>
+<p><img src="/2020/03/16/BlockChain-Security/StaleRate.png" alt></p>
+<h1 id="Layer-2"><a href="#Layer-2" class="headerlink" title="Layer 2"></a>Layer 2</h1><p>Smart Contracts只能合约</p>
+<ul>
+<li><strong>出入钱</strong></li>
+<li>在以太链中执行</li>
+<li>用高级语言写得</li>
+<li>公开后就<strong>不能修改打补丁</strong>了<!--
+上面是一段Solidity写成的智能合约，其问题在于，balance是一个local variable，不是我们真实的balance，这样会把我们的钱转光 -->
+</li>
+</ul>
+<h2 id="重入攻击-Reentrancy"><a href="#重入攻击-Reentrancy" class="headerlink" title="重入攻击 Reentrancy"></a>重入攻击 Reentrancy</h2><p><strong>Wallet</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">contract Wallet&#123;</span><br><span class="line">  uint balance&#x3D;10;</span><br><span class="line"></span><br><span class="line">  function withdraw()&#123;</span><br><span class="line">    if(balance &gt; 0)&#123;</span><br><span class="line">      msg.sender.call.value(balance)();</span><br><span class="line">    &#125;</span><br><span class="line">    balance&#x3D;0;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>User Contracts</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function moveBalance()&#123;</span><br><span class="line">  wallet.withdraw();</span><br><span class="line">&#125;</span><br><span class="line">function() payable&#123;</span><br><span class="line">  wallet.withdraw();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>利用了Solidity的特性：如果contract中没有一个函数用到payable，那么就会有一个隐函数生成function() payable{//log payment}，然后当使用call.value转移钱的时候，就会自动调用那个payable函数。</p>
+<p>那么我们就可以override这个payable函数，让他回调withdraw，那么就会不断迭代。在call.value那一行中，又因为上一行的balance只是local variable，不是我们真实的balance，这样会把我们的钱转光。</p>
+<p>这也就是DAO攻击。</p>
+<h2 id="未授权的写入"><a href="#未授权的写入" class="headerlink" title="未授权的写入"></a>未授权的写入</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">contract Wallet&#123;</span><br><span class="line">  address owner &#x3D; ....;</span><br><span class="line">  function initWallet(address _owner)&#123;</span><br><span class="line">    owner &#x3D; _owner;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  function withdraw(uint amount)&#123;</span><br><span class="line">    if(msg.sender &#x3D;&#x3D; owner)&#123;</span><br><span class="line">      owner.send(amount)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>本意是添加这个合约的owner，来限定只有owner可以转走钱。但是initWallet没有限定，于是任何人都可以重新把自己定义为owner，然后转走钱。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Consensus/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1358,261 +1703,13 @@ label &=  \underset{k}{arg\:max}\;p(C_k|x)\\\\
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/01/Intro-Model/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Lifan Zhao">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lifan's Note">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/03/01/Intro-Model/" itemprop="url">Pyro模型简介</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-01T17:32:50+00:00">
-                2020-03-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="Pyro模型介绍"><a href="#Pyro模型介绍" class="headerlink" title="Pyro模型介绍"></a>Pyro模型介绍</h1><p>概率编程的基础单元是<strong>随机函数Stochastic function</strong>。它是一种随机的Python可调用函数，由以下两个组成：</p>
-<ul>
-<li>确定性的Python代码</li>
-<li>原始<strong>随机函数</strong>，他们会调用一个随机数生成器</li></ul>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/03/01/Intro-Model/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/01/first-post/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Lifan Zhao">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lifan's Note">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/03/01/first-post/" itemprop="url">Pyro 安装</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-01T17:21:00+00:00">
-                2020-03-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>Pyro中文翻译</p>
-<p>尝试翻译<a href="https://pyro.ai/" target="_blank" rel="noopener">Pyro</a>的文档。第一次进行翻译，若有错误欢迎提醒。<br></p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/03/01/first-post/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">&lt;i class&#x3D;&quot;fa fa-angle-right&quot;&gt;&lt;&#x2F;i&gt;</a>
+  </nav>
+
 
 
           </div>
@@ -1660,7 +1757,7 @@ label &=  \underset{k}{arg\:max}\;p(C_k|x)\\\\
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
