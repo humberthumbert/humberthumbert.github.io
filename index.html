@@ -383,7 +383,7 @@ Pr(p|b,N) = \frac{Pr(b|p,N) Pr(p)}{\int Pr(b|p,N)Pr(p)dp}</script><h1 id="什么
 ({x \rightarrow \perp, y \rightarrow \perp}, 0.24)</script><p>然后我们需要观测，如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">observe x &#x3D;&#x3D; True</span><br></pre></td></tr></table></figure></p>
 <script type="math/tex; mode=display">({x \rightarrow \top, y \rightarrow \top}, 0.14/(0.14+0.56)),\\
 ({x \rightarrow \top, y \rightarrow \perp}, 0.56/(0.14+0.56)))</script><ul>
-<li><code>obeserve</code> 忽略不符合的executions，并正则 </li>
+<li><code>obeserve</code> 忽略不符合的executions，并正则 $\frac{Pr(non\:stuck\:state)}{\frac{num\:observe\:true}{num\:all\:observation}}$</li>
 <li><code>assume</code> 忽略不符合的execution</li>
 <li><code>assert</code> 让不符合的execution失败</li>
 </ul>
@@ -397,7 +397,15 @@ Pr(p|b,N) = \frac{Pr(b|p,N) Pr(p)}{\int Pr(b|p,N)Pr(p)dp}</script><h1 id="什么
 <script type="math/tex; mode=display">
 Pr(PC_1) + Pr(PC_2)</script><p>而不用去计算再减去两者的交集 $Pr(PC_1 \wedge PC_2)$</p>
 <p>你可能还想问这有什么用？举个例子，上面那段是1981年失事的哥伦比亚号的一段检查代码，如此判断有几千个之多，我们如何能保证这些代码的可靠性呢？</p>
-<p>显然，即使在有限的范围内，通过穷举会消耗polynomial时间，太久。</p>
+<script type="math/tex; mode=display">\begin{align}
+
+Pr(PCs|UP) &= \sum_{i=0}^n Pr(PCs|US_i) p(US_i)\\\\
+&= \sum_{i=0}^n \frac{Pr(PCs \wedge US_i)}{Pr(US_i)} p(US_i) \\\\
+&= \frac{\frac{num\:(PCs \wedge US_i \wedge D)}
+{num\:(D)}}{ \frac{num\:(US_i \wedge D)}{num\:(D)} }\\\\
+&=\frac{num\:(PCs \wedge US_i \wedge D)}{num\:(US_i \wedge D)}
+
+\end{align}</script><p>显然，即使在有限的范围内，通过穷举会消耗polynomial时间，太久。</p>
 <p>这时候我们的Symbolic Execution就可以派上用场了，因为他保证了独立性，所以我们可以用分治法。因为独立的clause可以被记录并再利用。这样就比NASA当时的算法快 $10^4$ 倍。</p>
 <h1 id="Arbitrary-Numerical-Constraint"><a href="#Arbitrary-Numerical-Constraint" class="headerlink" title="Arbitrary Numerical Constraint"></a>Arbitrary Numerical Constraint</h1><p>上面的例子都是离散的，但是真实的世界可不是，更多的情况我们需要预估连续的函数。</p>
 <ul>
