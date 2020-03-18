@@ -239,6 +239,234 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/18/Probabilistic-Background/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/03/18/Probabilistic-Background/" itemprop="url">概率编程基础知识</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-18T09:45:37+00:00">
+                2020-03-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="一个栗子"><a href="#一个栗子" class="headerlink" title="一个栗子"></a>一个栗子</h1><p>比如我们有一袋子卡片，已知里面有一些卡片，而这些卡片中有一些可能被涂成了蓝色的，有一些可能是白色的，具体的数量和比例都不缺定。我们现在可以进行n次抽取，查看后放回袋子里。</p>
+<p>贝叶斯统计步骤</p>
+<ol>
+<li>设计模型 （conjecture）</li>
+<li>根据数据，进行条件判断 （update）</li>
+<li>评估模型 （critique）</li>
+</ol>
+<p>我们的<strong>推测Conjecture</strong>是什么？</p>
+<ul>
+<li>如果蓝色的比例是p，那么白色的一定是1-p</li>
+<li>每次抽取都是独立的。</li>
+</ul>
+<p>我们假设存在一个p在[0,1]这个区间。这是我们的先验。</p>
+<p>再在根据看到的结果（data）进行条件判断，更新我们的p。</p>
+<p>具体的步骤：</p>
+<ol>
+<li>建立一个联合模型：<ul>
+<li>变量有：<ul>
+<li>data 观测到的数据</li>
+<li>parameters 待求的变量</li>
+</ul>
+</li>
+<li>给<strong>data distribution</strong>赋值（likelihood）这些值都是先验得到的</li>
+<li>给<strong>parameter distribution</strong>赋值（prior）</li>
+</ul>
+</li>
+<li>给定输入，推测联合后验</li>
+</ol>
+<p>回到例子中，我们的变量有：</p>
+<ul>
+<li>N：一共抽取了N次（data）</li>
+<li>b：一共有抽出了多少蓝色的卡片（data）</li>
+<li>p：蓝色卡片的占比（parameter）</li>
+</ul>
+<p>我们的联合模型：</p>
+<ul>
+<li>$b \sim Binomial(N,p)$ <strong>data distribution</strong></li>
+<li>$p \sim Uniform(0,1)$ <strong>prior distribution</strong></li>
+</ul>
+<p>所以根据贝叶斯定理，</p>
+<script type="math/tex; mode=display">
+posterior = \frac{likelihood \times prior}{average\;likelihood}</script><p>得到后验概率：</p>
+<script type="math/tex; mode=display">
+Pr(p|b,N) = \frac{Pr(b|p,N) Pr(p)}{\int Pr(b|p,N)Pr(p)dp}</script><h1 id="什么是概率编程"><a href="#什么是概率编程" class="headerlink" title="什么是概率编程"></a>什么是概率编程</h1><p>本质思想是取样所有可能的结果，并得到confidence</p>
+<p>就是在普通的编程上添加两个特性：</p>
+<ol>
+<li>有从各种分布中随机取值的能力</li>
+<li>有根据观察进行条件判断从而决定变量的值的能力</li>
+</ol>
+<p>换一种说法就是概率编程能够从正向和反向运行：</p>
+<ol>
+<li>正向：计算假设的结果</li>
+<li>反向：从观测的数据影响条件（限制可能的解释）</li>
+</ol>
+<h1 id="概率编程语言Probabilistic-Programming-Language"><a href="#概率编程语言Probabilistic-Programming-Language" class="headerlink" title="概率编程语言Probabilistic Programming Language"></a>概率编程语言Probabilistic Programming Language</h1><p>一般来说组成一门语言，需要syntax语法和semantic语义</p>
+<p><img src="/2020/03/18/Probabilistic-Background/SPPL_syntax.png" alt></p>
+<p>我们可以看到，基本上概率编程语言的syntax就是在普通编程语言syntax的基础上添加了分布。</p>
+<p><img src="/2020/03/18/Probabilistic-Background/state.png" alt></p>
+<p>那么对应的semantics上我们也添加了概率，</p>
+<h1 id="Data-Flow"><a href="#Data-Flow" class="headerlink" title="Data Flow"></a>Data Flow</h1><p>举例来说给变量x赋值一个伯努利分布，如下：</p>
+<script type="math/tex; mode=display">
+(x := Bernoulli(p),\sigma) \xrightarrow{p} \sigma[x \leftarrow True]</script><script type="math/tex; mode=display">
+(x:= Bernoulli(p),\sigma) \xrightarrow{1-p} \sigma[x \leftarrow False]</script><p>一个实例：</p>
+<p>$({x \rightarrow ?, y \rightarrow ?}, 1.0)$</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x:&#x3D;Bernoulli(0.7)</span><br></pre></td></tr></table></figure>
+<p>$({x \rightarrow \top, y \rightarrow ?}, 0.7),<br>({x \rightarrow \perp, y \rightarrow ?}, 0.3)$</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">y:&#x3D;Bernoulli(0.2)</span><br></pre></td></tr></table></figure>
+<script type="math/tex; mode=display">({x \rightarrow \top, y \rightarrow \top}, 0.14),
+({x \rightarrow \top, y \rightarrow \perp}, 0.56),\\\\
+({x \rightarrow \perp, y \rightarrow \top}, 0.06),
+({x \rightarrow \perp, y \rightarrow \perp}, 0.24)</script><p>然后我们需要观测，如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">observe x &#x3D;&#x3D; True</span><br></pre></td></tr></table></figure></p>
+<script type="math/tex; mode=display">({x \rightarrow \top, y \rightarrow \top}, 0.14/(0.14+0.56)),\\
+({x \rightarrow \top, y \rightarrow \perp}, 0.56/(0.14+0.56)))</script><ul>
+<li><code>obeserve</code> 忽略不符合的executions，并正则 </li>
+<li><code>assume</code> 忽略不符合的execution</li>
+<li><code>assert</code> 让不符合的execution失败</li>
+</ul>
+<h1 id="Symbolic-Probabilistic-Analysis"><a href="#Symbolic-Probabilistic-Analysis" class="headerlink" title="Symbolic Probabilistic Analysis"></a>Symbolic Probabilistic Analysis</h1><h2 id="User-Profile"><a href="#User-Profile" class="headerlink" title="User Profile"></a>User Profile</h2><p>给予我们的输入加一个概率，即我们现在知道某个输入出现的概率是多少。</p>
+<h2 id="Symbolic-Execution"><a href="#Symbolic-Execution" class="headerlink" title="Symbolic Execution"></a>Symbolic Execution</h2><p>假设我们有如下函数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">checkSafety</span><span class="params">(<span class="keyword">int</span> pressure,</span></span></span><br><span class="line"><span class="function"><span class="params">  <span class="keyword">int</span> altitude, <span class="keyword">int</span> spinSpeed)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">int</span> discountedPressure = pressure - altitude/<span class="number">2</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">if</span>(discountedPressure &gt; <span class="number">80</span> &amp;&amp; spinSpeed&gt;<span class="number">72</span>)&#123;</span><br><span class="line">     abort();</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Path Condition(pc)即到达这个情况的路径，比如上面的函数我们想要安全的达到最后的return，而不在中途abort，那么我们就要从root达到图中两个绿点。每个中间节点就相当于一个条件判断，而我们就象征性Symbolic地走到了想要到达的leaf。</p>
+<p><img src="/2020/03/18/Probabilistic-Background/PSE_PC.png" alt></p>
+<p>Path Condition有什么用呢？<br>他使得我们无论怎么分割树的leaf，我们都会获得这些leaves都将是相互独立的。</p>
+<p>比方说上面那两个情况，我们就可以直接求</p>
+<script type="math/tex; mode=display">
+Pr(PC_1) + Pr(PC_2)</script><p>而不用去计算再减去两者的交集 $Pr(PC_1 \wedge PC_2)$</p>
+<p>你可能还想问这有什么用？举个例子，上面那段是1981年失事的哥伦比亚号的一段检查代码，如此判断有几千个之多，我们如何能保证这些代码的可靠性呢？</p>
+<p>显然，即使在有限的范围内，通过穷举会消耗polynomial时间，太久。</p>
+<p>这时候我们的Symbolic Execution就可以派上用场了，因为他保证了独立性，所以我们可以用分治法。因为独立的clause可以被记录并再利用。这样就比NASA当时的算法快 $10^4$ 倍。</p>
+<h1 id="Arbitrary-Numerical-Constraint"><a href="#Arbitrary-Numerical-Constraint" class="headerlink" title="Arbitrary Numerical Constraint"></a>Arbitrary Numerical Constraint</h1><p>上面的例子都是离散的，但是真实的世界可不是，更多的情况我们需要预估连续的函数。</p>
+<ul>
+<li>[Hit-or-Miss Monte Carlo]</li>
+<li>[Interval Constraint propagation]</li>
+<li><p>[Stratified sampling]</p>
+</li>
+<li><p>[Optimal sampling allocation]</p>
+</li>
+<li>[未完待续]</li>
+</ul>
+<h1 id="PyMC3"><a href="#PyMC3" class="headerlink" title="PyMC3"></a>PyMC3</h1><p>讲了这么多，都是simple ppl或者是用其他语言模拟的概率编程。我们来看一下PyMC3。</p>
+<h2 id="Model-Variables"><a href="#Model-Variables" class="headerlink" title="Model Variables"></a>Model Variables</h2><ul>
+<li>Random variables: m.basic_RVs</li>
+<li>Free variables: m.free_RVs</li>
+<li>Observed variables: m.observed_RVs</li>
+</ul>
+<p>[Skipping lots of content]</p>
+<h1 id="Spurious-Model"><a href="#Spurious-Model" class="headerlink" title="Spurious Model"></a>Spurious Model</h1><p>Predictor Residual Plot<br>以A为因，输入B中，我们会得到两个量</p>
+<p>一个是Posterior后的 b<br>另一个是Posterior后的 mu<br>每一个算粗来线都和</p>
+<p>看他们的residual大小</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Scaling/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1515,130 +1743,6 @@ label &=  \underset{k}{arg\:max}\;p(C_k|x)\\\\
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/05/Intro-Inference/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Lifan Zhao">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lifan's Note">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/03/05/Intro-Inference/" itemprop="url">Pyro推断介绍</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-05T14:51:56+00:00">
-                2020-03-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="Pyro推断介绍"><a href="#Pyro推断介绍" class="headerlink" title="Pyro推断介绍"></a>Pyro推断介绍</h1><p>许多现代的机器学习可以转变为概率推断，继而用像Pyro这样的语言来表达。本章教程的目的，是为一个简单的物理问题创建一个生成模型，使得我们可以用Pyro的推断机制来解决这个问题。不过，我们先来引入本章所需到的模块</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/03/05/Intro-Inference/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1693,7 +1797,7 @@ label &=  \underset{k}{arg\:max}\;p(C_k|x)\\\\
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1706,7 +1810,7 @@ label &=  \underset{k}{arg\:max}\;p(C_k|x)\\\\
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
