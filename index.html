@@ -331,7 +331,24 @@
 <p>争议过程需要支付手续费。</p>
 <h2 id="State-Replacement"><a href="#State-Replacement" class="headerlink" title="State Replacement"></a>State Replacement</h2><p>把上一个state invalidate，然后只保存新的那个</p>
 <h3 id="Time-Lock-State-Replacement"><a href="#Time-Lock-State-Replacement" class="headerlink" title="Time Lock State Replacement"></a>Time Lock State Replacement</h3><p>Time Lock: 某个transaction不会在N个block内被纳入Blockchain中。<br>想当于保证了transaction顺序</p>
-<h3 id="Revocation-State-Replacement-Lightning"><a href="#Revocation-State-Replacement-Lightning" class="headerlink" title="Revocation State Replacement(Lightning)"></a>Revocation State Replacement(Lightning)</h3>
+<h3 id="Revocation-State-Replacement-Lightning"><a href="#Revocation-State-Replacement-Lightning" class="headerlink" title="Revocation State Replacement(Lightning)"></a>Revocation State Replacement(Lightning)</h3><p><img src="/2020/03/16/BlockChain-Scaling/Lightning.png" alt><br>如果有人作恶，那么所有的钱全归另一人。</p>
+<h2 id="同步"><a href="#同步" class="headerlink" title="同步"></a>同步</h2><p>因为在payment channel中只能单向传播，所以我们需要一个简单的条件转移。</p>
+<h2 id="Routing"><a href="#Routing" class="headerlink" title="Routing"></a>Routing</h2><ol>
+<li>Scalable：希望可以保持高速的交易</li>
+<li>Effectiveness：可以找到最可能过的路径</li>
+<li>Efficiency：快速</li>
+</ol>
+<h2 id="好处"><a href="#好处" class="headerlink" title="好处"></a>好处</h2><ul>
+<li>No Direct connection needed</li>
+<li>Decentralized limited censorship</li>
+<li>Optimistically fast and cheap</li>
+</ul>
+<h2 id="坏处"><a href="#坏处" class="headerlink" title="坏处"></a>坏处</h2><ul>
+<li>Collateral for each hop</li>
+<li>On-chain channel establishment</li>
+<li>Wormhole attack</li>
+</ul>
+
           
         
       
