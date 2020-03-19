@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Blockchain," />
+  <meta name="keywords" content="deep learning," />
 
 
 
@@ -79,20 +79,24 @@
 
 
 
-<meta name="description" content="Off Chain Transcation好处：  没有共识的延迟和费用 同时能保证无第三方保障的安全性 可以向后兼容（反悔！）">
+<meta name="description" content="动机无论是简单的FNN，还是CNN，异或是GAN，似乎都只关心一次性的输入数据，有什么办法能处理一串数据么？ 或者说有什么办法能够利用之前学习到的知识，作用在之后的学习上么？ 所以我们有了循环神经网络。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="区块链扩容">
-<meta property="og:url" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Scaling/index.html">
+<meta property="og:title" content="循环神经网络">
+<meta property="og:url" content="http://humberthumbert.github.io/2020/03/19/RNN/index.html">
 <meta property="og:site_name" content="Lifan&#39;s Note">
-<meta property="og:description" content="Off Chain Transcation好处：  没有共识的延迟和费用 同时能保证无第三方保障的安全性 可以向后兼容（反悔！）">
+<meta property="og:description" content="动机无论是简单的FNN，还是CNN，异或是GAN，似乎都只关心一次性的输入数据，有什么办法能处理一串数据么？ 或者说有什么办法能够利用之前学习到的知识，作用在之后的学习上么？ 所以我们有了循环神经网络。">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Scaling/Lightning.png">
-<meta property="article:published_time" content="2020-03-16T23:52:43.000Z">
-<meta property="article:modified_time" content="2020-03-19T04:49:52.334Z">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/19/RNN/RNN_Types.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/19/RNN/SimpleRNN_model.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/19/RNN/LSTM_model.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/19/RNN/LSTM_circuit.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/19/RNN/GRU_circuit.png">
+<meta property="article:published_time" content="2020-03-19T01:32:58.000Z">
+<meta property="article:modified_time" content="2020-03-19T04:49:18.061Z">
 <meta property="article:author" content="Lifan Zhao">
-<meta property="article:tag" content="Blockchain">
+<meta property="article:tag" content="deep learning">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Scaling/Lightning.png">
+<meta name="twitter:image" content="http://humberthumbert.github.io/2020/03/19/RNN/RNN_Types.png">
 
 
 
@@ -122,13 +126,13 @@
 
 
 
-  <link rel="canonical" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Scaling/"/>
+  <link rel="canonical" href="http://humberthumbert.github.io/2020/03/19/RNN/"/>
 
 
 
 
 
-  <title>区块链扩容 | Lifan's Note</title>
+  <title>循环神经网络 | Lifan's Note</title>
   
 
 
@@ -245,7 +249,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Scaling/">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/19/RNN/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Lifan Zhao">
@@ -262,7 +266,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">区块链扩容</h1>
+          <h1 class="post-title" itemprop="name headline">循环神经网络</h1>
         
 
         <div class="post-meta">
@@ -274,8 +278,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T23:52:43+00:00">
-                2020-03-16
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-19T01:32:58+00:00">
+                2020-03-19
               </time>
             
 
@@ -312,44 +316,108 @@
       
 
       
-        <h1 id="Off-Chain-Transcation"><a href="#Off-Chain-Transcation" class="headerlink" title="Off Chain Transcation"></a>Off Chain Transcation</h1><p>好处：</p>
+        <h1 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h1><p>无论是简单的FNN，还是CNN，异或是GAN，似乎都只关心一次性的输入数据，有什么办法能处理一串数据么？</p>
+<p>或者说有什么办法能够利用之前学习到的知识，作用在之后的学习上么？</p>
+<p>所以我们有了循环神经网络。<br><a id="more"></a></p>
+<h1 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h1><p><img src="/2020/03/19/RNN/RNN_Types.png" alt></p>
 <ul>
-<li>没有共识的延迟和费用</li>
-<li>同时能保证无第三方保障的安全性</li>
-<li>可以向后兼容（反悔！）<a id="more"></a>
-<h1 id="Channel-Networks"><a href="#Channel-Networks" class="headerlink" title="Channel Networks"></a>Channel Networks</h1><h2 id="Payment-Channel"><a href="#Payment-Channel" class="headerlink" title="Payment Channel"></a>Payment Channel</h2></li>
+<li>many-to-one：<ul>
+<li>可以用于语音识别（声纹作为sequential input，而识别的单词就是一个output）</li>
+<li>情感划分：判断一句话是积极还是消极的</li>
+<li>视频分类：从一连串的画面判断并分类</li>
 </ul>
-<ol>
-<li>从某一时间t开始，在现在A与B线下交易。Set up channel</li>
-<li>每交易一次，只记录最后的结果。</li>
-<li>因为每次交易双方都要签名，所以可以验证交易的真实性。</li>
-<li>直到另一时间点t+k，channel结束，我们把最后的记录返回到blockchain中</li>
-</ol>
+</li>
+<li>one-to-many:<ul>
+<li>音乐合成：输入一个类别，生成符合类别的音乐</li>
+<li>文章生成：同上</li>
+<li>图像理解：输入图片，理解各个之间的关系，生成语句来描述这张图片</li>
+</ul>
+</li>
+<li>many-to-many(同等长度)：<ul>
+<li>持续的情感预测：从一段视频中判断情感变化</li>
+<li>语音增强：消除意外的不必要的杂音</li>
+<li>视频分类：每一帧的角度</li>
+</ul>
+</li>
+<li>sequence-to-sequence(不同长度)：<ul>
+<li>机器翻译</li>
+<li>回答问题</li>
+</ul>
+</li>
+</ul>
+<p>以上这些都可以用循环神经网络实现</p>
+<h1 id="Simple-RNN"><a href="#Simple-RNN" class="headerlink" title="Simple RNN"></a>Simple RNN</h1><p><img src="/2020/03/19/RNN/SimpleRNN_model.png" alt><br>每一步的state $h_t$ 都受到前一步的state $h_{t-1}$ 与当前这一步的输入 $x_t$ 值影响</p>
+<script type="math/tex; mode=display">h_t = f_w(h_{t-1},x_t)</script><p>其中 $f_w$ 映射了参数w和两个输入值的关系，也即：</p>
+<script type="math/tex; mode=display">h_t = tanh(W_{hh}h_{t-1} + W_{xh}x_t)</script><p>而最后的输出值</p>
+<script type="math/tex; mode=display">y_t = W_{hy}h_t</script><h1 id="梯度爆炸和梯度消失"><a href="#梯度爆炸和梯度消失" class="headerlink" title="梯度爆炸和梯度消失"></a>梯度爆炸和梯度消失</h1><p>当我们又一个很长的输入时，向前传播没什么问题，但是当我们计算了loss后，试图将梯度向后传递时，问题就出现了。</p>
+<p>对t时刻，隐状态向量 $h_t$ 的偏导数是</p>
+<script type="math/tex; mode=display">\frac{\partial \mathcal{l} }{ \partial h_t}</script><p>那么对于最早的 $h_0$ 的偏导数就是</p>
+<script type="math/tex; mode=display">\partial L / \partial h_0 =
+  (\frac{\partial h_t}{\partial h_0}) ^T
+  \frac{\partial \mathcal{l}}{\partial h_t}</script><p>而 $\frac{\partial h_t}{\partial h_0}$ 展开就是：</p>
+<script type="math/tex; mode=display">
+\frac{\partial h_t}{\partial h_0} = \prod_{i=1}^{t} \frac{\partial h_i}{\partial h_{i-1}} = \prod_{i-1}^{t}W_{hh} = W_{hh}^t</script><p>这也就是说我们在反向传播的过程中需要反复乘以$W_{hh}$，对其进行奇异值分解SVD，得到</p>
+<script type="math/tex; mode=display">
+W_{hh} = U\Sigma V^T = \sum_{i=1}^{r} (\sigma^t_i u_i v_i) ^T</script><p>那么最后：</p>
+<script type="math/tex; mode=display">\begin{align}
+\frac{\partial \mathcal{l}}{\partial h_0} &=
+(\frac{\partial h_t}{\partial h_0})^T \frac{\partial \mathcal{l}}{\partial h_t} \\\\
+&= (\sum_{i=1}^{r} (\sigma^t_i u_i v_i) ^T)^T \frac{\partial \mathcal{l}}{\partial h_t} \\\\
+&= \sum_{i=1}^{r} \sigma^t_i v_i u_i ^T \frac{\partial \mathcal{l}}{\partial h_t}
+
+\end{align}</script><p>也就是说如果输入长度是n，我们就需要对 $\sigma$ 求n次幂。那么就很容导致梯度爆照（$\sigma \gt 1$），或者梯度消失（$\sigma \lt 1$）</p>
 <ul>
-<li>Balance Security任意一方都可以撤回原有的金额，无需另一方的辅助。</li>
-<li>State Progression当channel结束时，双方都可上传</li>
+<li>梯度爆炸：<ul>
+<li>会导致网络不收敛，影响训练。</li>
+<li>解决方法：梯度裁剪，即设定一个阈值，超过就把梯度设定为那个阈值</li>
 </ul>
-<p>那如果两者有歧义呢？</p>
-<p>那么会在channel结束时，不满意的一方可以触发争议机制，然后在固定长度争议时间内，Blockchain会要接受两人的evidence，交由其他的节点来验证，最后争议结束。</p>
-<p>争议过程需要支付手续费。</p>
-<h2 id="State-Replacement"><a href="#State-Replacement" class="headerlink" title="State Replacement"></a>State Replacement</h2><p>把上一个state invalidate，然后只保存新的那个</p>
-<h3 id="Time-Lock-State-Replacement"><a href="#Time-Lock-State-Replacement" class="headerlink" title="Time Lock State Replacement"></a>Time Lock State Replacement</h3><p>Time Lock: 某个transaction不会在N个block内被纳入Blockchain中。<br>想当于保证了transaction顺序</p>
-<h3 id="Revocation-State-Replacement-Lightning"><a href="#Revocation-State-Replacement-Lightning" class="headerlink" title="Revocation State Replacement(Lightning)"></a>Revocation State Replacement(Lightning)</h3><p><img src="/2020/03/16/BlockChain-Scaling/Lightning.png" alt><br>如果有人作恶，那么所有的钱全归另一人。</p>
-<h2 id="同步"><a href="#同步" class="headerlink" title="同步"></a>同步</h2><p>因为在payment channel中只能单向传播，所以我们需要一个简单的条件转移。</p>
-<h2 id="Routing"><a href="#Routing" class="headerlink" title="Routing"></a>Routing</h2><ol>
-<li>Scalable：希望可以保持高速的交易</li>
-<li>Effectiveness：可以找到最可能过的路径</li>
-<li>Efficiency：快速</li>
-</ol>
-<h2 id="好处"><a href="#好处" class="headerlink" title="好处"></a>好处</h2><ul>
-<li>No Direct connection needed</li>
-<li>Decentralized limited censorship</li>
-<li>Optimistically fast and cheap</li>
+</li>
+<li>梯度消失：<ul>
+<li>会导致捕捉长距离依赖的能力下降。比如我在开头说了一个词，过了足够长的时间，在结尾就会被遗忘。</li>
+<li>解决方案：LSTM，GRU通过门机制来控制RNN中信息流动来缓解梯度消失，也就是有选择性的遗忘或记得某些信息</li>
 </ul>
-<h2 id="坏处"><a href="#坏处" class="headerlink" title="坏处"></a>坏处</h2><ul>
-<li>Collateral for each hop</li>
-<li>On-chain channel establishment</li>
-<li>Wormhole attack</li>
+</li>
+</ul>
+<h1 id="LSTM"><a href="#LSTM" class="headerlink" title="LSTM"></a>LSTM</h1><p>长短期记忆<br><img src="/2020/03/19/RNN/LSTM_model.png" alt></p>
+<script type="math/tex; mode=display">\begin{align}
+& i_t = sigm(W_{xi} x_t + W_{hi} h_{t-1})\\\\
+& f_t = sigm(W_{xf} x_t + W_{hf} h_{t-1})\\\\
+& o_t = sigm(W_{xo} x_t + W_{hc} h_{t-1})\\\\
+& \hat{c}_t = tanh(W_{xc} x_t + W_{hc} h_{t-1})\\\\
+& c_t = f_t\odot c_{t-1} + i_t \odot \hat{c}_t \\\\
+& h_t = o_t \odot tanh(c_t)
+\end{align}</script><p>O输出门：控制那些 $h_{t-1}$ 可以被传输到下一个时刻</p>
+<p>I输入门：控制当前词 $x_t$ 的信息融入到细胞状态 $c_t$，判断当前词 $x_t$ 对全局的重要性</p>
+<p>F遗忘门：控制上一个时刻的细胞状态 $c_{t-1}$ 的信息融入细胞状态 $c_t$。</p>
+<ul>
+<li>在理解一句话的时候，当前词 $x_t$ 可能继续延续上文的意思去描述，</li>
+<li>也可能从当前词 $x_t$ 开始重新描述新的内容，与上文无关。</li>
+<li>与输入门I相反，F不对当前词 $x_t$ 的重要性进行判断，而判断的是上一时刻的细胞状态 $c_{t-1}$ 对当前计算的细胞状态 $c_t$ 的重要性</li>
+</ul>
+<p>C细胞状态：综合了当前词x_t和前一时刻细胞状态c_(t-1)。</p>
+<ul>
+<li>通过从 $c_{t-1}$ 到 $c_t$ 的「短路连接」，梯度得已有效地反向传播。</li>
+<li>当 $f_t$ 处于闭合状态时，$c_t$ 的梯度可以直接沿着最下面这条短路线传递到 $c_(t-1)$ ，不受参数 $W_{xh}$ 和 $W_{hh}$ 的影响，这是 LSTM 能有效地缓解梯度消失现象的关键所在。</li>
+</ul>
+<p><img src="/2020/03/19/RNN/LSTM_circuit.png" alt></p>
+<p>降维理解<br>简化 $i_t$, $f_t$, $o_t$的输入，降维为一维（ $\odot$ 在一维中就是相乘），简化单元为二值输出作为开关。</p>
+<p>所以如果 $i_t=1$（开关闭合）、$f_t=0$（开关打开）、$o_t=1$（开关闭合）时，LSTM 退化为标准的 RNN。</p>
+<h2 id="Extension-Peephole-Connections"><a href="#Extension-Peephole-Connections" class="headerlink" title="Extension: Peephole Connections"></a>Extension: Peephole Connections</h2><p>简单来说就是把细胞状态放在门里，让门去选择是否使用。</p>
+<script type="math/tex; mode=display">\begin{align}
+&i_t = \sigma( W_i [c_{t-1}, h_{t-1}, x_t] + b_i)\\\\
+&f_t = \sigma( W_f [c_{t-1}, h_{t-1}, x_t] + b_f)\\\\
+&o_t = \sigma( W_o [c_{t}, h_{t-1}, x_t] + b_o)\\\\
+\end{align}</script><h2 id="Extension-combine-forget-and-input-gates"><a href="#Extension-combine-forget-and-input-gates" class="headerlink" title="Extension: combine forget and input gates"></a>Extension: combine forget and input gates</h2><p>联合决定是加入还是忘记</p>
+<script type="math/tex; mode=display">\begin{align}
+& g_t = sigm(W_{xi} x_t + W_{hi} h_{t-1})\\\\
+& f_t = sigm(W_{xf} x_t + W_{hf} h_{t-1})\\\\
+& c_t = f_t\odot c_{t-1} + i_t \odot g_t \\\\
+
+\end{align}</script><h1 id="GRU"><a href="#GRU" class="headerlink" title="GRU"></a>GRU</h1><p><img src="/2020/03/19/RNN/GRU_circuit.png" alt></p>
+<p>R重置门：用于控制前一时刻的隐藏单元 $h_{t-1}$ 对当前词 $x_t$ 的影响。如果 $h_{t-1}$ 对 $x_t$ 不重要，即从当前词 $x_t$开始表述新的意思，与上文无关了。</p>
+<p>Z更新门：$z_t$ 用于决定是否忽略当前词 $x_t$。类似于LSTM中的输入们 $i_t$ 。$z_t$可以判断当前词 $x_t$ 对整体意思的表达是否重要。 当 $z_t$ 开关接通下面的支路时，我们将忽略当前词 $x_t$ ，同时构成了从 $h_{t-1}$ 到 $h_t$ 的短路连接，这使得梯度得以有效反向传播。和LSTM相同，这种短路机制有效的缓解了梯度消失的现象，和highway network十分相似。</p>
+<h1 id="CTC"><a href="#CTC" class="headerlink" title="CTC"></a>CTC</h1><ul>
+<li>[More to be filled]</li>
 </ul>
 
       
@@ -368,7 +436,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Blockchain/" rel="tag"># Blockchain</a>
+            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
           
         </div>
       
@@ -381,8 +449,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/03/16/BlockChain-Security/" rel="next" title="区块链安全">
-                <i class="fa fa-chevron-left"></i> 区块链安全
+              <a href="/2020/03/18/Probabilistic-Background/" rel="next" title="概率编程基础知识">
+                <i class="fa fa-chevron-left"></i> 概率编程基础知识
               </a>
             
           </div>
@@ -390,10 +458,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/03/18/Probabilistic-Background/" rel="prev" title="概率编程基础知识">
-                概率编程基础知识 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -520,7 +584,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Off-Chain-Transcation"><span class="nav-number">1.</span> <span class="nav-text">Off Chain Transcation</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Channel-Networks"><span class="nav-number">2.</span> <span class="nav-text">Channel Networks</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Payment-Channel"><span class="nav-number">2.1.</span> <span class="nav-text">Payment Channel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#State-Replacement"><span class="nav-number">2.2.</span> <span class="nav-text">State Replacement</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Time-Lock-State-Replacement"><span class="nav-number">2.2.1.</span> <span class="nav-text">Time Lock State Replacement</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Revocation-State-Replacement-Lightning"><span class="nav-number">2.2.2.</span> <span class="nav-text">Revocation State Replacement(Lightning)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#同步"><span class="nav-number">2.3.</span> <span class="nav-text">同步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Routing"><span class="nav-number">2.4.</span> <span class="nav-text">Routing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#好处"><span class="nav-number">2.5.</span> <span class="nav-text">好处</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#坏处"><span class="nav-number">2.6.</span> <span class="nav-text">坏处</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#动机"><span class="nav-number">1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#类型"><span class="nav-number">2.</span> <span class="nav-text">类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Simple-RNN"><span class="nav-number">3.</span> <span class="nav-text">Simple RNN</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#梯度爆炸和梯度消失"><span class="nav-number">4.</span> <span class="nav-text">梯度爆炸和梯度消失</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LSTM"><span class="nav-number">5.</span> <span class="nav-text">LSTM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Extension-Peephole-Connections"><span class="nav-number">5.1.</span> <span class="nav-text">Extension: Peephole Connections</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Extension-combine-forget-and-input-gates"><span class="nav-number">5.2.</span> <span class="nav-text">Extension: combine forget and input gates</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GRU"><span class="nav-number">6.</span> <span class="nav-text">GRU</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CTC"><span class="nav-number">7.</span> <span class="nav-text">CTC</span></a></li></ol></div>
             
 
           </div>

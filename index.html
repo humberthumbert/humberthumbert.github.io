@@ -239,6 +239,132 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/19/RNN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/03/19/RNN/" itemprop="url">循环神经网络</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-19T01:32:58+00:00">
+                2020-03-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h1><p>无论是简单的FNN，还是CNN，异或是GAN，似乎都只关心一次性的输入数据，有什么办法能处理一串数据么？</p>
+<p>或者说有什么办法能够利用之前学习到的知识，作用在之后的学习上么？</p>
+<p>所以我们有了循环神经网络。<br></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/03/19/RNN/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/18/Probabilistic-Background/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -309,126 +435,19 @@
 
       
         
-          
-            <h1 id="一个栗子"><a href="#一个栗子" class="headerlink" title="一个栗子"></a>一个栗子</h1><p>比如我们有一袋子卡片，已知里面有一些卡片，而这些卡片中有一些可能被涂成了蓝色的，有一些可能是白色的，具体的数量和比例都不缺定。我们现在可以进行n次抽取，查看后放回袋子里。</p>
+          <h1 id="一个栗子"><a href="#一个栗子" class="headerlink" title="一个栗子"></a>一个栗子</h1><p>比如我们有一袋子卡片，已知里面有一些卡片，而这些卡片中有一些可能被涂成了蓝色的，有一些可能是白色的，具体的数量和比例都不缺定。我们现在可以进行n次抽取，查看后放回袋子里。</p>
 <p>贝叶斯统计步骤</p>
 <ol>
 <li>设计模型 （conjecture）</li>
 <li>根据数据，进行条件判断 （update）</li>
-<li>评估模型 （critique）</li>
-</ol>
-<p>我们的<strong>推测Conjecture</strong>是什么？</p>
-<ul>
-<li>如果蓝色的比例是p，那么白色的一定是1-p</li>
-<li>每次抽取都是独立的。</li>
-</ul>
-<p>我们假设存在一个p在[0,1]这个区间。这是我们的先验。</p>
-<p>再在根据看到的结果（data）进行条件判断，更新我们的p。</p>
-<p>具体的步骤：</p>
-<ol>
-<li>建立一个联合模型：<ul>
-<li>变量有：<ul>
-<li>data 观测到的数据</li>
-<li>parameters 待求的变量</li>
-</ul>
-</li>
-<li>给<strong>data distribution</strong>赋值（likelihood）这些值都是先验得到的</li>
-<li>给<strong>parameter distribution</strong>赋值（prior）</li>
-</ul>
-</li>
-<li>给定输入，推测联合后验</li>
-</ol>
-<p>回到例子中，我们的变量有：</p>
-<ul>
-<li>N：一共抽取了N次（data）</li>
-<li>b：一共有抽出了多少蓝色的卡片（data）</li>
-<li>p：蓝色卡片的占比（parameter）</li>
-</ul>
-<p>我们的联合模型：</p>
-<ul>
-<li>$b \sim Binomial(N,p)$ <strong>data distribution</strong></li>
-<li>$p \sim Uniform(0,1)$ <strong>prior distribution</strong></li>
-</ul>
-<p>所以根据贝叶斯定理，</p>
-<script type="math/tex; mode=display">
-posterior = \frac{likelihood \times prior}{average\;likelihood}</script><p>得到后验概率：</p>
-<script type="math/tex; mode=display">
-Pr(p|b,N) = \frac{Pr(b|p,N) Pr(p)}{\int Pr(b|p,N)Pr(p)dp}</script><h1 id="什么是概率编程"><a href="#什么是概率编程" class="headerlink" title="什么是概率编程"></a>什么是概率编程</h1><p>本质思想是取样所有可能的结果，并得到confidence</p>
-<p>就是在普通的编程上添加两个特性：</p>
-<ol>
-<li>有从各种分布中随机取值的能力</li>
-<li>有根据观察进行条件判断从而决定变量的值的能力</li>
-</ol>
-<p>换一种说法就是概率编程能够从正向和反向运行：</p>
-<ol>
-<li>正向：计算假设的结果</li>
-<li>反向：从观测的数据影响条件（限制可能的解释）</li>
-</ol>
-<h1 id="概率编程语言Probabilistic-Programming-Language"><a href="#概率编程语言Probabilistic-Programming-Language" class="headerlink" title="概率编程语言Probabilistic Programming Language"></a>概率编程语言Probabilistic Programming Language</h1><p>一般来说组成一门语言，需要syntax语法和semantic语义</p>
-<p><img src="/2020/03/18/Probabilistic-Background/SPPL_syntax.png" alt></p>
-<p>我们可以看到，基本上概率编程语言的syntax就是在普通编程语言syntax的基础上添加了分布。</p>
-<p><img src="/2020/03/18/Probabilistic-Background/state.png" alt></p>
-<p>那么对应的semantics上我们也添加了概率，</p>
-<h1 id="Data-Flow"><a href="#Data-Flow" class="headerlink" title="Data Flow"></a>Data Flow</h1><p>举例来说给变量x赋值一个伯努利分布，如下：</p>
-<script type="math/tex; mode=display">
-(x := Bernoulli(p),\sigma) \xrightarrow{p} \sigma[x \leftarrow True]</script><script type="math/tex; mode=display">
-(x:= Bernoulli(p),\sigma) \xrightarrow{1-p} \sigma[x \leftarrow False]</script><p>一个实例：</p>
-<p>$({x \rightarrow ?, y \rightarrow ?}, 1.0)$</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x:&#x3D;Bernoulli(0.7)</span><br></pre></td></tr></table></figure>
-<p>$({x \rightarrow \top, y \rightarrow ?}, 0.7),<br>({x \rightarrow \perp, y \rightarrow ?}, 0.3)$</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">y:&#x3D;Bernoulli(0.2)</span><br></pre></td></tr></table></figure>
-<script type="math/tex; mode=display">({x \rightarrow \top, y \rightarrow \top}, 0.14),
-({x \rightarrow \top, y \rightarrow \perp}, 0.56),\\\\
-({x \rightarrow \perp, y \rightarrow \top}, 0.06),
-({x \rightarrow \perp, y \rightarrow \perp}, 0.24)</script><p>然后我们需要观测，如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">observe x &#x3D;&#x3D; True</span><br></pre></td></tr></table></figure></p>
-<script type="math/tex; mode=display">({x \rightarrow \top, y \rightarrow \top}, 0.14/(0.14+0.56)),\\
-({x \rightarrow \top, y \rightarrow \perp}, 0.56/(0.14+0.56)))</script><ul>
-<li><code>obeserve</code> 忽略不符合的executions，并正则 $\frac{Pr(non\:stuck\:state)}{\frac{num\:observe\:true}{num\:all\:observation}}$</li>
-<li><code>assume</code> 忽略不符合的execution</li>
-<li><code>assert</code> 让不符合的execution失败</li>
-</ul>
-<h1 id="Symbolic-Probabilistic-Analysis"><a href="#Symbolic-Probabilistic-Analysis" class="headerlink" title="Symbolic Probabilistic Analysis"></a>Symbolic Probabilistic Analysis</h1><h2 id="User-Profile"><a href="#User-Profile" class="headerlink" title="User Profile"></a>User Profile</h2><p>给予我们的输入加一个概率，即我们现在知道某个输入出现的概率是多少。</p>
-<h2 id="Symbolic-Execution"><a href="#Symbolic-Execution" class="headerlink" title="Symbolic Execution"></a>Symbolic Execution</h2><p>假设我们有如下函数</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">checkSafety</span><span class="params">(<span class="keyword">int</span> pressure,</span></span></span><br><span class="line"><span class="function"><span class="params">  <span class="keyword">int</span> altitude, <span class="keyword">int</span> spinSpeed)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">int</span> discountedPressure = pressure - altitude/<span class="number">2</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">if</span>(discountedPressure &gt; <span class="number">80</span> &amp;&amp; spinSpeed&gt;<span class="number">72</span>)&#123;</span><br><span class="line">     abort();</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Path Condition(pc)即到达这个情况的路径，比如上面的函数我们想要安全的达到最后的return，而不在中途abort，那么我们就要从root达到图中两个绿点。每个中间节点就相当于一个条件判断，而我们就象征性Symbolic地走到了想要到达的leaf。</p>
-<p><img src="/2020/03/18/Probabilistic-Background/PSE_PC.png" alt></p>
-<p>Path Condition有什么用呢？<br>他使得我们无论怎么分割树的leaf，我们都会获得这些leaves都将是相互独立的。</p>
-<p>比方说上面那两个情况，我们就可以直接求</p>
-<script type="math/tex; mode=display">
-Pr(PC_1) + Pr(PC_2)</script><p>而不用去计算再减去两者的交集 $Pr(PC_1 \wedge PC_2)$</p>
-<p>你可能还想问这有什么用？举个例子，上面那段是1981年失事的哥伦比亚号的一段检查代码，如此判断有几千个之多，我们如何能保证这些代码的可靠性呢？</p>
-<script type="math/tex; mode=display">\begin{align}
-
-Pr(PCs|UP) &= \sum_{i=0}^n Pr(PCs|US_i) p(US_i)\\\\
-&= \sum_{i=0}^n \frac{Pr(PCs \wedge US_i)}{Pr(US_i)} p(US_i) \\\\
-&= \frac{\frac{num\:(PCs \wedge US_i \wedge D)}
-{num\:(D)}}{ \frac{num\:(US_i \wedge D)}{num\:(D)} }\\\\
-&=\frac{num\:(PCs \wedge US_i \wedge D)}{num\:(US_i \wedge D)}
-
-\end{align}</script><p>显然，即使在有限的范围内，通过穷举会消耗polynomial时间，太久。</p>
-<p>这时候我们的Symbolic Execution就可以派上用场了，因为他保证了独立性，所以我们可以用分治法。因为独立的clause可以被记录并再利用。这样就比NASA当时的算法快 $10^4$ 倍。</p>
-<h1 id="Arbitrary-Numerical-Constraint"><a href="#Arbitrary-Numerical-Constraint" class="headerlink" title="Arbitrary Numerical Constraint"></a>Arbitrary Numerical Constraint</h1><p>上面的例子都是离散的，但是真实的世界可不是，更多的情况我们需要预估连续的函数。</p>
-<ul>
-<li>[Hit-or-Miss Monte Carlo]</li>
-<li>[Interval Constraint propagation]</li>
-<li><p>[Stratified sampling]</p>
-</li>
-<li><p>[Optimal sampling allocation]</p>
-</li>
-<li>[未完待续]</li>
-</ul>
-<h1 id="PyMC3"><a href="#PyMC3" class="headerlink" title="PyMC3"></a>PyMC3</h1><p>讲了这么多，都是simple ppl或者是用其他语言模拟的概率编程。我们来看一下PyMC3。</p>
-<h2 id="Model-Variables"><a href="#Model-Variables" class="headerlink" title="Model Variables"></a>Model Variables</h2><ul>
-<li>Random variables: m.basic_RVs</li>
-<li>Free variables: m.free_RVs</li>
-<li>Observed variables: m.observed_RVs</li>
-</ul>
-<p>[Skipping lots of content]</p>
-<h1 id="Spurious-Model"><a href="#Spurious-Model" class="headerlink" title="Spurious Model"></a>Spurious Model</h1><p>Predictor Residual Plot<br>以A为因，输入B中，我们会得到两个量</p>
-<p>一个是Posterior后的 b<br>另一个是Posterior后的 mu<br>每一个算粗来线都和</p>
-<p>看他们的residual大小</p>
-
-          
+<li>评估模型 （critique）</li></ol>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/03/18/Probabilistic-Background/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -545,47 +564,18 @@ Pr(PCs|UP) &= \sum_{i=0}^n Pr(PCs|US_i) p(US_i)\\\\
 
       
         
-          
-            <h1 id="Off-Chain-Transcation"><a href="#Off-Chain-Transcation" class="headerlink" title="Off Chain Transcation"></a>Off Chain Transcation</h1><p>好处：</p>
+          <h1 id="Off-Chain-Transcation"><a href="#Off-Chain-Transcation" class="headerlink" title="Off Chain Transcation"></a>Off Chain Transcation</h1><p>好处：</p>
 <ul>
 <li>没有共识的延迟和费用</li>
 <li>同时能保证无第三方保障的安全性</li>
-<li>可以向后兼容（反悔！）</li>
-</ul>
-<h1 id="Channel-Networks"><a href="#Channel-Networks" class="headerlink" title="Channel Networks"></a>Channel Networks</h1><h2 id="Payment-Channel"><a href="#Payment-Channel" class="headerlink" title="Payment Channel"></a>Payment Channel</h2><ol>
-<li>从某一时间t开始，在现在A与B线下交易。Set up channel</li>
-<li>每交易一次，只记录最后的结果。</li>
-<li>因为每次交易双方都要签名，所以可以验证交易的真实性。</li>
-<li>直到另一时间点t+k，channel结束，我们把最后的记录返回到blockchain中</li>
-</ol>
-<ul>
-<li>Balance Security任意一方都可以撤回原有的金额，无需另一方的辅助。</li>
-<li>State Progression当channel结束时，双方都可上传</li>
-</ul>
-<p>那如果两者有歧义呢？</p>
-<p>那么会在channel结束时，不满意的一方可以触发争议机制，然后在固定长度争议时间内，Blockchain会要接受两人的evidence，交由其他的节点来验证，最后争议结束。</p>
-<p>争议过程需要支付手续费。</p>
-<h2 id="State-Replacement"><a href="#State-Replacement" class="headerlink" title="State Replacement"></a>State Replacement</h2><p>把上一个state invalidate，然后只保存新的那个</p>
-<h3 id="Time-Lock-State-Replacement"><a href="#Time-Lock-State-Replacement" class="headerlink" title="Time Lock State Replacement"></a>Time Lock State Replacement</h3><p>Time Lock: 某个transaction不会在N个block内被纳入Blockchain中。<br>想当于保证了transaction顺序</p>
-<h3 id="Revocation-State-Replacement-Lightning"><a href="#Revocation-State-Replacement-Lightning" class="headerlink" title="Revocation State Replacement(Lightning)"></a>Revocation State Replacement(Lightning)</h3><p><img src="/2020/03/16/BlockChain-Scaling/Lightning.png" alt><br>如果有人作恶，那么所有的钱全归另一人。</p>
-<h2 id="同步"><a href="#同步" class="headerlink" title="同步"></a>同步</h2><p>因为在payment channel中只能单向传播，所以我们需要一个简单的条件转移。</p>
-<h2 id="Routing"><a href="#Routing" class="headerlink" title="Routing"></a>Routing</h2><ol>
-<li>Scalable：希望可以保持高速的交易</li>
-<li>Effectiveness：可以找到最可能过的路径</li>
-<li>Efficiency：快速</li>
-</ol>
-<h2 id="好处"><a href="#好处" class="headerlink" title="好处"></a>好处</h2><ul>
-<li>No Direct connection needed</li>
-<li>Decentralized limited censorship</li>
-<li>Optimistically fast and cheap</li>
-</ul>
-<h2 id="坏处"><a href="#坏处" class="headerlink" title="坏处"></a>坏处</h2><ul>
-<li>Collateral for each hop</li>
-<li>On-chain channel establishment</li>
-<li>Wormhole attack</li>
-</ul>
-
-          
+<li>可以向后兼容（反悔！）</li></ul>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/03/16/BlockChain-Scaling/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1203,129 +1193,22 @@ Pr(PCs|UP) &= \sum_{i=0}^n Pr(PCs|US_i) p(US_i)\\\\
 
       
         
-          
-            <h1 id="数据形式"><a href="#数据形式" class="headerlink" title="数据形式"></a>数据形式</h1><ol>
-<li><p>Cryptographic Hash Functions</p>
-<ul>
+          <h1 id="数据形式"><a href="#数据形式" class="headerlink" title="数据形式"></a>数据形式</h1><ol>
+<li>Cryptographic Hash Functions<ul>
 <li>输入任意长数据，输出固定长hash，且计算容易</li>
 <li>安全性：<ul>
 <li>防碰撞Collision Resistance:<br>  很难找到一堆x,y满足 $x \neq y$ and $H(x)=H(y)$</li>
 <li>Second pre-image resistance(more constrained than collision resistance)<br>  对于x，很难找到一个y，满足：$x \neq y$ and $H(x) = H(y)$</li>
 <li>Pre-image resistance<br>  对于任意h，在hash函数的输出中，很难找到对应的x，即 $H(x)=h$</li>
 <li>Hiding<br>  当从高低熵概率分布中选择一个秘密值r，再有 $H(r||x)$ 的结果，我们很难找到对应的x，这样的情况下我们可以说hash函数H是hiding<br>  就是说，对密码加hash H和salt r，这样即使有人黑了数据库知道了加密后的密码，也无法倒推出我们的原来的密码</li>
-<li>Puzzle-friendly<br>  对于一个输出n个字节h值的哈希函数H，如果选择一个k，那么他应该很难在$2^n$时间内找到一个x使得$H(k||x)=h$<br>  就是说最佳方法是brute force，使得挖矿变得可能<br>  A solution to the puzzle is a value x, s.t. $H(id||x) \in Y$</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>Markle Tree</p>
-<ul>
-<li>比如有四组Transaction，Hash每个Transcation得到4个hash值，两两hash得到两个hash值，最后再hash一次，得到Merkle Root。<ul>
-<li>如果有奇数的，则自己和自己组hash</li>
-</ul>
-</li>
-<li>如果一个Transcation变动，那么Merkle root会变</li>
-<li>可以通过O(log(n))时间找到变动的地方</li>
-<li>Simple Payment Verification目的是用户不需要下载所有交易部分，只需要有header就可以</li>
-<li>步骤如下，假设有Transcation T_k要验证<br>  1) H_k = Hash(T_k)<br>  2) 节点从区块链网络上获取最长链的Header<br>  3) 从区块链获取带验证支付对应的Merkle tree哈希认证路径<br>  4) 从认证路径，与H_k一起重新计算Hash<br>  5) 如果最后结果与Root相同则支付有效。</li>
-</ul>
-</li>
-</ol>
-<pre><code>![](BlockChain-Background/MerkleTree.png)
-要验证HK，则需要知道HL、HIJ、HMNOP 和 HABCDEFGH
-</code></pre><ol>
-<li>Elliptic Curve Signature Algorithm(ECDSA)<ul>
-<li>用来对transaction签名</li>
-<li>验证Transaction的签名</li>
-</ul>
-</li>
-</ol>
-<h1 id="地址"><a href="#地址" class="headerlink" title="地址"></a>地址</h1><ul>
-<li>唯一身份</li>
-<li>公钥的Hash</li>
-<li>0 &lt; Balance &lt; 21 Million Bitcoin</li>
-<li>1 Satoshi == $10^{-8}$ Bitcoin</li>
-<li>地址的第一位表示需要几个秘钥来</li>
-</ul>
-<h1 id="交易Transaction"><a href="#交易Transaction" class="headerlink" title="交易Transaction"></a>交易Transaction</h1><p>当Alice将她拥有的一个比特币发送0.25个比特币给Bob时，0.25个BTC将会有一个新的地址，而Alice剩下的0.75个BTC的地址也会改变。</p>
-<p>$\sum inputs \geq \sum outputs$ 大于等于是因为中间会收取一定的费用给矿工。</p>
-<h2 id="比特币脚本Scripts"><a href="#比特币脚本Scripts" class="headerlink" title="比特币脚本Scripts"></a>比特币脚本<a href="https://happypeter.github.io/binfo/bitcoin-scripts" target="_blank" rel="noopener">Scripts</a></h2><p><img src="/2020/03/16/BlockChain-Background/Opcode.png" alt></p>
-<ul>
-<li>Stack based programming language，即根据opcode，对stack顶的数据进行计算，这样增快了速度</li>
-<li>如果验证为真，则交易是正确的</li>
-<li>用许多操作码来减少时间，防止DoS攻击</li>
-</ul>
-<h1 id="Transcation的种类"><a href="#Transcation的种类" class="headerlink" title="Transcation的种类"></a>Transcation的种类</h1><ul>
-<li>P2PKH Pay to Public Key Hash如上图所示</li>
-<li>P2SH Pay to Script Hash</li>
-<li>Multisignature(m-n)</li>
-</ul>
-<h2 id="Block"><a href="#Block" class="headerlink" title="Block"></a>Block</h2><p>由Header和List of transactions组成</p>
-<p>Header以下这些组成</p>
-<ol>
-<li>版本信息</li>
-<li>上一个block的header的hash，</li>
-<li>merkle root</li>
-<li>Unix时间戳</li>
-<li>Target（代表挖矿的难度）</li>
-<li>Nonce</li>
-</ol>
-<h1 id="挖矿"><a href="#挖矿" class="headerlink" title="挖矿"></a>挖矿</h1><h2 id="如何挖矿"><a href="#如何挖矿" class="headerlink" title="如何挖矿"></a>如何挖矿</h2><ol>
-<li>加入网络，监听交易，验证所有进来的交易tx，并收集成List of transcation</li>
-<li>监听新的block，区块连会每隔多少时间自动生成一个新的区块<br> 其中包含前一个区块头的hash，交易的merkle root，和一个target<br> 这个target控制挖矿难度，每隔固定周期会调整target是他不会太难或太易</li>
-<li>建立Block模版，即创建header</li>
-<li>找到一个Nonce，使其满足条件<br> Hash( Hash(prev_block_header) | txs | N ) &lt; target，只能brute force</li>
-<li>告诉其他的矿工 gossip P2P</li>
-<li>接受奖励</li>
-</ol>
-<p>因为现在很难靠自己一个人算出结果，所以大家一般都加入一个矿池，Pool Operator按每个人的算力贡献分配所得的。</p>
-<h2 id="Mining-Difficulty-in-Pooling"><a href="#Mining-Difficulty-in-Pooling" class="headerlink" title="Mining Difficulty in Pooling"></a>Mining Difficulty in Pooling</h2><p>Bitcoin Difficulty: Hash(Hash(B3) | txs | N) &lt; Target = 0x000**</p>
-<p>Pool Difficulty: Hash(Hash(B3) | txs | N) &lt; target = 0x00**</p>
-<p>把任务分配给每个矿工，每个矿工的t &lt;&lt; T，难度远小于正常的T</p>
-<h2 id="Merge-Mining"><a href="#Merge-Mining" class="headerlink" title="Merge Mining"></a>Merge Mining</h2><p>如果两种区块链都用了相同的PoW，那么弱的那方（因为参加挖矿的人数不多，所以target比较简单）很容易被大区块链中的矿工池所控制。</p>
-<p>比如Namecoin是对Bitcoin添加了DNS的一个链，其本质算法与Bitcoin相同。那么Bitcoin的矿工计算得到一个随机数，如果随机数满足Namecoin的难度值（Namecoin的难度值一般情况肯定比bitcoin小，或者相等），Namecoin挖矿成功，打包交易成区块，然后上链；</p>
-<p>如果随机数同时满足Bitcoin的难度值，bitcoin挖矿成功，打包交易上链（注意是bitcoin的区块链，bitcoin与namecoin拥有自己独立的区块链）。</p>
-<p>好处：可以利用算力</p>
-<p>缺点：</p>
-<ul>
-<li>方便了黑客</li>
-<li>弱方的链可能不会被validate</li>
-</ul>
-<h2 id="矿池的潜在危害"><a href="#矿池的潜在危害" class="headerlink" title="矿池的潜在危害"></a>矿池的潜在危害</h2><ul>
-<li>可以决定那些transcation添加入blockchain</li>
-<li>可以影响transcation fee或者gas price</li>
-<li>可以相互协作达到51%攻击</li>
-<li>影响PoS的投票机制</li>
-</ul>
-<p>所以要去中心化矿池<br>Bitcoin的方法：P2Pool，重新建一个share链，每个人算shared block，当算到正确解时，发钱。</p>
-<p>Efficiency：A share is set to be found every 30 seconds. The more miners, the higher payout variance</p>
-<p>Security: Many orphan shares (due to short block time) Small P2Pools have weak security. Need to incentivize block submission and validation</p>
-<p>Ethereum的方法：SmartPool</p>
-<h1 id="Fork"><a href="#Fork" class="headerlink" title="Fork"></a>Fork</h1><h2 id="Hard-Fork"><a href="#Hard-Fork" class="headerlink" title="Hard Fork"></a>Hard Fork</h2><p>之前所有的不符合新标准的block都会合规，符合的变不合规。增加了functionality<br>所有的节点都需要升级到最新版本</p>
-<h2 id="Soft"><a href="#Soft" class="headerlink" title="Soft"></a>Soft</h2><p>只有之前合规的block变成不合规，减少了functionality<br>以前的block仍可以用。<br>    比如进阶到了P2SH</p>
-<p><img src="/2020/03/16/BlockChain-Background/Fork.png" alt></p>
-<h1 id="Segregated-Witness-Segwit"><a href="#Segregated-Witness-Segwit" class="headerlink" title="Segregated Witness(Segwit)"></a>Segregated Witness(Segwit)</h1><p>把签名和脚本放到witness block中，链中只保存sender，reciver和value</p>
-<p>好处：</p>
-<ol>
-<li>可以扩容到4mb而不需要hard fork，</li>
-<li>同时也解决了malleable的问题，<br> 即Bob可以改变上一个Alice与Bob的未提交的交易Tx，即改变其 signature，使得Tx不成立，那么Bob和Charlie之间的交易Tx+1，根据UTXO就会不成立，如果Charlie已经给Bob物品，那么就会有损失。</li>
-</ol>
-<p>缺点：</p>
-<ol>
-<li>Signatures required to validate a block,</li>
-<li>Complex</li>
-</ol>
-<h1 id="用户分类"><a href="#用户分类" class="headerlink" title="用户分类"></a>用户分类</h1><ul>
-<li>Full Node保存了所有的记录的节点</li>
-<li>Miner矿工</li>
-<li>Light Node用户<ul>
-<li>因为不全，所以使用SPV</li>
-<li>小，可以PoW，可以跟全连。</li>
-</ul>
-</li>
-</ul>
-
-          
+<li>Puzzle-friendly<br>  对于一个输出n个字节h值的哈希函数H，如果选择一个k，那么他应该很难在$2^n$时间内找到一个x使得$H(k||x)=h$<br>  就是说最佳方法是brute force，使得挖矿变得可能<br>  A solution to the puzzle is a value x, s.t. $H(id||x) \in Y$</li></ul></li></ul></li></ol>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/03/16/BlockChain-Background/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1622,135 +1505,6 @@ label &=  \underset{k}{arg\:max}\;p(C_k|x)\\\\
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/14/FNN/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Lifan Zhao">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lifan's Note">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/03/14/FNN/" itemprop="url">FNN</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-14T21:23:32+00:00">
-                2020-03-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="前情提要：机器学习"><a href="#前情提要：机器学习" class="headerlink" title="前情提要：机器学习"></a>前情提要：机器学习</h1><h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>对于某类任务 T 和性能度量<br>P，一个计算机程序被认为可以从经验 E 中学习是指，通过经验 E 改进后，它在任务 T 上由性能度量 P 衡量的性能有所提升。</p>
-<ul>
-<li>T：指我们想要完成的任务，如分类，回归，合成采样等等</li>
-<li>P：一般指准确率accuarcy</li>
-<li>E：经验，我们的数据集。对于supervised，我们的数据集包含特征和标签。对于unsupervised，只包含特征，学习特征的结构关系，如聚类。</li>
-</ul>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/03/14/FNN/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1805,7 +1559,7 @@ label &=  \underset{k}{arg\:max}\;p(C_k|x)\\\\
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-count">14</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
