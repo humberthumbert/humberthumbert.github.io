@@ -79,16 +79,16 @@
 
 
 
-<meta name="description" content="支持随机变量推断作为一个通用的推断算法被重点设计在Pyro之中。现在我们就来看一下Pyro中我们如何使用变分推断。 Setup我们将假设，我们已经用Pyro定义了模型（细节可见Pyro模型简介）Pyro的model是一个接受参数的随机函数model (*args, **kwargs)。model()的不同部分的映射关系如下：  观察Observation $\Leftrightarrow$ 带ob">
+<meta name="description" content="支持随机变量推断作为一个通用的推断算法被重点设计在Pyro之中。现在我们就来看一下Pyro中我们如何使用变分推断。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Pyro SVI 随机变分推断简介">
 <meta property="og:url" content="http://humberthumbert.github.io/2020/03/20/Pyro-SVI/index.html">
 <meta property="og:site_name" content="Lifan&#39;s Note">
-<meta property="og:description" content="支持随机变量推断作为一个通用的推断算法被重点设计在Pyro之中。现在我们就来看一下Pyro中我们如何使用变分推断。 Setup我们将假设，我们已经用Pyro定义了模型（细节可见Pyro模型简介）Pyro的model是一个接受参数的随机函数model (*args, **kwargs)。model()的不同部分的映射关系如下：  观察Observation $\Leftrightarrow$ 带ob">
+<meta property="og:description" content="支持随机变量推断作为一个通用的推断算法被重点设计在Pyro之中。现在我们就来看一下Pyro中我们如何使用变分推断。">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://humberthumbert.github.io/2020/03/20/Pyro-SVI/Beta.png">
 <meta property="article:published_time" content="2020-03-20T12:34:17.000Z">
-<meta property="article:modified_time" content="2020-03-20T18:06:11.394Z">
+<meta property="article:modified_time" content="2020-03-20T18:09:01.450Z">
 <meta property="article:author" content="Lifan Zhao">
 <meta property="article:tag" content="Probabilistic Programming">
 <meta property="article:tag" content="pyro">
@@ -314,7 +314,7 @@
       
 
       
-        <p>支持随机变量推断作为一个通用的推断算法被重点设计在Pyro之中。现在我们就来看一下Pyro中我们如何使用变分推断。</p>
+        <p>支持随机变量推断作为一个通用的推断算法被重点设计在Pyro之中。现在我们就来看一下Pyro中我们如何使用变分推断。<br><a id="more"></a></p>
 <h1 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h1><p>我们将假设，我们已经用Pyro定义了模型（细节可见<a href="https://humberthumbert.github.io/2020/03/01/Intro-Model/">Pyro模型简介</a>）Pyro的model是一个接受参数的随机函数<code>model
 (*args, **kwargs)</code>。<code>model()</code>的不同部分的映射关系如下：</p>
 <ol>
