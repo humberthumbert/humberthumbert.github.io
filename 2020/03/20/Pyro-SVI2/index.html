@@ -79,15 +79,15 @@
 
 
 
-<meta name="description" content="目标：拓展SVI到大数据集对于一个有N个观察的模型，跑model和guide，建立ELBO这两件事涉及了估计对数概率密度函数，而这个估计的复杂程度挺糟糕的。如果我们想要扩展到大数据集，这将是个问题。幸运的是，ELBO目标天然支持二次采样，只要我们的model&#x2F;guide有一些可供我们使用的条件独立的结构。比方说，当观察对隐变量条件独立，ELBO中的对数似然就可以被近似为：  \sum_{i&#x3D;1}^">
+<meta name="description" content="目标：拓展SVI到大数据集对于一个有N个观察的模型，跑model和guide，建立ELBO这两件事涉及了估计对数概率密度函数，而这个估计的复杂程度挺糟糕的。如果我们想要扩展到大数据集，这将是个问题。幸运的是，ELBO目标天然支持二次采样，只要我们的model&#x2F;guide有一些可供我们使用的条件独立的结构。比方说，当观察对隐变量条件独立，ELBO中的对数似然就可以被近似为：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Pyro SVI：条件独立，二次取样和摊销">
 <meta property="og:url" content="http://humberthumbert.github.io/2020/03/20/Pyro-SVI2/index.html">
 <meta property="og:site_name" content="Lifan&#39;s Note">
-<meta property="og:description" content="目标：拓展SVI到大数据集对于一个有N个观察的模型，跑model和guide，建立ELBO这两件事涉及了估计对数概率密度函数，而这个估计的复杂程度挺糟糕的。如果我们想要扩展到大数据集，这将是个问题。幸运的是，ELBO目标天然支持二次采样，只要我们的model&#x2F;guide有一些可供我们使用的条件独立的结构。比方说，当观察对隐变量条件独立，ELBO中的对数似然就可以被近似为：  \sum_{i&#x3D;1}^">
+<meta property="og:description" content="目标：拓展SVI到大数据集对于一个有N个观察的模型，跑model和guide，建立ELBO这两件事涉及了估计对数概率密度函数，而这个估计的复杂程度挺糟糕的。如果我们想要扩展到大数据集，这将是个问题。幸运的是，ELBO目标天然支持二次采样，只要我们的model&#x2F;guide有一些可供我们使用的条件独立的结构。比方说，当观察对隐变量条件独立，ELBO中的对数似然就可以被近似为：">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-03-20T20:27:53.000Z">
-<meta property="article:modified_time" content="2020-03-21T19:55:53.460Z">
+<meta property="article:modified_time" content="2020-03-21T19:57:23.062Z">
 <meta property="article:author" content="Lifan Zhao">
 <meta property="article:tag" content="Probabilistic Programming">
 <meta property="article:tag" content="pyro">
@@ -312,7 +312,7 @@
       
 
       
-        <h1 id="目标：拓展SVI到大数据集"><a href="#目标：拓展SVI到大数据集" class="headerlink" title="目标：拓展SVI到大数据集"></a>目标：拓展SVI到大数据集</h1><p>对于一个有N个观察的模型，跑<code>model</code>和<code>guide</code>，建立ELBO这两件事涉及了估计对数概率密度函数，而这个估计的复杂程度挺糟糕的。如果我们想要扩展到大数据集，这将是个问题。幸运的是，ELBO目标天然支持二次采样，只要我们的model/guide有一些可供我们使用的条件独立的结构。比方说，当观察对隐变量条件独立，ELBO中的对数似然就可以被近似为：</p>
+        <h1 id="目标：拓展SVI到大数据集"><a href="#目标：拓展SVI到大数据集" class="headerlink" title="目标：拓展SVI到大数据集"></a>目标：拓展SVI到大数据集</h1><p>对于一个有N个观察的模型，跑<code>model</code>和<code>guide</code>，建立ELBO这两件事涉及了估计对数概率密度函数，而这个估计的复杂程度挺糟糕的。如果我们想要扩展到大数据集，这将是个问题。幸运的是，ELBO目标天然支持二次采样，只要我们的model/guide有一些可供我们使用的条件独立的结构。比方说，当观察对隐变量条件独立，ELBO中的对数似然就可以被近似为：<br><a id="more"></a></p>
 <script type="math/tex; mode=display">
 \sum_{i=1}^{N} \approx \frac{N}{M} \sum_{i \in I_M}\:log\:p(x_i|Z)</script><p>其中 $I_M$ 是M个索引组成的mini-batch（M&lt;N）（讨论详见[1,2].）好了，问题解决了！但我们能用它做什么呢？</p>
 <h1 id="在Pyro中标记条件独立"><a href="#在Pyro中标记条件独立" class="headerlink" title="在Pyro中标记条件独立"></a>在Pyro中标记条件独立</h1><p>如果一个使用者想要做这件事，他首先需要保证model和guide都是按Pyro可以利用相关条件独立的方式写下的。Pyro给条件独立提供了两种原始类型：<code>plate</code>和<code>markov</code>。让我们看一下简单的那个</p>
