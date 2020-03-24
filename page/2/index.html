@@ -239,6 +239,138 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Background/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/03/16/BlockChain-Background/" itemprop="url">区块链基础知识</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T13:59:05+00:00">
+                2020-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="数据形式"><a href="#数据形式" class="headerlink" title="数据形式"></a>数据形式</h1><ol>
+<li>Cryptographic Hash Functions<ul>
+<li>输入任意长数据，输出固定长hash，且计算容易</li>
+<li>安全性：<ul>
+<li>防碰撞Collision Resistance:<br>  很难找到一堆x,y满足 $x \neq y$ and $H(x)=H(y)$</li>
+<li>Second pre-image resistance(more constrained than collision resistance)<br>  对于x，很难找到一个y，满足：$x \neq y$ and $H(x) = H(y)$</li>
+<li>Pre-image resistance<br>  对于任意h，在hash函数的输出中，很难找到对应的x，即 $H(x)=h$</li>
+<li>Hiding<br>  当从高低熵概率分布中选择一个秘密值r，再有 $H(r||x)$ 的结果，我们很难找到对应的x，这样的情况下我们可以说hash函数H是hiding<br>  就是说，对密码加hash H和salt r，这样即使有人黑了数据库知道了加密后的密码，也无法倒推出我们的原来的密码</li>
+<li>Puzzle-friendly<br>  对于一个输出n个字节h值的哈希函数H，如果选择一个k，那么他应该很难在$2^n$时间内找到一个x使得$H(k||x)=h$<br>  就是说最佳方法是brute force，使得挖矿变得可能<br>  A solution to the puzzle is a value x, s.t. $H(id||x) \in Y$</li></ul></li></ul></li></ol>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/03/16/BlockChain-Background/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/GAN/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1047,7 +1179,7 @@ label &=  \underset{k}{arg\:max}\;p(C_k|x)\\\\
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">17</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
