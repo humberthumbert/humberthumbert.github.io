@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="deep learning," />
+  <meta name="keywords" content="Blockchain," />
 
 
 
@@ -79,18 +79,20 @@
 
 
 
-<meta name="description" content="前情提要：机器学习定义对于某类任务 T 和性能度量P，一个计算机程序被认为可以从经验 E 中学习是指，通过经验 E 改进后，它在任务 T 上由性能度量 P 衡量的性能有所提升。  T：指我们想要完成的任务，如分类，回归，合成采样等等 P：一般指准确率accuarcy E：经验，我们的数据集。对于supervised，我们的数据集包含特征和标签。对于unsupervised，只包含特征，学习特征的结">
+<meta name="description" content="Off Chain Transcation好处：  没有共识的延迟和费用 同时能保证无第三方保障的安全性 可以向后兼容（反悔！）">
 <meta property="og:type" content="article">
-<meta property="og:title" content="FNN">
-<meta property="og:url" content="http://humberthumbert.github.io/2020/03/15/FNN/index.html">
+<meta property="og:title" content="区块链扩容">
+<meta property="og:url" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Scaling/index.html">
 <meta property="og:site_name" content="Lifan&#39;s Note">
-<meta property="og:description" content="前情提要：机器学习定义对于某类任务 T 和性能度量P，一个计算机程序被认为可以从经验 E 中学习是指，通过经验 E 改进后，它在任务 T 上由性能度量 P 衡量的性能有所提升。  T：指我们想要完成的任务，如分类，回归，合成采样等等 P：一般指准确率accuarcy E：经验，我们的数据集。对于supervised，我们的数据集包含特征和标签。对于unsupervised，只包含特征，学习特征的结">
+<meta property="og:description" content="Off Chain Transcation好处：  没有共识的延迟和费用 同时能保证无第三方保障的安全性 可以向后兼容（反悔！）">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2020-03-14T21:23:32.000Z">
-<meta property="article:modified_time" content="2020-03-16T02:50:06.723Z">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Scaling/Lightning.png">
+<meta property="article:published_time" content="2020-03-16T15:52:43.000Z">
+<meta property="article:modified_time" content="2020-03-19T04:49:52.334Z">
 <meta property="article:author" content="Lifan Zhao">
-<meta property="article:tag" content="deep learning">
+<meta property="article:tag" content="Blockchain">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Scaling/Lightning.png">
 
 
 
@@ -120,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="http://humberthumbert.github.io/2020/03/15/FNN/"/>
+  <link rel="canonical" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Scaling/"/>
 
 
 
 
 
-  <title>FNN | Lifan's Note</title>
+  <title>区块链扩容 | Lifan's Note</title>
   
 
 
@@ -243,7 +245,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/15/FNN/">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Scaling/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Lifan Zhao">
@@ -260,7 +262,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">FNN</h1>
+          <h1 class="post-title" itemprop="name headline">区块链扩容</h1>
         
 
         <div class="post-meta">
@@ -272,8 +274,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-15T05:23:32+08:00">
-                2020-03-15
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T23:52:43+08:00">
+                2020-03-16
               </time>
             
 
@@ -310,61 +312,45 @@
       
 
       
-        <h1 id="前情提要：机器学习"><a href="#前情提要：机器学习" class="headerlink" title="前情提要：机器学习"></a>前情提要：机器学习</h1><h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>对于某类任务 T 和性能度量<br>P，一个计算机程序被认为可以从经验 E 中学习是指，通过经验 E 改进后，它在任务 T 上由性能度量 P 衡量的性能有所提升。</p>
+        <h1 id="Off-Chain-Transcation"><a href="#Off-Chain-Transcation" class="headerlink" title="Off Chain Transcation"></a>Off Chain Transcation</h1><p>好处：</p>
 <ul>
-<li>T：指我们想要完成的任务，如分类，回归，合成采样等等</li>
-<li>P：一般指准确率accuarcy</li>
-<li>E：经验，我们的数据集。对于supervised，我们的数据集包含特征和标签。对于unsupervised，只包含特征，学习特征的结构关系，如聚类。</li>
+<li>没有共识的延迟和费用</li>
+<li>同时能保证无第三方保障的安全性</li>
+<li>可以向后兼容（反悔！）<a id="more"></a>
+<h1 id="Channel-Networks"><a href="#Channel-Networks" class="headerlink" title="Channel Networks"></a>Channel Networks</h1><h2 id="Payment-Channel"><a href="#Payment-Channel" class="headerlink" title="Payment Channel"></a>Payment Channel</h2></li>
 </ul>
-<a id="more"></a>
-<h2 id="拟合中的问题"><a href="#拟合中的问题" class="headerlink" title="拟合中的问题"></a>拟合中的问题</h2><p>这过程是我们希望通过学习的方式拟合真实世界中未知的函数，那么因为我们只有有限的数据集，我们一方面希望生成的函数可以贴近真实的函数underfitting（即减少training error），另一方面也希望生成的函数不要太贴合测试集（毕竟只是对真实世界一部分的采样）overfitting，也即希望泛化误差（generalization error）较低。</p>
-<p>我们用测试集来评估泛化误差 <script type="math/tex">\frac{1}{m^{(test)} }||X^{(test)}w-y^{(test)}||^{2}_{2}</script></p>
-<p>我们可以通过调整模型的容量（capacity），一种控制训练算法容量的方法是选择假设空间（hypothesis space），即扩大函数族比如在线性回归中，使用多项式函数替代。</p>
-<p>使用K-fold的方法可以准确度量泛化误差，即每次取 $\frac{N}{K}$ 的数据作为测试集，剩下的其他为训练集，K次的平均误差就是我们要的泛化误差</p>
-<p>均方差也是一个度量方法，</p>
-<script type="math/tex; mode=display">\begin{align}
-MSE&=E[(\hat\theta_m-\theta)^2] \\
-&= Bias(\hat\theta_m)^2 + Var(\hat\theta_m)
-\end{align}</script><p>容量增大时，bias减小，variance增大。</p>
-<h2 id="最大似然估计"><a href="#最大似然估计" class="headerlink" title="最大似然估计"></a>最大似然估计</h2><p>设 $p_{model}(x;\theta)$ 是我们的模型，对应的有个真实的模型 $p_{data}(x)$</p>
-<p>对 $\theta$ 的最大似然估计就是</p>
-<script type="math/tex; mode=display">
-\begin{align}
-\theta_{ML} &= \underset{\theta}{argmax}\:p_{model}(\mathbb{X};\theta)\\\\
-&=\underset{\theta}{argmax}\:\prod_{i=1}^{m}p_{model}(x^{(i)};\theta)\\\\
-&=\underset{\theta}{argmax}\:\sum_{i=1}^{m}log\:p_{model}(x^{(i)};\theta)\\\\
-&=\underset{\theta}{argmax}\:\mathbb{E}_{x \sim \hat{p}_{data}} log\: p_{model}(x;\theta)
-\end{align}</script><p>那么KL散度</p>
-<script type="math/tex; mode=display">
-D_{KL}(\hat{p}_{data}||p_{model})=\mathbb{E}_{x\sim\hat{p}_{data}}[log\:\hat{p}_{data}(x)-log\:p_{model}(x)]</script><p>又因为 $p_{data}$ 那一项和数据生成无关，所以只需要最小化 $-\mathbb{E}_{x\sim\hat{p}_{data}}[log\:p_{model}(x)]$</p>
-<p>【具体的机器学习算法如PCA, SVM另外一篇文章里再写】</p>
-<h1 id="前馈神经网络Feedforward-Neural-Netweork"><a href="#前馈神经网络Feedforward-Neural-Netweork" class="headerlink" title="前馈神经网络Feedforward  Neural Netweork"></a>前馈神经网络Feedforward  Neural Netweork</h1><p>在机器学习中，我们碰到一个难题，那就是线性模型虽然可以高效且可靠的拟合，但是其能力居现在线性函数之中。<br>为了拓展他，我们使用核kernel来将x变换成非线性。那么如何选择这个核 $\phi$ 呢？</p>
 <ol>
-<li>选择一个无限维的 $\phi$。理想状态是只有维度足够高，我们就可以拟合训练集。但是其对测试集的泛化能力不够。</li>
-<li>手动设计 $\phi$ ，但是每个任务都需要人工手动，且每个 $\phi$ 都只对应那个任务，无法迁移</li>
-<li>而深度学习的策略是去学习 $\phi$ 。比如我们有一个模型$y=f(x;\theta,w)=\phi(x;\theta)^{T}w$，我们有两种参数：用于学习 $\phi$ 的 $\theta$，和用于将 $\phi(x)$ 映射到所需的输出的参数$w$。其中 $\phi$ 定义了一个隐藏层。</li>
+<li>从某一时间t开始，在现在A与B线下交易。Set up channel</li>
+<li>每交易一次，只记录最后的结果。</li>
+<li>因为每次交易双方都要签名，所以可以验证交易的真实性。</li>
+<li>直到另一时间点t+k，channel结束，我们把最后的记录返回到blockchain中</li>
 </ol>
-<p>深度学习的方法，既有第一种方法中可以拟合训练集的能力，也有第二种方法中，可以人工设计函数族 $\phi(x;\theta)$ 的好处，而没必要找到准确的某个函数。</p>
-<p>举例来说，要拟合XOR异或函数 $f(x;W,c,w,b)$，我们可以构建一层隐函数。</p>
-<script type="math/tex; mode=display">f(x;W,c,w,b) = w^T max\{0,W^Tx+c\}+b</script><h2 id="基于梯度的学习"><a href="#基于梯度的学习" class="headerlink" title="基于梯度的学习"></a>基于梯度的学习</h2><p>因为神经网络是非线性的，所以其代价函数是非凸的，也就意味着，我们不可能像线性回归或SVM那样保证全局的收敛（也就是找到全局最优解），所以对初始值敏感（即初始点导致我们只能到达局部最优解）。<br>训练算法就是基于使用梯度来使得损失函数下降的各种方法。</p>
 <ul>
-<li><p>Approximation Error:基于 生成函数 $\hat\phi$ 与实际函数 $\phi$ 之间差异产生的误差，可以通过增加层数来减少</p>
-</li>
-<li><p>Estimation Error:由于通过训练集习得损失和实际损失函数之间的误差产生，用更大的数据量可以减少，但如果我们增加更多的层或神经元，反而会引起overfitting</p>
-</li>
-<li><p>Optimisation Error:因为非凸性导致无法达到全局最优解，更多的计算可以降低error</p>
-</li>
+<li>Balance Security任意一方都可以撤回原有的金额，无需另一方的辅助。</li>
+<li>State Progression当channel结束时，双方都可上传</li>
 </ul>
-<h3 id="输出单元"><a href="#输出单元" class="headerlink" title="输出单元"></a>输出单元</h3><h4 id="Sigmoid"><a href="#Sigmoid" class="headerlink" title="Sigmoid"></a>Sigmoid</h4><p>用于Bernoulli输出分布的sigmoid</p>
-<script type="math/tex; mode=display">
-\hat{y}=\sigma(w^Th+b)</script><p>$\sigma$就是logistic sigmoid，这样我们生成 $\hat{y}$ 服从bernoulli分布 $$</p>
-<p>sigmoid 激活函数在 z 取非常小的负值时会饱和到 0，当 z 取非常大的正值时<br>会饱和到 1。这种情况一旦发生，梯度会变得非常小以至于不能用来学习，无论此时<br>模型给出的是正确还是错误的答案。</p>
-<h4 id="Softmax"><a href="#Softmax" class="headerlink" title="Softmax"></a>Softmax</h4><p>用于Multinoulli输出分布的softmax<br>如果我们的问题不再是二元的（如判断这张图是否是狗），而是分类（如判断这张图属于那种动物），可以使用softmax函数。<br>Softmax是sigmoid的扩展。</p>
-<h3 id="隐藏单元"><a href="#隐藏单元" class="headerlink" title="隐藏单元"></a>隐藏单元</h3><h4 id="Sigmoid-和-tanh"><a href="#Sigmoid-和-tanh" class="headerlink" title="Sigmoid 和 tanh"></a>Sigmoid 和 tanh</h4><p>当 z 取绝对值很大的正值时，它们饱和到一个高值，当 z 取绝对值很大的负值时，它们饱和到一个低值，并且仅仅当 z 接近 0 时它们才对输入强烈敏感。sigmoid 单元的广泛饱和性会使得基于梯度的学习变得非常困难。因为这个原因，现在不鼓励将它们用作前馈网络中的隐藏单元。</p>
-<p>当必须要使用 sigmoid 激活函数时，双曲正切激活函数通常要比 logistic sigmoid 函数表现更好。在 $tanh(0) = 0$ 而 $\sigma(0) = \frac{1}{2}$ 的意义上，它更像是单位函数。</p>
-<h4 id="RELU"><a href="#RELU" class="headerlink" title="RELU"></a>RELU</h4><script type="math/tex; mode=display">g(z) = max\{0,z\}</script><p>易于优化，梯度大且已知，使用 ReLU得到的SGD的收敛速度会比 sigmoid/tanh 快。这是因为它是linear，而且ReLU只需要一个阈值就可以得到激活值，不用去计算复杂的运算。</p>
-<p>但是训练过程该函数不适应较大梯度输入，因为在参数更新以后，ReLU的神经元不会再有激活的功能，导致梯度永远都是零。</p>
-<h4 id="Leaky-RELU"><a href="#Leaky-RELU" class="headerlink" title="Leaky RELU"></a>Leaky RELU</h4><p>解决了左侧为零的情况，使得负轴的信息不会全部丢失</p>
+<p>那如果两者有歧义呢？</p>
+<p>那么会在channel结束时，不满意的一方可以触发争议机制，然后在固定长度争议时间内，Blockchain会要接受两人的evidence，交由其他的节点来验证，最后争议结束。</p>
+<p>争议过程需要支付手续费。</p>
+<h2 id="State-Replacement"><a href="#State-Replacement" class="headerlink" title="State Replacement"></a>State Replacement</h2><p>把上一个state invalidate，然后只保存新的那个</p>
+<h3 id="Time-Lock-State-Replacement"><a href="#Time-Lock-State-Replacement" class="headerlink" title="Time Lock State Replacement"></a>Time Lock State Replacement</h3><p>Time Lock: 某个transaction不会在N个block内被纳入Blockchain中。<br>想当于保证了transaction顺序</p>
+<h3 id="Revocation-State-Replacement-Lightning"><a href="#Revocation-State-Replacement-Lightning" class="headerlink" title="Revocation State Replacement(Lightning)"></a>Revocation State Replacement(Lightning)</h3><p><img src="/2020/03/16/BlockChain-Scaling/Lightning.png" alt><br>如果有人作恶，那么所有的钱全归另一人。</p>
+<h2 id="同步"><a href="#同步" class="headerlink" title="同步"></a>同步</h2><p>因为在payment channel中只能单向传播，所以我们需要一个简单的条件转移。</p>
+<h2 id="Routing"><a href="#Routing" class="headerlink" title="Routing"></a>Routing</h2><ol>
+<li>Scalable：希望可以保持高速的交易</li>
+<li>Effectiveness：可以找到最可能过的路径</li>
+<li>Efficiency：快速</li>
+</ol>
+<h2 id="好处"><a href="#好处" class="headerlink" title="好处"></a>好处</h2><ul>
+<li>No Direct connection needed</li>
+<li>Decentralized limited censorship</li>
+<li>Optimistically fast and cheap</li>
+</ul>
+<h2 id="坏处"><a href="#坏处" class="headerlink" title="坏处"></a>坏处</h2><ul>
+<li>Collateral for each hop</li>
+<li>On-chain channel establishment</li>
+<li>Wormhole attack</li>
+</ul>
 
       
     </div>
@@ -382,7 +368,7 @@ D_{KL}(\hat{p}_{data}||p_{model})=\mathbb{E}_{x\sim\hat{p}_{data}}[log\:\hat{p}_
       
         <div class="post-tags">
           
-            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+            <a href="/tags/Blockchain/" rel="tag"># Blockchain</a>
           
         </div>
       
@@ -395,8 +381,8 @@ D_{KL}(\hat{p}_{data}||p_{model})=\mathbb{E}_{x\sim\hat{p}_{data}}[log\:\hat{p}_
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/03/05/Intro-Inference/" rel="next" title="Pyro推断介绍">
-                <i class="fa fa-chevron-left"></i> Pyro推断介绍
+              <a href="/2020/03/16/BlockChain-Security/" rel="next" title="区块链安全">
+                <i class="fa fa-chevron-left"></i> 区块链安全
               </a>
             
           </div>
@@ -405,8 +391,8 @@ D_{KL}(\hat{p}_{data}||p_{model})=\mathbb{E}_{x\sim\hat{p}_{data}}[log\:\hat{p}_
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2020/03/15/CNN/" rel="prev" title="卷积网络">
-                卷积网络 <i class="fa fa-chevron-right"></i>
+              <a href="/2020/03/18/Probabilistic-Background/" rel="prev" title="概率编程基础知识">
+                概率编程基础知识 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -556,7 +542,7 @@ D_{KL}(\hat{p}_{data}||p_{model})=\mathbb{E}_{x\sim\hat{p}_{data}}[log\:\hat{p}_
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前情提要：机器学习"><span class="nav-number">1.</span> <span class="nav-text">前情提要：机器学习</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#定义"><span class="nav-number">1.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拟合中的问题"><span class="nav-number">1.2.</span> <span class="nav-text">拟合中的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最大似然估计"><span class="nav-number">1.3.</span> <span class="nav-text">最大似然估计</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#前馈神经网络Feedforward-Neural-Netweork"><span class="nav-number">2.</span> <span class="nav-text">前馈神经网络Feedforward  Neural Netweork</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基于梯度的学习"><span class="nav-number">2.1.</span> <span class="nav-text">基于梯度的学习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#输出单元"><span class="nav-number">2.1.1.</span> <span class="nav-text">输出单元</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Sigmoid"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">Sigmoid</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Softmax"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">Softmax</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#隐藏单元"><span class="nav-number">2.1.2.</span> <span class="nav-text">隐藏单元</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Sigmoid-和-tanh"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">Sigmoid 和 tanh</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RELU"><span class="nav-number">2.1.2.2.</span> <span class="nav-text">RELU</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Leaky-RELU"><span class="nav-number">2.1.2.3.</span> <span class="nav-text">Leaky RELU</span></a></li></ol></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Off-Chain-Transcation"><span class="nav-number">1.</span> <span class="nav-text">Off Chain Transcation</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Channel-Networks"><span class="nav-number">2.</span> <span class="nav-text">Channel Networks</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Payment-Channel"><span class="nav-number">2.1.</span> <span class="nav-text">Payment Channel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#State-Replacement"><span class="nav-number">2.2.</span> <span class="nav-text">State Replacement</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Time-Lock-State-Replacement"><span class="nav-number">2.2.1.</span> <span class="nav-text">Time Lock State Replacement</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Revocation-State-Replacement-Lightning"><span class="nav-number">2.2.2.</span> <span class="nav-text">Revocation State Replacement(Lightning)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#同步"><span class="nav-number">2.3.</span> <span class="nav-text">同步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Routing"><span class="nav-number">2.4.</span> <span class="nav-text">Routing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#好处"><span class="nav-number">2.5.</span> <span class="nav-text">好处</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#坏处"><span class="nav-number">2.6.</span> <span class="nav-text">坏处</span></a></li></ol></li></ol></div>
             
 
           </div>

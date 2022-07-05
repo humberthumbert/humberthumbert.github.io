@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="pyro,python," />
+  <meta name="keywords" content="Blockchain," />
 
 
 
@@ -79,19 +79,21 @@
 
 
 
-<meta name="description" content="Pyro中文翻译 尝试翻译Pyro的文档。第一次进行翻译，若有错误欢迎提醒。">
+<meta name="description" content="我们注意到一个事实：所有的区块都需要矿工去放到区块链上的。 那么假设我们完成了一个交易，什么时候会被传到链上呢？有不同的做法  Synchronous同步，即保证在t时刻后上传 Asynchronous异步，即保证最终一定会上传 Eventually Asynchronous最终同步，即给定一个变量t，保证在x+t时刻之前一定上传">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Pyro 安装">
-<meta property="og:url" content="http://humberthumbert.github.io/2020/03/02/first-post/index.html">
+<meta property="og:title" content="区块链：共识机制">
+<meta property="og:url" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Consensus/index.html">
 <meta property="og:site_name" content="Lifan&#39;s Note">
-<meta property="og:description" content="Pyro中文翻译 尝试翻译Pyro的文档。第一次进行翻译，若有错误欢迎提醒。">
+<meta property="og:description" content="我们注意到一个事实：所有的区块都需要矿工去放到区块链上的。 那么假设我们完成了一个交易，什么时候会被传到链上呢？有不同的做法  Synchronous同步，即保证在t时刻后上传 Asynchronous异步，即保证最终一定会上传 Eventually Asynchronous最终同步，即给定一个变量t，保证在x+t时刻之前一定上传">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2020-03-01T17:21:00.000Z">
-<meta property="article:modified_time" content="2020-03-01T23:57:47.809Z">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Consensus/BroadCast.png">
+<meta property="og:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Consensus/Standard.png">
+<meta property="article:published_time" content="2020-03-16T15:02:47.000Z">
+<meta property="article:modified_time" content="2020-03-16T23:46:55.728Z">
 <meta property="article:author" content="Lifan Zhao">
-<meta property="article:tag" content="pyro">
-<meta property="article:tag" content="python">
+<meta property="article:tag" content="Blockchain">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://humberthumbert.github.io/2020/03/16/BlockChain-Consensus/BroadCast.png">
 
 
 
@@ -121,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="http://humberthumbert.github.io/2020/03/02/first-post/"/>
+  <link rel="canonical" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Consensus/"/>
 
 
 
 
 
-  <title>Pyro 安装 | Lifan's Note</title>
+  <title>区块链：共识机制 | Lifan's Note</title>
   
 
 
@@ -244,7 +246,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/02/first-post/">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Consensus/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Lifan Zhao">
@@ -261,7 +263,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Pyro 安装</h1>
+          <h1 class="post-title" itemprop="name headline">区块链：共识机制</h1>
         
 
         <div class="post-meta">
@@ -273,8 +275,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-02T01:21:00+08:00">
-                2020-03-02
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T23:02:47+08:00">
+                2020-03-16
               </time>
             
 
@@ -311,9 +313,96 @@
       
 
       
-        <p>Pyro中文翻译</p>
-<p>尝试翻译<a href="https://pyro.ai/" target="_blank" rel="noopener">Pyro</a>的文档。第一次进行翻译，若有错误欢迎提醒。<br><a id="more"></a></p>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h3 id="从源头安装"><a href="#从源头安装" class="headerlink" title="从源头安装"></a>从源头安装</h3><p>Pyro支持3.4+。安装前请先安装<a href="http://pytorch.org/" target="_blank" rel="noopener">PyTorch</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install pyro-ppl</span><br></pre></td></tr></table></figure><br>或者从源头安装<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;pyro-ppl&#x2F;pyro.git</span><br><span class="line">cd pyro</span><br><span class="line">python setup.py install</span><br></pre></td></tr></table></figure></p>
+        <p>我们注意到一个事实：所有的区块都需要矿工去放到区块链上的。</p>
+<p>那么假设我们完成了一个交易，什么时候会被传到链上呢？有不同的做法</p>
+<ol>
+<li>Synchronous同步，即保证在t时刻后上传</li>
+<li>Asynchronous异步，即保证最终一定会上传</li>
+<li>Eventually Asynchronous最终同步，即给定一个变量t，保证在x+t时刻之前一定上传<a id="more"></a>
+</li>
+</ol>
+<h1 id="可能的失败情况"><a href="#可能的失败情况" class="headerlink" title="可能的失败情况"></a>可能的失败情况</h1><p>矿工节点可能会出错，要设定最多多少节点可以出错，一般来说设定在f &lt; N/2 或 f &lt; N/3<br>矿工节点的表现可以分为以下三种情况</p>
+<ol>
+<li>矿工诚实，且可通讯</li>
+<li>矿工的通信出现问题，无法确认情况</li>
+<li>矿工不诚实</li>
+</ol>
+<h1 id="不同的广播模型："><a href="#不同的广播模型：" class="headerlink" title="不同的广播模型："></a>不同的广播模型：</h1><p>一致模型：即有人会不发送或者终止一个请求<br>可靠模型：即发送者发送v，则</p>
+<ol>
+<li>Termination接受到的人会发送v，</li>
+<li>Reliablity每个接受到的人都发送v，</li>
+<li>Consistancy任意两个发送者都发送v</li>
+</ol>
+<p>其实就是拜占庭将军问题BFT，即在通讯可能延迟，和被干扰的情况下，怎么让各个将军投票执行同一个操作。</p>
+<p>pBFT pratical Byzantine Fault Tolerance 或 <a href="http://thesecretlivesofdata.com/raft/" target="_blank" rel="noopener">RAFT</a>：</p>
+<ol>
+<li>选举出一个节点作为leader，并轮换</li>
+<li>当客户端提出一个操作时，leader通知其他的节点，然后大家验证并投票</li>
+<li>如果f个没有返回消息，而f个恶意返回错误结果，那么只要有f+1个节点返回确认结果即可通过这个操作。而总节点数即为n=3f+1<br>pBFT的特点</li>
+<li>安全性：<ul>
+<li>输出总是一致的，可以排除网络不好或恶意领导的情况</li>
+<li>尽管是异步的，但最终是同步的</li>
+</ul>
+</li>
+<li>存在性Liveness（保证一定有结果）：<ul>
+<li>如果没有进度，新的leader可以被选举</li>
+<li>如果接着网络正常，leader诚实，才有Liveness</li>
+</ul>
+</li>
+</ol>
+<p>（对比PoW 1. Leader就是靠算力选举的 2. 只要有矿工，我们就能保证Liveness）</p>
+<p>pBFT的优点</p>
+<ol>
+<li><p>高效，由于各个节点达成共识是在同一时刻决定的首先，所以pBFT 无需等待确认。</p>
+</li>
+<li><p>节能，因为pBFT 是无需挖矿的，所以pBFT 不用耗能。</p>
+</li>
+</ol>
+<p>pBFT的缺点</p>
+<ol>
+<li><p>中心化，由于要保证各个节点间的频繁的通信，所以节点数不能太多。</p>
+</li>
+<li><p>门槛高，由于pBFT 不能防止女巫攻击，也就无法防御一个恶意用户用多个账户来进行共识的造假行为，所以需要审核加入节点。</p>
+</li>
+</ol>
+<h1 id="FLP不可能原理"><a href="#FLP不可能原理" class="headerlink" title="FLP不可能原理"></a>FLP不可能原理</h1><p>在异步模型系统中，即使只有一个进程失败，也没有任何算法能保证非失败进程达到一致性。</p>
+<p>意味着：每个Protocol都需要有个时间的限定。</p>
+<p>\<br><em>所以Bitcoin和这个有什么关系呢？</em></p>
+<p>因为Bitcoin的矿工都是利益驱使的，且加入和退出都是随意的，即有可能被此利用形成51%攻击。</p>
+<p>比如说A要加入节点，他</p>
+<ol>
+<li>首先需要联系别人，获取其他peer的节点地址，</li>
+<li>通过TCP传输（无验证无加密）要验证的Package（一般你和别人的连接数为125，但是你可以连接更多，这样就意味大家会更多的把transaction发送个你）<br> package包括：<ul>
+<li>signature verification，</li>
+<li>consistency，UTXO验证，</li>
+<li>DoS保护机制<br>  一般性的惩罚：返回的大小或者加密方式错了<br>  严重的惩罚：签名验证错误，UTXO验证错误<br>  禁止IP地址24小时</li>
+</ul>
+</li>
+</ol>
+<p>禁止IP地址的问题是：若用了Tor网络，那么Tor上的所有节点都会被禁止</p>
+<h1 id="Block传播"><a href="#Block传播" class="headerlink" title="Block传播"></a>Block传播</h1><p><img src="/2020/03/16/BlockChain-Consensus/BroadCast.png" alt><br>由上图可见，我们并不能保证你的transaction什么时候会被放到链上。（异步时间模型）</p>
+<h2 id="不同的传播方式"><a href="#不同的传播方式" class="headerlink" title="不同的传播方式"></a>不同的传播方式</h2><ul>
+<li><p>标准</p>
+<ul>
+<li>先发送Transaction/Block的Hash</li>
+<li>接受者接收到hash，并要求返还这个Transaction/Block</li>
+<li>发送者把Transaction/Block发送出去<br><img src="/2020/03/16/BlockChain-Consensus/Standard.png" alt><br>为什么只从一个peer中取Block？因为最早到的最快。</li>
+</ul>
+</li>
+<li><p>发送头部</p>
+<ul>
+<li>先发送Header</li>
+<li>请求Block</li>
+<li>再发送Block</li>
+</ul>
+</li>
+<li>未请求的Block推送<ul>
+<li>矿工直接发送Block，但没添加header</li>
+<li>减少了propagate的时间</li>
+</ul>
+</li>
+<li>Fibre(Fast Internet Bitcoin Relay Engine)Network</li>
+</ul>
 
       
     </div>
@@ -331,9 +420,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/pyro/" rel="tag"># pyro</a>
-          
-            <a href="/tags/python/" rel="tag"># python</a>
+            <a href="/tags/Blockchain/" rel="tag"># Blockchain</a>
           
         </div>
       
@@ -346,14 +433,18 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2020/03/16/BlockChain-SmartContract/" rel="next" title="区块链：智能合约">
+                <i class="fa fa-chevron-left"></i> 区块链：智能合约
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2020/03/02/Intro-Model/" rel="prev" title="Pyro模型简介">
-                Pyro模型简介 <i class="fa fa-chevron-right"></i>
+              <a href="/2020/03/16/BlockChain-Security/" rel="prev" title="区块链安全">
+                区块链安全 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -503,7 +594,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#从源头安装"><span class="nav-number">1.1.</span> <span class="nav-text">从源头安装</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#可能的失败情况"><span class="nav-number">1.</span> <span class="nav-text">可能的失败情况</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#不同的广播模型："><span class="nav-number">2.</span> <span class="nav-text">不同的广播模型：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FLP不可能原理"><span class="nav-number">3.</span> <span class="nav-text">FLP不可能原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Block传播"><span class="nav-number">4.</span> <span class="nav-text">Block传播</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#不同的传播方式"><span class="nav-number">4.1.</span> <span class="nav-text">不同的传播方式</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -650,24 +741,7 @@
   
 
 
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config("");
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-      all[i].SourceElement().parentNode.className += ' has-jax';
-    }
-  });
-</script>
-
-<script type="text/javascript" src="">
-</script>
-<!-- End: Injected MathJax -->
-<!-- hexo-inject:end -->
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
 
 
 
@@ -720,6 +794,43 @@
   
 
   
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
   
 
 
