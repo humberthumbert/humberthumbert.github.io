@@ -239,6 +239,1291 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2022/07/05/ObjectDetection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2022/07/05/ObjectDetection/" itemprop="url">目标检测 整理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-07-05T22:42:43+08:00">
+                2022-07-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Object-Detection目标检测"><a href="#Object-Detection目标检测" class="headerlink" title="Object Detection目标检测"></a>Object Detection目标检测</h1><h2 id="Two-Stage-Objection-Detection"><a href="#Two-Stage-Objection-Detection" class="headerlink" title="Two Stage Objection Detection"></a>Two Stage Objection Detection</h2><h3 id="RCNN"><a href="#RCNN" class="headerlink" title="RCNN"></a>RCNN</h3><p>将<strong>物体检测当做分类问题</strong>处理，即先提取一系列的候选区域，然后对候选区域进行分类。Two-staged</p>
+<ol>
+<li>候选区域生成：region proposal，此时用的是selective search算法：先将图片分割成小区域，然后再合并包含同一物体可能性高的区域并输出，<strong>提取2000个候选区域</strong>，并对每一个区域进行归一化处理得到<strong>固定大小</strong>的图像</li>
+<li>CNN特征提取。用CNN网络得到固定维度的特征输出。</li>
+<li><a href>SVM分类器</a>：使用线性分类器对输出的特征进行分类，并采用了难样本挖掘来平衡正负样本的不平衡</li>
+<li>位置精修：通过一个回归器，对特征进行辩解回归以得到更为精确的目标区域</li>
+</ol>
+<ul>
+<li>三个问题：<ul>
+<li>多步训练：步骤繁琐且训练速度较慢</li>
+<li>分类需要用MLP网络，因此输入的尺寸固定</li>
+<li>region proposal需要提取并保存，占用空间较大</li>
+</ul>
+</li>
+</ul>
+<h3 id="Fast-RCNN"><a href="#Fast-RCNN" class="headerlink" title="Fast RCNN"></a>Fast RCNN</h3><p>有三点改进：</p>
+<ol>
+<li>共享卷积：整幅图送到卷积网络中进行区域生成来减少计算量，但依旧采用selective search方法。 </li>
+<li>RoI Pooling：region of interesting，利用特征池化的方法进行特征尺度变换，可以处理任意大小的图片</li>
+<li>多任务损失：将分类和回归网络放在一起训练，放弃SVM，采用<a href="./MathForDL.md#softmax">softmax函数</a>进行分类</li>
+</ol>
+<h3 id="Faster-RCNN"><a href="#Faster-RCNN" class="headerlink" title="Faster RCNN"></a>Faster RCNN</h3><p>采用Region Proposal Network，利用Anchor机制将区域生成和卷积网络联系在一起。Anchor可以看作是图像上很多固定大小和宽高的方框，FasterRCNN认为只需要将anchor和物体进行匹配，然后对anchor进行分类和位置的微调就可以完成检测，<strong>降低了网络收敛的难度</strong></p>
+<p>包括4个部分：</p>
+<ol>
+<li>特征提取网络Backbone：输入图像经过Backbone得到feature map</li>
+<li><p>RPN Module：区域生成模块，生成region proposal：</p>
+<p><strong>RPN in Stage One</strong></p>
+<ol>
+<li>Anchor生成：RPN对feature map上的<strong>每一个点都对应了9个anchor</strong>。这9个anchor大小宽高不同，[8,16,32]x[0.5,1,2]。每个点的9个anchor对应原尺寸图片上的9个框。</li>
+<li>Anchor与标签的匹配。这些框映射回输入图片的尺寸，然后和ground truth中的bbox做IOU。对于每个Anchor和每个标签，判断标准如下（<strong>注意顺序不能随意变动</strong>）：<ul>
+<li>对于任何一个Anchor，<strong>与所有标签的最大IoU小于0.3</strong>，视为负样本</li>
+<li>对于任何一个Label，<strong>与其最大IoU的Anchor</strong>，视为正样本（保证每个标注的物体有bbox）</li>
+<li>对于任何一个Anchor，<strong>与所有标签的最大IoU大于0.7</strong>，视为正样本</li>
+<li><em>为了保证这一阶段的<strong>召回率Recall</strong>，允许一个标签对应多个anchors，而不允许一个anchor对应多个标签。正样本视为前景（有物体的区域），负样本视为背景（无关注物体的区域）</em></li>
+</ul>
+</li>
+<li>Anchor的筛选：因为生成了2万个anchor，如果全部采用则正负样本不均衡，不利于网络收敛。RPN默认选择256个Anchors进行损失计算，其中最多不超过128个正样本。</li>
+<li><p>求解回归偏移值：对于这些anchor，我们计算其与ground truth的偏移值</p>
+<script type="math/tex; mode=display">\left\{\begin{matrix}
+      &t_x = (x_{gt}-x_a)/w_a\\
+      &t_y = (y_{gt}-y_a)/h_a\\
+      &t_w = \log(\frac{w_{gt}}{w_a})\\
+      &t_h = \log(\frac{h_{gt}}{h_a})
+      \end{matrix}\right .</script><p>  位置偏移$t_x$和$t_y$利用了宽高进行归一化，宽高偏移$t_w$和$t_h$进行了对数处理，限制了偏移量的范围，利于收敛。<strong>在后面预测值的时候，直接将预测的$x,y,w,h$替换上式中的gt</strong>，然后求真值 <strong>$t_x,t_y,t_w,t_h$</strong> 和新得到的值的差值就可以进行学习。</p>
+<pre><code>  - 通过这样的方式缩小了框的坐标变化幅度，只需要预测相对这个anchor的移动量，使得网络易于收敛，准确预测。anchor相当于给了一个强先验，说物体都在我给的这些框里。
+</code></pre></li>
+<li><p>损失函数设计</p>
+<script type="math/tex; mode=display">\mathcal{L}({P_i},{t_i})=\frac{1}{N_{cls}}\sum_i L_{cls}(p_i,p_i^*)+\lambda\frac{1}{N_{reg}}\sum_i P_i^*L_{reg}(t_i,t_i^*)</script><p>  其中 $\sum_i L_{cls}(P_i, P_i^<em>)$是256个筛选出来的Anchors的分类损失，$P_i$是每个Anchor的类别gt，$P_i^</em>$是每个Anchor的预测值，此处指判断是否是前景，不判断具体class，用cross entropy。</p>
+<p>  $\sum_i P_i^<em> L_{reg}(t_i, t_i^</em>)$代表了回归损失，其中bbox_inside_weights实际上起到了$p_i^*$进行筛选的作用，bbox_outside_weights 起到了$\lambda\frac{1}{N_{reg}}$来平衡两部分损失的作用。</p>
+<script type="math/tex; mode=display">L_{reg}(t_i,t_i^*) = \sum_{i\in x,y,w,h}smooth_{L1}(t_i-t_i^*)\\
+      smooth_{L1}(x) = 
+      \begin{cases}
+      0.5x^2 & \text{ if } |x| < 1 \\
+      |x|-0.5& \text{ if } \text{otherwise}
+      \end{cases}</script><p>  当预测值与gt差距太大时，采用L1 loss免得导数太大无法收敛。</p>
+</li>
+</ol>
+<p><strong>RPN in Stage Two</strong></p>
+<ol>
+<li>RPN的功能是region proposal。具体方式和训练RPN相同：<ol>
+<li>backbones提取feature maps</li>
+<li>过RPN网络得到(4x9xHxW)和(2x9xHxW)个值，</li>
+<li>根据分类网络输出的得分（也就是后者）排序，取前12000个得分最高的anchors</li>
+<li>通过<strong>Non-Maximum Suppression</strong>来将重叠的框去掉：<br> 先将anchors按得分排序，取最大的得分的anchor保留，去除所有与这个anchor IoU超过一定threshold的anchors。然后再取剩下的中的最大得分的anchor，重复上一个步骤，直到原始的anchors集都用完。</li>
+<li>取前2000个作为最后的proposal regions<ol>
+<li>2000个proposal region与所有的物体标签的IoU，根据IoU矩阵的值来筛选出符合条件的正负样本，筛选标准如下：</li>
+</ol>
+</li>
+<li>对于任何一个proposal，其与所有标签的最大IoU如果大于等于0.5，视为正样本</li>
+<li>对于任何一个proposal，其与所有标签的最大IoU如果大于等于0且小于0.5，视为负样本<br>然后对于分类出来的正负样本，控制正负样本比例满足1：3，总数控制在256个。因此正样本数量不超过64个，超过就随机取64个。负样本取256-p个，超过也随机取256-p个。<br>这样做的目的是：</li>
+</ol>
+<ul>
+<li>筛选出更贴近正式物体的RoI</li>
+<li>减少送入后续全连接网络的数量，有效减少了计算量</li>
+<li>完成了后续RCNN部分的真值计算</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<ol>
+<li><p>RoI Pooling层</p>
+<p> RPN给出了256个proposal region以及对应的ground truth；Backbone给出了feature maps。因为proposal region是对于原图尺寸而言的，将RoI映射到feature上就是RoI Pooling。</p>
+<p> 假设当前RoI为332x332，backbone提取的feature maps下采样率为16，目标features为512x7x7。</p>
+<ol>
+<li>将332x332下采样16倍，得到20.75x20.75并向下取整，得到20x20.</li>
+<li><p>要将20x20的区域处理为7x7的特征。因为 $ 20/7 \approx 2.857$再次向下取整，采取2x2大小，stride=2的max pooling，得到7x7的输出。</p>
+<ul>
+<li>以输入图片为参考坐标的候选框在feature maps上如何映射？<script type="math/tex; mode=display">\left\{\begin{matrix}
+      scale = \frac{S_f}{S_i}\\
+      X_f = scale * X_i\\
+      Y_f = scale * Y_i
+  \end{matrix}\right .</script>  其中，f下标是feature map，i下标是image，$(X_f,Y_f)$位feature上的坐标点，$(X_i,Y_i)$为原始image上的坐标点。</li>
+<li>如何把形状和大小各异的RoI归一化为固定大小的目标识别区域？<br>  通过对feature map分块池化归一化到固定大小，即第二步，分成$(H_i/H_r)\times (W_i/W_r)$块，对每块MaxPool。</li>
+</ul>
+<p>这里的问题是：因为两次向下取整，势必带来偏差，影响正确率。</p>
+<p><strong>An Alternative Way： RoI Align</strong></p>
+<p><strong>取消量化操作</strong>，利用双线性插值Bilinear Interpolation的方法获得坐标为浮点数的像素点上的图像数值，从而将整个特征聚集过程转为一个连续的操作。</p>
+</li>
+<li>遍历每一个候选区域，保持浮点数边界不做取整。</li>
+<li>将候选区域分割成kxk个单元，每个单元的边界也不做量化。</li>
+<li><p>在每个单元中计算固定四个坐标位置（即：假定4个采样点），用双线性差值的方法计算出这四个位置的值，然后做最大池化操作。以下图为例，将RoI分割成2x2的单元格，再将每个单元格子划分成4个小方格，以每个小方格的中心作为采样点（红色点）对它进行 <strong><a href>双线性插值</a></strong>，得到该采样点的像素值。最后对4个采样点max pooling得到最后ROI Align的结果。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201210111829137.gif" alt></p>
+</li>
+</ol>
+</li>
+</ol>
+<pre><code>设一个点$(x,y)$,知道四个点$Q_{11}=(x_1,y_1),Q_{12}=(x_1,y_2),Q_{21}=(x_2,y_1)$以及$Q_{22}=(x_2,y_2)$
+
+先按x方向进行线性插值
+$$f(x,y_1) = \frac{x_2-x}{x_2-x_1}f(Q_{11})+\frac{x-x_1}{x_2-x_1}f(Q_{21})\\
+f(x,y_2) = \frac{x_2-x}{x_2-x_1}f(Q_{12})+\frac{x-x_1}{x_2-x_1}f(Q_{22})\\
+$$
+再按y方向进行线性插值
+$$f(x,y) = \frac{y_2-y}{y_2-y_1}f(x，y_1) + \frac{y-y_1}{y_2-y_1}f(x,y2)$$
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Bilinear_interpolation_visualisation.svg/170px-Bilinear_interpolation_visualisation.svg.png)
+
+
+- ROI Align的反向传播
+
+    普通RoI Pooling反向传播公式为：
+    $$\frac{\partial L}{\partial x_i}= \sum_r\sum_j[i=i^*(r,j)]\frac{\partial L}{\partial y_{rj}}$$
+
+    其中x_i是池化前feature map上的像素点，y_rj代表池化后第r个候选区域的第j个点，i^*(r,j)代表y_rj像素值的来源（最大池化的时候选出的最大像素值所在点的坐标）
+
+    RoI Align的反向传播需要做出修改：
+    $$\frac{\partial L}{\partial x_i}=\sum_r\sum_j[d(i,i^*(r,j)) &lt; 1](1-\triangle h)(1-\triangle w)\frac{\partial L}{\partial y_{rj}}$$
+
+    因为$x_i^*(r,j)$是一个浮点数的坐标位置，在池化前的特征图中，每个与$x_i^*(r,j)$横纵坐标均小于1的点都应该接受与此对应的点$y_{rj}$回传的梯度，d(.)表示两个点之间的距离，$\triangle h$和$\triangle w$表示$x_i$和$x_i^*(r,j)$横纵坐标的差，这里作为双线性内插的系数乘在原始梯度上。
+</code></pre><ol>
+<li><p>全连接RCNN<br>RoI Pooling得到256x512x7x7的features，将后面三维展开成1维，利用VGGNet的两个全连接层，得到256x4096的RoI特征。为了预测类别和回归，将4096维分别接入分类和回归的MLP中。</p>
+<p>分类网络输出num of class+1（background）维，回归网络输出每个类别下的4个位置偏移量。于是一共输出（num_of_cls+1）*4维。</p>
+<ul>
+<li>虽然256个ROI放在了一起计算，但是相互之间独立，并<strong>没有共享特征</strong>，造成了重复计算。</li>
+</ul>
+<p>损失函数与RPN类似，只不过此时分类softmax为21类不再是2类。回归时最多有64个正样本参与回归计算，负样本不参与回归计算。</p>
+</li>
+</ol>
+<ul>
+<li>一些缺点和后续改进：<ul>
+<li>卷积提取网络：对于多尺度和小尺寸的物体不友好，没有融合多层feature maps</li>
+<li>NMS：对于遮挡物体不友好，因为会直接删除掉造成漏检。</li>
+<li>RoI Pooling：两次向下取整带来feature上的影响，mask rcnn提出RoI Align</li>
+<li>RCNN全连接：没有权值共享</li>
+<li>正负样本：需要超参来限制正负样本的数量</li>
+<li>两个阶段：无法达到实时。</li>
+</ul>
+</li>
+</ul>
+<h2 id="YOLO系列"><a href="#YOLO系列" class="headerlink" title="YOLO系列"></a>YOLO系列</h2><h3 id="YOLO-v1"><a href="#YOLO-v1" class="headerlink" title="YOLO v1"></a>YOLO v1</h3><ol>
+<li>首先将输入图片resize到448x448大小，送入CNN网络，最后输出得到7x7的特征图。<ul>
+<li>特征提取网络有3个细节<ul>
+<li>3x3的卷积过后通常会接一个通道数更低的1x1的卷积，<strong>降低计算量，提升模型的非线性能力</strong></li>
+<li>除了最后一层使用线性激活函数外，其余层的激活函数<strong><a href="./DL-knowledge.md#activation-激活函数">Leaky ReLU</a></strong>（ReLU没有负数的导数，activate均值为正，导致bias shift）</li>
+<li>训练中使用了Dropout与数据增强的方法来防止过拟合</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>特征图的意义<br> 其精髓在于7x7x30的feature map。</p>
+<ol>
+<li>将原图划分为7x7个区域，每个区域就对应着最后特征图上的一个点。</li>
+<li><p>如果一个物体的中心点落在某个7x7的区域中，那么那个区域就负责检测该物体。具体的，我们希望提取的那个点的feature可以预测B个bounding box以及bbox的置信度confidence score。</p>
+<ul>
+<li><p>所谓置信包含两个方面，一是$Pr(object)$这个边界框包含目标的可能性大小，二是这个边界框的准确度（预测框与GT的IoU, $\text{IoU}^{truth}_{pred}$ ）。所以置信度c定义为：$Pr(object) * \text{IoU}^{truth}_{pred}$</p>
+<p>所以需要对应feature maps上的点的channel等于 $B*|x,y,w,h,c|+C$。v1中B=2，C=20，所以最后生成的feature maps通道数为30。</p>
+<p>具体的实现上，前20个是类别概率值，中间两个是bbox的置信度，最后8个是两个预测框的x,y,w,h。纯粹是为了计算 切片方便。</p>
+</li>
+</ul>
+</li>
+<li>损失计算<ol>
+<li>区分开正负样本：<ul>
+<li>当一个真实物体的中心落在了某个区域内，该区域就负责检测该物体。具体做法是将与该真实物体有最大IoU的bbox设为正样本，这个区域的类别真值为该真实物体的类别，该边框的置信度为1</li>
+<li>除了上述被赋予正样本的bbox，其余bbox皆为负样本，负样本没有类别损失与边框位置损失，只有置信度损失，其真值为0</li>
+</ul>
+</li>
+<li>Loss由5部分组成，均采用MSE损失：<br>$$\lambda_{coord}\sum_{i=0}^{s^2}\sum_{j=0}^B\mathbb{1}^{\text{obj}}_{ij}[(x_i-\hat{x_i})^2+(y_i-\hat{y_i})^2]\\</li>
+</ol>
+<ul>
+<li>\lambda_{coord}\sum_{i=0}^{s^2}\sum_{j=0}^B\mathbb{1}^{\text{obj}}_{ij}[(\sqrt{w_i}-\sqrt{\hat{w_i}})^2 + (\sqrt{h_i}-\sqrt{\hat{h_i}})^2] \\</li>
+<li>\sum_{i=0}^{s^2}\sum_{j=0}^B\mathbb{1}^{\text{obj}}_{ij}(C_i-\hat{C_i})^2 \\</li>
+<li>\lambda_{no\ obj}\sum_{i=0}^{s^2}\sum_{j=0}^B\mathbb{1}^{\text{no\ obj}}_{ij}(C_i-\hat{C_i})^2 \\</li>
+<li>\sum_{i=0}^{S^2}\mathbb{1}^{\text{obj}}_i\sum_{c\in \text{classes}}(p_i(c)-\hat{p_i}(c))^2<br>$$</li>
+</ul>
+</li>
+</ol>
+<p>其中第一项是边界框中心坐标的误差项，$\mathbb{1}^{\text{obj}}_{ij}$是指第i个单元格存在目标，且该单元格的第j个bbox负载预测该目标。</p>
+<p>第二项是bbox的宽高的误差项，通过<strong>平方差，降低对尺度的铭感，强化小物体的损失权重</strong></p>
+<p>第三项是包含目标的边界框的置信度误差项。</p>
+<p>第四项是不包含目标的bbox的置信度误差项。$\lambda_{no\ obj}=0.5$调低负样本置信度损失的权重。</p>
+<p>第五项是包含目标的单元格的分类误差项。$\mathbb{1}^{\text{obj}}_i$指的是第i个单元格存在目标。这里的C_i=$Pr(object) * \text{IoU}^{truth}_{pred}$</p>
+<p> 推理的时候需要NMS7x7x2=98个框，需要按类别NMS。</p>
+</li>
+</ol>
+<ul>
+<li>不足之处：<ul>
+<li>每个区域只有两个框，且两个框都指向同一个类别。这个限制会导致模型对小物体，以及靠的特别近的物体检测效果不好</li>
+<li>由于没有anchor这类先验框，模型对<strong>新的，或者不常见宽高比例的物体检测效果不好</strong>，另外由于下采样率较大，边框的检测精度不高</li>
+<li>损失函数中，大物体的位置损失权重越小物体的位置损失权重是一样的，导致同等比例的位置误差，大物体的损失会比小物体大，小物体的损失在总损失中占比较小，会带来物体定位的不准确。</li>
+</ul>
+</li>
+</ul>
+<h3 id="YOLO-v2"><a href="#YOLO-v2" class="headerlink" title="YOLO v2"></a>YOLO v2</h3><ol>
+<li>网络结构的改善：采用了darknet，</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2022/07/05/DL-knowledge/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2022/07/05/DL-knowledge/" itemprop="url">Deep Learning基础知识 整理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-07-05T22:40:41+08:00">
+                2022-07-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Basic-Component"><a href="#Basic-Component" class="headerlink" title="Basic Component"></a>Basic Component</h1><h2 id="Loss常见损失"><a href="#Loss常见损失" class="headerlink" title="Loss常见损失"></a>Loss常见损失</h2><p>机器学习中监督学习的本质是给定一系列样本$(x_i,y_i)$，尝试学习$x\rightarrow y$的映射关系。损失函数是用来估量<strong>模型的输出$\hat{y}$和真实值$y$之间的差距</strong>，从而给模型的优化指引方向。</p>
+<script type="math/tex; mode=display">\hat{\theta}=\argmin_{\theta}\frac{1}{N}\sum_{i=1}^{N}L(y_i,f(x_i;\theta+\lambda \Phi(\theta)))</script><p>其中，前面的均值函数为经验风险，$\mathcal{L}(y_i,f(x_i;\theta))$为损失函数，后面的项$\lambda \Phi(\theta)$为<strong>结构风险</strong>,$\Phi(\theta)$衡量模型复杂度。</p>
+<p>A loss function is a part of a cost function which is a type of an objective function.</p>
+<ul>
+<li>loss function：对单个训练样本而言</li>
+<li>cost fucntion：对整个训练集而言</li>
+<li>objective function：任意希望被优化的函数</li>
+</ul>
+<h3 id="MSE-Mean-Squared-Error-Loss"><a href="#MSE-Mean-Squared-Error-Loss" class="headerlink" title="MSE(Mean Squared Error) Loss"></a>MSE(Mean Squared Error) Loss</h3><p>就是L2 Loss</p>
+<script type="math/tex; mode=display">\mathcal{L}=\frac{1}{N}\sum_{i=1}^{N}(y_i-\hat{y_i})^2</script><ul>
+<li>推导：通过假设<strong>模型预测与真实值之间的误差</strong>服从<strong>高斯分布</strong>$(\mu=0,\sigma=1)$，那么对于任意$x_i$，模型生成他对应真实值$y_i$的概率为：<script type="math/tex; mode=display">p(y_i|x_i)=\frac{1}{\sqrt{2\pi}}\exp(-\frac{(y_i-\hat{y_i})^2}{2})</script>假设N个样本点相互独立，则这组$x$得到对于$y$的概率为他们的累乘：<script type="math/tex; mode=display">\mathcal{L}(x,y)=\prod_{i=1}^N \frac{1}{\sqrt{2\pi}}\exp(-\frac{(y_i-\hat{y_i})^2}{2})</script>两边取对数：<script type="math/tex; mode=display">\mathcal{LL}(x,y)=-\frac{N}{2}\log 2\pi-\frac{1}{2}\sum_{i=1}^N (y_i-\hat{y_i})^2</script>去掉第一项常数,转换成最小化负对数似然(Negative Log-Likelihood)就得到了：<script type="math/tex; mode=display">\mathcal{NLL}(x,y)=\sum_{i=1}^N (y_i-\hat{y_i})^2</script></li>
+<li>所以在假设成立的前提下使用是比较合适的，比如<strong>回归</strong>问题。而类似分类问题就不是一个好选择了。</li>
+</ul>
+<h3 id="MAE-Mean-Absolute-Error-Loss"><a href="#MAE-Mean-Absolute-Error-Loss" class="headerlink" title="MAE(Mean Absolute Error) Loss"></a>MAE(Mean Absolute Error) Loss</h3><p>就是L1 Loss</p>
+<script type="math/tex; mode=display">\mathcal{L} = \frac{1}{N}\sum_{i=1}^{N}|y_i-\hat{y_i}|</script><ul>
+<li>推导：假设<strong>模型预测和真实值之间的误差</strong>服从<strong>Laplace分布</strong>$(\mu=0,\beta=1)$，则对于一个$x_i$其输出值为$y_i$的概率为：<script type="math/tex; mode=display">p(y_i|x_i) = \frac{1}{2}\exp(-|y_i-\hat{y_i}|)</script>同上推导：<script type="math/tex; mode=display">\mathcal{L}(x,y)=\prod_{i=1}^N \frac{1}{2}\exp(-|y_i-\hat{y_i}|)\\
+\mathcal{LL}(x,y) = -\frac{N}{2}-\sum_{i=1}^N|y_i-\hat{y_i}|\\
+\mathcal{NLL}(x,y) = \sum_{i=1}^N|y_i-\hat{y_i}|</script></li>
+<li><strong>MSE和MAE的区别</strong><ul>
+<li>梯度不同，MSE为$-\hat{y_i}$，MAE为$\pm1$，对于梯度下降而言，MSE更好 </li>
+<li>MAE对异常点更鲁棒：平方项会拉大噪点的影响</li>
+</ul>
+</li>
+</ul>
+<h3 id="BCE-Binary-Cross-Entropy-Loss"><a href="#BCE-Binary-Cross-Entropy-Loss" class="headerlink" title="BCE(Binary Cross Entropy) Loss"></a>BCE(Binary Cross Entropy) Loss</h3><p>先通过<a href="./MathForDL.md#sigmoid">sigmoid</a>将输出$\hat{y_i}$限制在$(0,1)$之间，那么对于$x_i$其被判断为正例的概率为$p(y_i=1|x_i)=\hat{y_i}$，那么对应为负例的概率为$p(y_i=0|x_i)=1-\hat{y_i}$</p>
+<script type="math/tex; mode=display">p(y_i|x_i)=\hat{y_i}^{y_i} (1-\hat{y_i})^{1-y_i}</script><p>同上</p>
+<script type="math/tex; mode=display">\mathcal{L}(x,y)=\prod_{i=1}^N(\hat{y_i}^{y_i} (1-\hat{y_i})^{1-y_i})\\
+
+\mathcal{LL}(x,y)=\sum_{i=1}^N y_i \log(\hat{y_i})+ \sum_{i=1}^{N} (1-y_i)\log (1-\hat{y_i})\\</script><p>二元的cross entropy就是</p>
+<script type="math/tex; mode=display">\mathcal{NLL} = -y \log y - (1-y)\log (1-y)</script><h3 id="CE-Cross-Entropy-Loss"><a href="#CE-Cross-Entropy-Loss" class="headerlink" title="CE(Cross Entropy) Loss"></a>CE(Cross Entropy) Loss</h3><p>类似于二分类的BCE，此处的$y_i$变成了<strong>one-hot的向量</strong>，同时模型输出的压缩从Sigmoid函数<strong>变成了<a href="./MathForDL.md#softmax">Softmax函数</a></strong>，其压缩输出在(0,1)之间，且所有输出之和为1</p>
+<script type="math/tex; mode=display">p(y_i|x_i)=\prod_{k=1}^K(\hat{y_i}^k)^{y_i^k}</script><p>其中k属于class的种类数，</p>
+<script type="math/tex; mode=display">\mathcal{NLL}(x,y)=-\sum_{i=1}^N\sum_{k=1}^Ky_i^{k}\log(\hat{y_i}^k)</script><p>又由于$y_i$是one-hot向量，上式可以写成：</p>
+<script type="math/tex; mode=display">\mathcal{NLL} = \sum_{i=1}^{N}y_i^{c_i} \log y_i^{\hat{c}_i}</script><p>其中$c_i$是$x_i$的目标类。</p>
+<ul>
+<li>为什么分类中不使用MSE Loss？<ul>
+<li>因为输出的$\hat{y_i}$和真实值$y_i$需要在分类的类别中，其差值不是高斯分布所以效果很差。</li>
+</ul>
+</li>
+<li>为什么分类使用交叉熵损失？<ol>
+<li>最大似然来解释，即上面的推导</li>
+<li>KL散度，让输出分布和真实分布贴近可以用KL散度表示。$KL(y_i,\hat{y_i})=\sum_{k=1}^K y_i\log y_i-\sum_{k=1}^K y_i\log \hat{y_i}$,又第一项与优化无关，就变成了<a href="./MathForDL.md#cross-entropy">Cross Entropy</a> $-\sum_{k=1}^K y_i\log{\hat{y_i}}$</li>
+</ol>
+</li>
+</ul>
+<h3 id="Hinge-Loss"><a href="#Hinge-Loss" class="headerlink" title="Hinge Loss"></a>Hinge Loss</h3><script type="math/tex; mode=display">\mathcal{L}_{hinge}=\sum_{i=1}^N \max(0,1-sgn(y_i)\hat{y_i})</script><p>当y_i=1的时候，hinge loss会对判断为负的结果有较大惩罚，同时还会在[0,1]区间对判断为正，但是不确定的结果有较小惩罚。所以hinge loss会给出一个清晰的决策边界</p>
+<h3 id="Exponential-Loss"><a href="#Exponential-Loss" class="headerlink" title="Exponential Loss"></a>Exponential Loss</h3><script type="math/tex; mode=display">L(Y,f(X)) = \exp(-Y\ f(X))</script><p>Adaboost中使用</p>
+<h3 id="Log-Likelihood-Loss"><a href="#Log-Likelihood-Loss" class="headerlink" title="Log-Likelihood Loss"></a>Log-Likelihood Loss</h3><script type="math/tex; mode=display">L(Y,P(Y|X))=-log(P(Y|X))</script><p>非常好的表征概率分布，在很多场景尤其是多分类，如果需要知道结果属于每个类别的置信度，那它非常适合；健壮性不强，相比于hinge loss对噪声更敏感</p>
+<h3 id="Focal-Loss"><a href="#Focal-Loss" class="headerlink" title="Focal Loss"></a>Focal Loss</h3><p>由于在one-stage的object detection中windows的前景类别和背景的可能达到1：1000，使用CE Loss，主要的class的Loss会overwhelm数量少的class（也就是背景的判断影响了对前景的学习），所以在CE Loss的基础上改进：</p>
+<script type="math/tex; mode=display">L(Y,f(X))=\sum_{i=1}^K(1-f(x_i))^{\gamma}y^{c_i}\log(f(x_i))</script><h2 id="Activation-激活函数"><a href="#Activation-激活函数" class="headerlink" title="Activation 激活函数"></a>Activation 激活函数</h2><p>通过激活函数给网络添加增加非线性，使得NN可以学习到非线性的复杂函数</p>
+<ol>
+<li>连续并可导（允许少数点不可导）的分线性函数。可导的激活函数可以直接利用数值优化的方式来学习网络参数</li>
+<li>激活函数及其导函数要尽可能简单，有利于提高计算效率</li>
+<li>激活函数的导函数的值域要在一个合适的区间内，不能太大也不能太小，否则会影响训练的效率和稳定性（？ReLU）</li>
+</ol>
+<h3 id="常见激活函数"><a href="#常见激活函数" class="headerlink" title="常见激活函数"></a>常见激活函数</h3><ul>
+<li>tanh: $\tanh(x)=\frac{\exp(x)-\exp(-x)}{\exp(x)+\exp(-x)}$<ul>
+<li>zero-centered，[0,1]区分</li>
+</ul>
+</li>
+<li>Sigmoid:  $\sigma (x)=\frac{1}{1+e^{-x}}$<ul>
+<li>梯度消失，[0,1]区分</li>
+</ul>
+</li>
+<li>Softplus: $ln(1+e^{x}$<ul>
+<li>[0,inf]区分</li>
+</ul>
+</li>
+<li>Softmax: $\frac{e^{x_i}}{\sum_{j=1}^J e^{x_j} }\text{for} i=1,…,J$</li>
+<li>ReLU: $max(0, x)$<ul>
+<li>解决梯度消失的问题。[0,inf]区分</li>
+</ul>
+</li>
+<li>LeakyReLU: $\begin{cases} 0.01x &amp; \text{ if } x<0 \\ x & \text{ if }>0 \end{cases}$</0></li>
+<li>ELU： $f(x)=\begin{cases} x &amp;\text{if }x &gt;0 \\ \alpha(e^x-1) &amp;\text{if} x\leq 0 \end{cases}$<ul>
+<li>relu没有负值，导致激活值的均值不在零，在多层的激活函数累加下会导致bias shift。elu既利用了负值的信息，又让均值为0.</li>
+</ul>
+</li>
+</ul>
+<h2 id="Batch-Normalization"><a href="#Batch-Normalization" class="headerlink" title="Batch Normalization"></a>Batch Normalization</h2><h2 id="Convolution卷积"><a href="#Convolution卷积" class="headerlink" title="Convolution卷积"></a>Convolution卷积</h2><p> Input  $\begin{bmatrix} a &amp; b &amp; c \\ d &amp; e &amp; f \\ g &amp; h &amp; i \\ \end{bmatrix}$, kernel $\begin{bmatrix} 1 &amp; 2 \\ 3 &amp; 4 \\ \end{bmatrix}$</p>
+<p> Output的尺寸：$output = (input-kernel+2*padding)/stride+1$</p>
+<ul>
+<li><strong>为什么用卷积代替mlp</strong><ul>
+<li>全链接层参数太多，导致训练效率低下</li>
+<li>Convolution优点：<ul>
+<li>局部连接local connection：局部感知野：对于一个部分，左右移动一个pixel应该不影响结果（所以mlp中连接所有点的操作过于冗余），局部内的像素连接比较紧密，对较远的像素连接稀疏，通过多层全链接，深处的一个点就相当于原图的一块区域。</li>
+<li>权值共享weight sharing：减少了weights的数量，降低了网络复杂度。kernel中每一个channel可以理解为不同的特征提取方法，比如边缘检测的算子，这些channel可以通用在整个图片上。</li>
+<li>池化Pooling：降尺寸，减少计算量，特征压缩。通过pooling层，提取特征（max pooling最大的，avg pooling平均的）来减缓卷积层对位置的敏感性。（注：conv2d配合stride同样可以达到downsample的效果，且可能可以学到不一样的特征，而pooling的操作时固定的，但是其占用的计算量和存储量更小。有文章证明conv2d with stride更好）（注2:BP的时候，avg pooling将gradient平均到上一层的每个位置，max pooling将gradient传到最大的那个位置）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>1x1卷积和mlp层的关系</strong><ul>
+<li>对于1x1的输入而言，两者没有区别，而对于[b,c,h,w]的输入，1x1的卷积的输出尺寸不变，[b,c’,h,w]，c’可以进行升维或者降维。而对于MLP层来说，其输出维[b,c,1,1]。另外参数量在h x w的情况下会更多。</li>
+</ul>
+</li>
+<li><strong>空洞卷积</strong><ul>
+<li>对于每次stride，kernel对应的每一个点中间都要隔开dilation个点。以此希望在不改变参数量的情况下增加感受野。（卷积核填充0，或者输入等间隔采样）</li>
+<li>网格效应：局部信息丢失，远距离获取的信息没有相关性</li>
+</ul>
+</li>
+</ul>
+<h2 id="Transpose-Convolution转置卷积-反卷积"><a href="#Transpose-Convolution转置卷积-反卷积" class="headerlink" title="Transpose Convolution转置卷积/反卷积"></a>Transpose Convolution转置卷积/反卷积</h2><p>Input $\begin{bmatrix} a &amp; b &amp;c \\ d &amp; e &amp; f \\ g &amp; h &amp; i \end{bmatrix}$, kernel $\begin{bmatrix} 1 &amp; 2 &amp; 3 \\ 4 &amp; 5 &amp; 6 \\ 7 &amp; 8 &amp; 9 \end{bmatrix}$, 反卷积操作：</p>
+<p>$H_{out}=(H_{in}−1)×stride[0]−2×padding[0]+dilation[0]×(kernel_size[0]−1)+output_padding[0]+1$</p>
+<p>先将input两边补零（kernel_size-1)：</p>
+<script type="math/tex; mode=display">\begin{bmatrix} 
+0 &0 &0 &0 &0 &0 &0\\
+0 &0 &0 &0 &0 &0 &0\\
+0 &0 &a &b &c &0 &0\\
+0 &0 &d &e &f &0 &0\\
+0 &0 &g &h &i &0 &0\\
+0 &0 &0 &0 &0 &0 &0\\
+0 &0 &0 &0 &0 &0 &0\\
+\end{bmatrix}</script><p>如果stride &gt; 1:</p>
+<script type="math/tex; mode=display">\begin{bmatrix}
+0 &0 &0 &0 &0 &0 &0 &0 &0\\
+0 &0 &0 &0 &0 &0 &0 &0 &0\\
+0 &0 &a &0 &b &0 &c &0 &0\\
+0 &0 &0 &0 &0 &0 &0 &0 &0\\
+0 &0 &d &0 &e &0 &f &0 &0\\
+0 &0 &0 &0 &0 &0 &0 &0 &0\\
+0 &0 &g &0 &h &0 &i &0 &0\\
+0 &0 &0 &0 &0 &0 &0 &0 &0\\
+0 &0 &0 &0 &0 &0 &0 &0 &0\\
+\end{bmatrix}</script><p>把kernel 180度旋转：</p>
+<script type="math/tex; mode=display">\begin{bmatrix}
+9& 8& 7\\
+6& 5& 4\\
+3& 2& 1\\
+\end{bmatrix}</script><p>然后进行正常卷积。</p>
+<ul>
+<li><strong>ConvTranspose2d会导致什么？</strong><ul>
+<li><a href="https://distill.pub/2016/deconv-checkerboard/" target="_blank" rel="noopener">Checkerboard Artifact</a> 转置卷积因为stride=2和kernelsize的倍数关系，总会有些下层的点upsampling到上层的时候被多次计算，但是我们又不希望去专门设计不会overlap的filter这样会限制模型的自由度，所以提出了Nearest Neighbor Interpolation-Resize Deconvolution，Bilinear-Resize Deconvolution，虽然一定程度上能减轻棋盘格现象，但是不一定是最好的。</li>
+</ul>
+</li>
+</ul>
+<h2 id="Optimizer优化器"><a href="#Optimizer优化器" class="headerlink" title="Optimizer优化器"></a>Optimizer优化器</h2><p>待优化参数$\theta$，目标函数$f(\theta )$,学习率$\eta$</p>
+<p>每一次epoch t迭代优化：</p>
+<ol>
+<li>计算目标函数关于当前参数的梯度:$g_t=\triangledown_{\theta} f(\theta_{t})$</li>
+<li>根据历史梯度计算一阶动量和二阶动量：$m_t=\phi(g_1,g_2,…,g_t); V_t = \psi(g_1,g_2,…,g_t)$</li>
+<li>计算当前时刻的下降梯度： $\triangle\theta_t=-\eta\times m_t/\sqrt{V_t}$</li>
+<li>根据下降梯度进行更新：$\theta_{t+1}=\theta_t+\triangle\theta_t$</li>
+</ol>
+<h3 id="Stochastic-Gradient-Descendent随机梯度下降"><a href="#Stochastic-Gradient-Descendent随机梯度下降" class="headerlink" title="Stochastic Gradient Descendent随机梯度下降"></a>Stochastic Gradient Descendent随机梯度下降</h3><p>对于一个数据量大，复杂度高的模型，不可能一口气看完所有数据然后计算其梯度。所以才用了minibatch的方法，<strong>以一个minibatch的数据为单位，计算一个批次的梯度，然后再反向传播，并更新参数</strong></p>
+<script type="math/tex; mode=display">\mathcal{g}_t=\triangledown_{\theta_{t-1}}f(\theta_{t-1})</script><p>没有动量$m_t = g_t; V_t = I^2$，所以：</p>
+<script type="math/tex; mode=display">\triangle\theta_t = -\eta \times g_t</script><p>其中，$g_t$参数梯度，$\eta$学习率。</p>
+<ul>
+<li><strong>好处</strong><ul>
+<li>分担训练压力</li>
+<li>加速收敛，因为一个epoch中有多次更新梯度的机会。</li>
+</ul>
+</li>
+<li><strong>坏处</strong><ul>
+<li>开始的学习率难以确定</li>
+<li>容易陷入局部最优解：为了解决这个问题，通常我们会加入动量（momentum）保留一些历史的更新方向，希望<strong>增加优化的稳定性，降低陷入局部最优无法跳出的风险</strong><script type="math/tex; mode=display">m_t = \beta \times m_{t-1}+ (1-\beta)\times g_t\\
+  \triangle\theta_t = -\eta \times m_t</script><ul>
+<li>理论上，如果$m_t,m_{t-1}$的方向相同的话，梯度会变大，加快收敛。如果方向不同，则梯度会变小，抑制梯度更新的震荡增加稳定性。当训练结束的中后期，$g_t$可能趋近于0，动量可以使得梯度不为零从而跳出局部最优。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="AdaGrad"><a href="#AdaGrad" class="headerlink" title="AdaGrad"></a>AdaGrad</h3><p>自适应学习率：对于经常更新的参数，已经积累了大量关于他的只是，不希望被单个样本影响太大，希望学习率慢一点；对于偶尔更新的参数，了解的信息太少，希望从每个偶然出现的样本上多学一点，希望学习率快一些。那么应该<strong>如何度量历史更新频率</strong>呢？<strong><em>二阶动量</em></strong>，即迄今为止<strong>所有梯度值的平方和</strong>：</p>
+<script type="math/tex; mode=display">V_t = \sum_{\tau=1}^t g_\tau^2</script><p>那么我们得到:</p>
+<script type="math/tex; mode=display">\triangle\theta_t = -\eta\cdot m_t / \sqrt{V_t}</script><p>于是学习率变成了$\frac{\eta}{\sqrt{V_t}}$，更新的越多$\sqrt{V_t}$越大，学习率就越小。</p>
+<ul>
+<li>但是由于$\sqrt{V_t}$是单调递增的，最后会导致学习率递减至0，提前结束学习。</li>
+</ul>
+<h3 id="AdaDelta-RMSProp"><a href="#AdaDelta-RMSProp" class="headerlink" title="AdaDelta/RMSProp"></a>AdaDelta/RMSProp</h3><p>既然基于所有历史二阶动量的AdaGrad太过激进，那么何不只选择关注一段时期内，关注过去一段时间窗口的下降梯度。</p>
+<p>指数移动平局值：</p>
+<script type="math/tex; mode=display">V_t = \beta_2\cdot V_{t-1} + (1-\beta_2)g_t^2</script><h3 id="Adam-Adaptive-Momentum"><a href="#Adam-Adaptive-Momentum" class="headerlink" title="Adam(Adaptive + Momentum)"></a>Adam(Adaptive + Momentum)</h3><p>SGD的一阶动量：</p>
+<script type="math/tex; mode=display">m_t = \beta_1\cdot m_{t-1} + (1-\beta_1) \cdot g_t</script><p>加上AdaDelta的二阶动量：</p>
+<script type="math/tex; mode=display">V_t = \beta_2\cdot V_{t-1} + (1-\beta_2) g_t^2</script><p>得到</p>
+<script type="math/tex; mode=display">\triangle\theta_t = -\eta\cdot \frac{\beta_1\cdot m_{t-1} + (1-\beta_1) \cdot g_t}{\sqrt{\beta_2\cdot V_{t-1} + (1-\beta_2) g_t^2}}</script><h4 id="Some-Problem"><a href="#Some-Problem" class="headerlink" title="Some Problem"></a>Some Problem</h4><ul>
+<li>AdaGrad和SGD都会收敛，只是有会提前收敛的问题。但是AdaDelta和Adam由于用的是一段时间内的累积，<strong>$V_t$可能时大时小</strong>导致训练不稳定，模型无法收敛。可以通过$max(V_{t-1},Adam)$的方式保证收敛。</li>
+<li>自适应学习率算法可能会对前期出现的特征过拟合，后期才出现的特征很难纠正前期的拟合效果。</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2022/07/05/GAN2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2022/07/05/GAN2/" itemprop="url">对抗生成网络 整理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-07-05T22:38:38+08:00">
+                2022-07-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="GAN-Metrics"><a href="#GAN-Metrics" class="headerlink" title="GAN Metrics"></a>GAN Metrics</h1><h2 id="Inception-Score"><a href="#Inception-Score" class="headerlink" title="Inception Score"></a>Inception Score</h2><ul>
+<li><strong>Concept</strong> 用图片分类器来评估生成图片的质量。清晰度：对于清楚的图片，分类器应该可以确定的判断该图的种类，那么其熵$p(y|x)$（即不确定性）比较小。多样性：对于所有生成的图片，每个种类应该均匀生成，所以$p(y)=\sum p(y|x^{(i)})$</li>
+<li><p><strong>Equation</strong>： $IS(G)=\exp(\mathbb{E}_{x\sim p_g}D_{KL}(p(y|x)||p(y)))$</p>
+<ul>
+<li>$\mathbb{E}_{x\sim p_g}$: 循环所有样本</li>
+<li>$D_{KL}$: <a href="./MathForDL.md#relative-entropy--kl-divergence">KL散度</a></li>
+<li>$p(y|x)$: 对于图片x，属于所有类别的概率分布，对于给定图片x，表示为一个1000维向量</li>
+<li>$p(y)$: 边缘概率，具体实现为对于所有的验证图片x，计算得到$p(y|x)$，再求所有向量的平均值。</li>
+</ul>
+</li>
+<li><p><strong>IS 有什么问题</strong></p>
+<ol>
+<li>数据集，因为基于InceptionV3，只能使用ImageNet1000，所以不能直接生成图片套用在InceptionV3上。</li>
+<li>使用框架的不同，pytorch，tensorflow等，IS差别会很大</li>
+<li>IS高的图片不一定真实：因为是根据分类器来给分的，所以可以根据分类器的结果来刷分（提高全体图片的类别多样性，那么每一张图片的熵就会低）</li>
+<li>IS低的图片不一定虚假：如果图片的类不在1000类中则会低</li>
+<li>多样性检测有局限性：如果每个类只生成一个样子，依旧是mode collapses</li>
+<li>IS不能反映过拟合：如果模型完全记忆数据集，给出Train集的数据，IS也会很高。</li>
+</ol>
+</li>
+</ul>
+<h2 id="FID"><a href="#FID" class="headerlink" title="FID"></a>FID</h2><ul>
+<li><strong>Definition</strong>: The Frechet distance $d(\cdot,\cdot)$ between the Gaussian with mean $(m, \Sigma)$ obtained from $p(\cdot)$ and the Gaussian with mean $(m_r, \Sigma_w)$  obtained from $p_w$. 假设原始图片和生成图片都服从高斯分布，计算两个分布的均值和协方差，算均值和协方差的距离。</li>
+<li><strong>Equation</strong>: $d^2((m_g, \Sigma_g), (m_r, \Sigma_w) = ||m_g-m_r||^2_2 + Tr(\Sigma_g+\Sigma_w-2(\Sigma_g\Sigma_w)^{0.5})$</li>
+<li><p><strong>Method</strong>:</p>
+<pre><code>1. 加载图片[B,C,H,W], 文件数最好是bs的倍数否则会导致少读几个文件。
+2. Inception V3去除输出层，只取到最后一个pooling层，
+    得到[Bx2048x1x1] feature（如果输入图片尺寸不对，
+    增加一个adaptive_avg_pool2d到1x1)
+3. diff = m_g-m_r
+    diff.dot(diff)+np.trace(sigma_g)+np.trace(sigma_r)-2*linalg.sqrtm(simga_g.dot(sigma_r))
+</code></pre></li>
+<li><strong>FID 优缺点</strong><ol>
+<li>优点1：生成模型的训练集可以和InceptionV3不同</li>
+<li>优点2：刷分不会导致生成图片的质量变差</li>
+<li>缺点1：强假设 提取的图片特征符合Gaussian</li>
+<li>缺点2：无法反映过拟合的问题</li>
+</ol>
+</li>
+</ul>
+<h2 id="LPIPS-Learned-Perceptual-Image-Patch-Similarity"><a href="#LPIPS-Learned-Perceptual-Image-Patch-Similarity" class="headerlink" title="LPIPS(Learned Perceptual Image Patch Similarity)"></a>LPIPS(Learned Perceptual Image Patch Similarity)</h2><ul>
+<li>$d(x,x_0)=\sum_l \frac{1}{H_l W_l} \sum_{h,w}||w_l \bigodot (\hat{y}^l_{hw}-\hat{y_{0}}^l_{hw})||$</li>
+<li>通过预训练的VGG，AlexNet等网络，对一对图片x,x_0进行特征提取，对每层提取出来的特征计算归一化后相减得到diff并平方（？），将每层的diff过一个1x1的卷积（乘以w），并进行空间尺度上的平均，最后每层的输出相加。</li>
+<li>StarGANv2里使用LPIPS来测量多样性，数值越大说明越不相似。<ul>
+<li>对此存疑，原文中是通过训练一个simple network，将diff的结果输入到这个网络中让他判断是原图和distort图一对，来反过来finetune整个pretrained network。但是starganv2里好像直接采用了vgg的网络？</li>
+</ul>
+</li>
+</ul>
+<h2 id="Precision-and-Recall（Improved）"><a href="#Precision-and-Recall（Improved）" class="headerlink" title="Precision and Recall（Improved）"></a>Precision and Recall（Improved）</h2><ul>
+<li>Motivation: 因为IS，FID等只有一个维度的分数，所以无法区分不同失败的例子。（无法同时满足真实性和多样性两个指标）</li>
+<li>Definition: 对于参考分布P(X)和学习到的分布Q(Y)，<ul>
+<li>Precision: 生成的图片可以落在真实分布的流型上的比例<script type="math/tex; mode=display">\frac{1}{M}\sum_{j=1}^{M} 1_{Y_j \in \text{manifold}(X_1,...,X_N)}</script></li>
+<li>Density: 真实的图片覆盖生成分布的比例<script type="math/tex; mode=display">\frac{1}{N}\sum_{i=1}^{N} 1_{X_i \in \text{manifold}(Y_1,...,Y_M)}</script>其中N,M是真实和生成的数量，流型Manifold定义为：<script type="math/tex; mode=display">\text{manifold}(X_1,...,X_N)=\bigcup_{i=1}^{N}B(X_i,\text{NND}_k(X_i))</script>其中$B(x,r)$是以x为球心，r为半径的D维球形；$\text{NND}_k(X_i)$是$X_i$到除了自己以外第k近的邻居的距离。</li>
+</ul>
+</li>
+</ul>
+<h2 id="Density-and-Coverage"><a href="#Density-and-Coverage" class="headerlink" title="Density and Coverage"></a>Density and Coverage</h2><ul>
+<li><p>Motivation:precision和recall会受到outliers的影响且计算效率低。</p>
+<ul>
+<li>outlier: 在没有归一化操作前，一个outlier会使得得到的流型覆盖一大块在outlier附近的区域，从而让流型overestimate。<ul>
+<li>precision: 生成的样本可能落在overestimate的流型部分中从而让percision看起来更高。</li>
+<li>recall：因为模型倾向于生成不真实但不同的样本，所以生成流型也经常比真正的生成分布大。另外由于每个模型的fake manifold都不同，每次都需要重新计算流型。</li>
+</ul>
+</li>
+<li>computational inefficiency：需要两两计算距离，每个样本都需要计算$O(kM\log M)$</li>
+</ul>
+</li>
+<li><p>于是提出了Density和Coverage</p>
+<ul>
+<li>Density：计算有多少个真实样本的neighborhood sphere包含$Y_j$,<script type="math/tex; mode=display">\frac{1}{kM}\sum_{j=1}{M}\sum_{i=1}{N}1_{Y_j \in B(X_i, \text{NND}_k(X_i))}</script></li>
+<li>Coverage:计算所有真实样本中，neighborhood sphere包含至少一个生成样本的比例。<script type="math/tex; mode=display">\frac{1}{N}\sum_{i=1}^{N}1_{\exist j \text{s.t.} Y_j \in B(X_i, \text{NND}_k(X_i))}</script></li>
+</ul>
+</li>
+<li>mode collapse 和 mode dropping的区别？<ul>
+<li>mode collapse是 many z to ~one x</li>
+<li>mode dropping是 real data not inG(z)</li>
+</ul>
+</li>
+</ul>
+<h2 id="Perceptual-Path-Length"><a href="#Perceptual-Path-Length" class="headerlink" title="Perceptual Path Length"></a>Perceptual Path Length</h2><ul>
+<li>Idea： 除了清晰度和多样性，生成器<strong>能否很好的把不同图片的特征分离出来</strong>也是一个关注的指标。StyleGAN的作者希望当我们给定一个z from latent space的时候，$z_1$能控制人的头发，$z_2$能控制人的眉毛等等，当调整$z_1$时，生成的图片只会有头发的变换。</li>
+<li>Equation: <strong>PPL评估利用生成器从一个图片变到另一个图片的距离，越小越好</strong><script type="math/tex; mode=display">\text{PPL} = \mathbb{E}[ \frac{1}{\epsilon^2} d(G(slerp(z_1,z_2;t)), G(slerp(z_1,z_2;t+\epsilon))) ]</script><ul>
+<li>$\epsilon$ 细分的小段，1e-4</li>
+<li>$d(\cdot,\cdot)$ perceptual distance，用预训练的VGG来衡量</li>
+<li>slerp：spherical linear interpolation球面线性插值</li>
+<li>$t\sim U(0,1)$插值参数，服从均匀分布</li>
+</ul>
+</li>
+</ul>
+<h2 id="Generative-Adversarial-Network、"><a href="#Generative-Adversarial-Network、" class="headerlink" title="Generative Adversarial Network、"></a>Generative Adversarial Network、</h2><h3 id="WGAN"><a href="#WGAN" class="headerlink" title="WGAN"></a>WGAN</h3><p><a href="./MathForDL.md#jensen-shannon-divergence">书接JS散度</a><br>考虑到几乎不可能去便利所有的联合分布$\gamma$去计算距离$||x-y||$的期望$\mathbb{E}_{(x,y)\sim\gamma}[||x-y||]$，因此直接计算$W(p_r, p_g)$是不现实的，WGAN提出用 Kantorovich-Rubinstein 对偶性将W转化为：</p>
+<script type="math/tex; mode=display">W(p_r, p_g) = \frac{1}{K}\sup_{||f||_L \leq K} \mathbb{E}_{x\sim p_r}[f(x)]-\mathbb{E}_{x\sim p_g}[f(x)]</script><p>$\sup(\cdot)$是上确界，$||f||_L \leq K$表示函数$f: R\rightarrow R$满足K-阶Lipschitz连续性，即满足</p>
+<script type="math/tex; mode=display">|f(x_1-x_2)| \leq K\cdot |x_1-x_2|</script><p>于是，我们使用判别网络$D_\theta (x)$参数化$f(x)$函数，在$D_\theta$满足1阶Lipschitz约束的条件下，K=1，得到：</p>
+<script type="math/tex; mode=display">W(p_r, p_g) = \sup_{||D_\theta||_l \leq 1} \mathbb{E}_{x\sim p_r}[D_\theta(x)] - \mathbb{E}_{x\sim p_g}[D_\theta(x)]</script><p>因此求解$W(p_r, p_g)$的问题转化为：</p>
+<script type="math/tex; mode=display">\underset{\theta}{max}\mathbb{E}_{x\sim p_r}[D_\theta (x)] - \mathbb{E}_{x\sim p_g}[D_\theta (x)] \;\;\;\text{such that}\;\; \ ngledown_{\hat{x}}D(\hat{x}) \leq I</script><p>也就是在满足D(x)处处导数小于1的情况下求解最大值。所以在实际应用上作者的做法是，限制神经网络的所有参数$\theta$都不会超过某个范围[-c,c]，这样关于输入样本x的导数$\frac{\partial f_\theta}{\partial x}$也就不会超过这个范围，所以通过这个上届，满足小于某个K值的上确界。</p>
+<ul>
+<li>可以防止mode collapse，但不能提升图像质量。</li>
+</ul>
+<h3 id="WGAN-GP"><a href="#WGAN-GP" class="headerlink" title="WGAN-GP"></a>WGAN-GP</h3><p>添加了Gradient Penalty来迫使判别器满足1阶Lipschitz函数约束，同时发现在1周围工作效果更好</p>
+<script type="math/tex; mode=display">\text{GP} \triangleq \mathbb{E}_{\hat{x}\sim P_{\hat{x}}}[(||\triangledown_{\hat{x}}D(\hat{x})||_2 - 1)^2]</script><p>所以<strong>Discriminator的目标函数</strong>为：</p>
+<script type="math/tex; mode=display">\underset{\theta}{max} \mathcal{L}(G,D) =
+\mathbb{E}_{x_r\sim p_r}[D(x_r)] - \mathbb{E}_{x_f\sim p_g}[D(x_f)]
+-\lambda\mathbb{E}_{\hat{x}\sim P(\hat{x})}[(||\triangledown_{\hat{x}}D(\hat{x})||_2-1)^2]</script><p>第一项是EM距离，第二项是GP，其中$\hat{x}=tx_r+(1-t)x_f,\;\; t\in[0,1]$<br><strong>Generator的目标函数</strong>为：</p>
+<script type="math/tex; mode=display">
+\underset{\theta}{min} \mathcal{L}(G,D) =
+\mathbb{E}_{x_r\sim p_r}[D(x_r)] + \mathbb{E}_{x_f\sim p_g}[D(x_f)]</script><p>又第一项与G无关，可以省去得到</p>
+<script type="math/tex; mode=display">
+\underset{\theta}{min} \mathcal{L}(G,D) = -\mathbb{E}_{x_f\sim p_g}[D(x_f)] = -\mathbb{E}_{z\sim p_z(\cdot)}[D(G(z))]</script><ul>
+<li><p><strong>WGAN做了什么？</strong></p>
+<ul>
+<li>判别器去掉最后一层sigmoid</li>
+<li>discriminator和generator在算loss时没有log</li>
+<li>每次更新<strong>判别器</strong>的参数后把他们的绝对值clip到一个孤单常数c</li>
+<li>不使用Adam等基于动量的优化算法，推荐使用RMSProp，SGD也行</li>
+</ul>
+</li>
+<li><p><strong>为什么WGAN要把vanilla GAN的最后一层sigmoid拿掉</strong></p>
+<ul>
+<li>因为原始的GAN的目标是判断图片的真假，所以用sigmoid来获取类别的概率。WGAN中判别器作为EM距离的度量网络，其目标是衡量生成分布$p_g$和真实分布$p_r$之间的EM距离，属于实数空间，所以不需要加Sigmoid。</li>
+</ul>
+</li>
+</ul>
+<h3 id="Vanilla-GAN"><a href="#Vanilla-GAN" class="headerlink" title="Vanilla GAN"></a>Vanilla GAN</h3><ul>
+<li>Idea: 给定一个latent z使用generator来生成图片，使用discriminator来判断区分生成图片和真实图片，并返还gradient给Generator更新参数。Discriminator的目标是最大化区分真假的结果，Generator的目标是最小化其生成图片被判断为假的概率。最后两者大道纳什均衡。</li>
+<li><p>Equation:</p>
+<ul>
+<li><p>Discriminator:</p>
+<script type="math/tex; mode=display">\mathcal{L}(G,D)=\mathbb{E}_{x_r\sim p_r}[\log D(x_r)]+\mathbb{E}_{z\sim p_z}[\log(1-D(G(z)))]</script></li>
+<li><p>Generator:</p>
+<script type="math/tex; mode=display">\mathcal{L}(G,D)=\mathbb{E}_{z\sim p_z}[\log(1-D(G(z)))]【1】</script><ul>
+<li>因为$\log(1-D(G(x)))$的梯度很小，作者用了一个log D trick，将其替换为最大化$\log(D(G(x))$，其梯度更大，且和Discirminator学习的方向一致。</li>
+</ul>
+</li>
+<li><p>所以总的目标函数为：</p>
+<script type="math/tex; mode=display">
+\underset{G}{min}\ \underset{D}{max}\ V(G,D) =
+\mathbb{E}_{x_r\sim p_r}[\log D(x_r)]+
+\mathbb{E}_{z\sim p_z}[\log D(1-G(z))]</script></li>
+</ul>
+</li>
+<li><p><strong>Vanilla GAN的问题</strong></p>
+<ul>
+<li><p>判别器越好，生成器梯度消失越严重。</p>
+<ul>
+<li>当固定G的时候D Loss变为：$-P_r(x)\log(D(x))-P_g(x)\log(1-D(x))$<br>  令其关于D(x)的导数为0的道<script type="math/tex; mode=display">-\frac{P_r(x)}{D(x)}+ \frac{P_g(x)}{1-D(x)}=0\\
+  D^*(x) = \frac{P_r(x)}{P_r(x)+P_g(x)}【2】</script>论文里于是证明：当$P_r(x)=0$且$P_g(x)\neq0$时，最优判别器应该为给出0（也就是说判断生成的图片都为假）；而当$P_r(x)=P_g(x)$时，最优判别器应该给出0.5（也就是说无法判断谁真谁假）</li>
+</ul>
+<p>于是我们回头看Generator的loss，加上一项判断$x_r$的值对于gradient并无影响(最小化他等同于最小化之前的loss），得到：</p>
+<script type="math/tex; mode=display">\mathbb{E}_{x_r\sim p_r}[\log(D(x_r))]+\mathbb{E}_{z\sim p_z}[\log(1-D(G(z)))]</script><p>把公式【2】带回，得到</p>
+<script type="math/tex; mode=display">\mathbb{E}_{x_r\sim p_r}[\log \frac{P_r(x)}{\frac{1}{2}[P_r(x)+P_g(x)]}] + \mathbb{E}_{x_g\sim p_g}[\log \frac{P_g(x)}{\frac{1}{2}[P_g(x)+P_r(x)]}] -2\log2</script><p>根据JS散度:</p>
+<script type="math/tex; mode=display">2JS(P_r||P_g)-2\log2</script><p>在假设中JS散度对于有重叠的两个分布则公式是成立，但是因为GAN的z的取值有限（比如2^6维）而要生成的图片维度极高（比如256*256=2^16），则图片虽然在高维，但是其变化受到z值的限制，于是两个$p_r$和$p_g$的分布就很难会有重叠；如果没有重叠，那么JS散度就变成了0，而损失也就变成了-2log2，而梯度就变成了0。</p>
+</li>
+<li>最小化第二种生成器loss函数，会等价于最小化一个不合理的距离衡量，导致两个问题，一是梯度不稳定，二是mode collapse。<br>经过<a href="https://zhuanlan.zhihu.com/p/25071913" target="_blank" rel="noopener">推导</a>，最小化第二个G loss函数等同于最小化<script type="math/tex; mode=display">KL(P_g||P_r)-2JS(P_r||P_g)</script>一边是要最小化生成分布和真实分布的KL散度，另一边却又要最大化两者JS散度，于是会梯度不稳。另外，$KL(P_g||P_r)$项对生成的样本不真实时惩罚巨大，对没生成真实样本的情况惩罚微小，导致生成器偏向生成几种确定的样本，从而导致模式坍塌。</li>
+</ul>
+</li>
+</ul>
+<h3 id="LSGAN"><a href="#LSGAN" class="headerlink" title="LSGAN"></a>LSGAN</h3><script type="math/tex; mode=display">L_D^{LSGAN}=\mathbb{E}[(D(x)-1)^2]+\mathbb{E}[D(G(z))^2]</script><script type="math/tex; mode=display">L_G^{LSGAN}=\mathbb{E}[D(G(z)-1)^2]</script><p>  惩罚离群的点，让生成图像接近真实数据<br>  但是会使得生成图像失去多样性</p>
+<h3 id="DCGAN"><a href="#DCGAN" class="headerlink" title="DCGAN"></a>DCGAN</h3><ul>
+<li>把GAN的mlp转变为全卷积。Generator里用<a href="./DL-knowledge.md#transpose-convolution转置卷积反卷积">Conv2dTranspose</a>进行上采样，一步一步扩大图片尺寸。<ul>
+<li>Generator中使用ReLU作为<a href="./DL-knowledge.md#activation-激活函数">激活函数</a></li>
+</ul>
+</li>
+<li>Discriminator和Generator对称，取消pooling层，用带步长的卷积代替，一步一步缩小图片，最后判断图片真假。<ul>
+<li>Discriminator中使用Leaky ReLU。</li>
+</ul>
+</li>
+<li>Generator和Discriminator中使用BN层（稳定GAN的训练）<ul>
+<li>实验表示但不要对generator的输出层和discriminator的输入层使用BN，会不稳定</li>
+</ul>
+</li>
+<li>提出latent interpolation，对于z1，z2生成的两张图片x1，x2， 如果对z1，z2进行线性插值生成的图片应该显示从x1逐渐渐变到x2。如果图像发生急剧变化，则就是模型没有学到特征只是记住了图像。</li>
+<li>通过生成模型输入向量的加减发修改图像，类似word2vec，king-man+woman=queen</li>
+</ul>
+<h3 id="Improved-Techiques-for-Training-GANs"><a href="#Improved-Techiques-for-Training-GANs" class="headerlink" title="Improved Techiques for Training GANs"></a>Improved Techiques for Training GANs</h3><ul>
+<li>Feature matching: 因为generator和discriminator在进行min max的纳什均衡游戏，但是两者的目标函数又是凹函数，会导致两者loss此消彼长。提出使用discriminator作为feature extractor，然后将generator的目标改为$||\mathbb{E}_{x\sim p_r}f(x)-\mathbb{E}_{z\sim p_z}f(G(z))||_2^2$。<ul>
+<li>个人认为虽然在统计意义上是合理的，但是不是很make sense，在多轮epoch中一张图片会有不同z生成，势必导致G混淆latent的作用。</li>
+</ul>
+</li>
+<li>Minibatch Discriminator：认为mode collapse的原因和discriminator每次只看一张图片有关，由于每次只看一张图片，discriminator容易落入local minimal无法跳出。所以使用minibatch，对于discriminator中间的一层输出，每个图的特征$x_i\in minibatch$通过一个矩阵T，映射成一个矩阵。然后每个图对应的矩阵的第k行两两做L1距离的计算并求和，然后重新组成一个n x B的矩阵作为下一层的输入。<ul>
+<li>后来的文章基本没有用这个方法。</li>
+</ul>
+</li>
+<li>Historical averaging  生成和判别器的损失函数中添加一项正则项，$||\theta-\frac{1}{t}\sum_{i=1}^{t}\theta[i]||^2$，通过保证和之前的参数的抖动不过大来控制GAN的稳定性（后来的文章几乎也没见过，有使用衰减系数来记录参数的）</li>
+<li>One-side Label Smoothing</li>
+<li>Virtual Batch Normalization</li>
+<li>提出了<a href="./GAN.md#inception-score">IS</a> ，感觉是本文唯一被引用的原因。</li>
+</ul>
+<h3 id="Conditional-GAN"><a href="#Conditional-GAN" class="headerlink" title="Conditional GAN"></a>Conditional GAN</h3><p>在Vanilla GAN的基础上添加了条件概率，使得目标函数变为</p>
+<script type="math/tex; mode=display">V(G,D) = \min_{G} \max_{D}\mathbb{E}_{x\sim p_x}[\log D(x|y)] + \mathbb{E}_{x\sim p_g}[log(1-D(x|y))]</script><p>具体操作中就是</p>
+<ol>
+<li>把输入的z和类别c做concat，作为输入给generator</li>
+<li>把$x$和c作为输入给到判别器，让他判断（1）x是否是真实的，（2）x是否属于类别c</li>
+</ol>
+<h3 id="Pix2Pix"><a href="#Pix2Pix" class="headerlink" title="Pix2Pix"></a>Pix2Pix</h3><ul>
+<li>Generator：使用Unet结构，输入的轮廓图x进行encode，然后再decode成图片<ul>
+<li>Unet：输入和输出的图像的surface appearance应该不同，而潜在的结构（underlying structure）应该相似。对于I2IT的任务来说，输入和输出应该共享一些底层信息，因此使用Unet这种跳跃连接（skip connection）的方法，i层与n-i层concat。</li>
+</ul>
+</li>
+<li>Discriminator：使用条件判断器PatchGAN，将图片变成70x70的区块并判断每个区块的真假并统计。<ul>
+<li>因为L1和L2 loss重建的图像很模糊，并不能很好的恢复图像的高频部分（图像的边缘等），而对于低频部分（色块等）恢复良好，所以采用patch的方式分区块对局部进行判断。</li>
+</ul>
+</li>
+<li>Loss Function<script type="math/tex; mode=display">\arg\min_G \max_D \mathbb{E}_{x,y}[\log D(x,y)]+\mathbb{E}_{x,z}[\log(1-D(x,G(x,z)))]+\\\mathbb{E}_{x,y,z}[||y-G(x,z)||_1]</script></li>
+<li>作者认为L1 loss可以来补充低频信息，而GAN Loss可以来补充高频信息</li>
+<li>缺点：x到y之间是一对一的映射，应用范围有限，且test的数据与train数据差距较大时效果很差。</li>
+</ul>
+<h3 id="BicycleGAN"><a href="#BicycleGAN" class="headerlink" title="BicycleGAN"></a>BicycleGAN</h3><p>为了增加多样性</p>
+<ul>
+<li><p>VAE-GAN</p>
+<p><img src="https://pic1.zhimg.com/v2-87fd8c791bb12747ef9fb39ab77c6354_r.jpg" alt="VAE-GAN"><br>图片压缩成z，再还原成图片最后GAN loss判断</p>
+</li>
+<li><p>cVAE-GAN</p>
+<p><img src="https://pic1.zhimg.com/80/v2-dd3887f6a4e37527cff4ec7cc32943a0_720w.jpg" alt="cVAE-GAN"></p>
+<ul>
+<li><p>不变的是：</p>
+<ul>
+<li>L1 和 D的loss</li>
+<li>从 B到 z 再到B</li>
+</ul>
+</li>
+<li><p>在VAEGAN的基础上添加了</p>
+<ul>
+<li>压缩的z和随机采样的z做kl损失，使得压缩的z符合随机分布</li>
+<li>Generator take A and z as input</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>cGAN<ul>
+<li>将class和latent concat作为输入给generator</li>
+</ul>
+</li>
+<li>cLR-GAN<br><img src="https://pic1.zhimg.com/80/v2-81ec56072828bfe0fd938ba1232936f4_720w.jpg" alt="cLR-GAN"><ul>
+<li>不变的是：<ul>
+<li>A对应的就是y， z还是随机的变化，作为G的输入</li>
+<li>真实B和生成的B做D的判断</li>
+</ul>
+</li>
+<li>在cGAN的基础上添加了<ul>
+<li>Encoder，并重新压缩B得到$\hat{z}$和z做L1 loss</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Unet中z有两种concat的方法：<ul>
+<li><img src="https://pic2.zhimg.com/80/v2-a91e995b06a278ba5d05ec40ef9f7bad_720w.jpg" alt="unet concat"></li>
+</ul>
+</li>
+</ul>
+<h3 id="CycleGAN"><a href="#CycleGAN" class="headerlink" title="CycleGAN"></a>CycleGAN</h3><p>不再需要paired data，通过cycle consistency loss，即$A\underset{G_A}{\rightarrow} B \underset{G_B}{\rightarrow} \hat{A}$后求$||A-\hat{A}||_1$<br><img src="https://img-blog.csdnimg.cn/20190804132517275.jpg?x-oss-process%3Dimage%2Fwatermark%2Ctype_ZmFuZ3poZW5naGVpdGk%2Cshadow_10%2Ctext_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTQzODAxNjU%3D%2Csize_16%2Ccolor_FFFFFF%2Ct_70" alt="cyclegan"></p>
+<ul>
+<li>discriminator中使用了LSGAN的最小二乘损失<a href="./DL-knowledge.md#msemean-squared-error-loss">MSE</a></li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2022/07/05/MathForDL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2022/07/05/MathForDL/" itemprop="url">MathForDL</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-07-05T22:35:03+08:00">
+                2022-07-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Base-Math-Knowledge-for-Deep-Learning"><a href="#Base-Math-Knowledge-for-Deep-Learning" class="headerlink" title="Base Math Knowledge for Deep Learning"></a>Base Math Knowledge for Deep Learning</h1><h2 id="范数"><a href="#范数" class="headerlink" title="范数"></a>范数</h2><p>具有“距离”概念的函数。一个满足半正定（非负），齐次$p(av)=ap(v)$,和三角不等性$p(u+v)\leq p(u)+p(v)$的函数我们称之为距离/半范数。而再保证 正定$p(v)=0, \text{if}\ v=\vec{0}$的额外性质，那么这个函数p就是范数。</p>
+<h3 id="p-norm-p范数"><a href="#p-norm-p范数" class="headerlink" title="p-norm p范数"></a>p-norm p范数</h3><p>对应Lp-Norm，也就是闵科夫斯基距离，一组距离的定义，当计算距离的时候$x=x_1-x_2$</p>
+<script type="math/tex; mode=display">||x||_p=(\sum_{i=1}^{n}|x_i|^p)^{\frac{1}{p}}</script><p>因此当p=1的时候就是L1-Norm，就是曼哈顿距离，即所有非零数的绝对值之和</p>
+<script type="math/tex; mode=display">||x||_1=\sum_{i=1}^{n}|x_i|</script><p>当p=2的时候就是L2-Norm，就是欧几里得距离，即所有数的平方和的开方</p>
+<script type="math/tex; mode=display">||x||_2=(\sum_{i=1}^{n}|x_i^2|)^{\frac{1}{2}}</script><p>当p=$+\infty$的时候，就是取x中绝对值最大的那个元素的绝对值,也就是切比雪夫距离</p>
+<script type="math/tex; mode=display">||x||_{+\infty}=\max_{i=1}^{n}(|x_i|)</script><p><a href>Lasso回归</a>  <a href>Ridge回归</a></p>
+<h2 id="Entropy"><a href="#Entropy" class="headerlink" title="Entropy"></a>Entropy</h2><p>$离散随机变量 X = \{x_1,x_2,…,x_n\}, 其概率为 p_i=p(X=x_i) $</p>
+<script type="math/tex; mode=display">H(X)=-\sum_{i=1}^np(x_i)log p(x_i)</script><p>x越不可能发生，则p(x)的概率越小，而其log p(x)的值则越大，意味着信息量越大，统计每件x的概率和信息。</p>
+<h3 id="联合熵"><a href="#联合熵" class="headerlink" title="联合熵"></a>联合熵</h3><p>对于服从联合分布为P(x,y)的一对离散随机变量(X,Y)，</p>
+<script type="math/tex; mode=display">H(X,Y) = -\sum_{x \in X}\sum_{ y\in Y}P(x,y) log P(x,y)</script><h3 id="条件熵"><a href="#条件熵" class="headerlink" title="条件熵"></a>条件熵</h3><script type="math/tex; mode=display">
+\begin{aligned}
+H(Y|X) &=\sum_x p(x) H(Y|X=x)\\
+&=-\sum_x p(x) \sum_y p(y|x) log p(y|x)\\
+&=-\sum_x\sum_y p(x,y) log p(y|x)\\
+&=-\sum_{x,y}p(x,y) log p(y|x)
+\end{aligned}</script><script type="math/tex; mode=display">H(Y|X) = H(X,Y)-H(X)</script><h3 id="Mutual-Information"><a href="#Mutual-Information" class="headerlink" title="Mutual Information"></a>Mutual Information</h3><p>互信息： 度量两个随机变量的“相关性”，随机事件X的不确定性或者熵H(X)，以及在知道随机事件Y条件下的不确定性（条件熵）的差异</p>
+<script type="math/tex; mode=display">I(X,Y) = H(X)-H(X|Y) = H(X) +H(Y)-H(X,Y)= \sum_{x,y}P(x,y) \frac{p(x,y)}{P(x)p(y)}</script><h3 id="KL-Divergence-相对熵"><a href="#KL-Divergence-相对熵" class="headerlink" title="KL Divergence/相对熵"></a>KL Divergence/相对熵</h3><p><strong>Equation</strong></p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+D_{KL}(p||q)
+&= H(p,q) - H(p)\\
+&= -\sum_x p(x)log q(x) - \sum_x -p(x)log p(x)\\
+&= -\sum_x p(x)(log q(x) - log p(x))\\
+&= -\sum_x p(x) log \frac{q(x)}{p(x)}
+\end{aligned}</script><ul>
+<li>度量两个随机变量的距离</li>
+<li>$D_{KL}(p||q) \neq D_{KL}(q||p)$</li>
+<li>$D_{KL}(p||q) &gt; 0$</li>
+<li>对于两个分布距离很远的分布，没有重叠时，$D_{KL}(p||q)=\sum 1\cdot \log \frac{1}{0}=+ \infin$，没有意义。</li>
+</ul>
+<h3 id="Cross-Entropy"><a href="#Cross-Entropy" class="headerlink" title="Cross Entropy"></a>Cross Entropy</h3><p>一个真实分布$p(x)$和一个非真实分布$q(x)$<br>要用非真实分布q(x)来表示来自真实分布p(x)的平均编码长度</p>
+<script type="math/tex; mode=display">H(p,q) = \sum_x p(x) log \frac{1}{q(x)}</script><p>我们希望生成数据和原始数据分布越接近越好，所以可以用KL散度，但又因为KL的一项只于p(x)有关，所以可以用交叉熵做loss评估模型、</p>
+<p><img src="https://math.jianshu.com/math?formula=L(%5Ctheta" alt>%3D%5Csum_%7Bi%3D1%7D%5E%7Bm%7D%5Cleft%5B-y%5E%7Bi%7D%20%5Clog%20h_%7B%5Ctheta%7D%5Cleft(x%5E%7Bi%7D%5Cright)%2B%5Cleft(1-y%5E%7Bi%7D%5Cright)%20%5Clog%20%5Cleft(1-h_%7B%5Ctheta%7D%5Cleft(x%5E%7Bi%7D%5Cright)%5Cright)%5Cright%5D)</p>
+<h3 id="Jensen-Shannon-Divergence"><a href="#Jensen-Shannon-Divergence" class="headerlink" title="Jensen-Shannon Divergence"></a>Jensen-Shannon Divergence</h3><p>是KL散度的一个变形</p>
+<script type="math/tex; mode=display">JS(p||q) = \frac{1}{2}D_{KL}(p(x)||\frac{p(x)+q(x)}{2})+\frac{1}{2}D_{KL}(q(x)||\frac{p(x)+q(x)}{2})</script><ul>
+<li>$JS(p||q) \in [0,1]$，相同是0，相反是1.</li>
+<li>$JS(p||q) = JS(q||p)$</li>
+<li>对于两个分布距离很远的分布，没有重叠时，$JS(p||q)=\sum 1\cdot \log \frac{1}{1/2}+\sum 1\cdot \log \frac{1}{1/2}=\log 2$. 当两个分布完全等于零是，JS=0<br>  因此得到<script type="math/tex; mode=display">
+JS(p||q)=\begin{cases}
+&log2 \text{ if } \theta\neq0\\
+&0 \text{ if } \theta=0
+\end{cases}</script>所以Vanilla GAN的生成器的梯度很有可能近似为0，导致梯度消失。那么</li>
+<li><strong>Vanilla GAN不稳定的原因</strong><ul>
+<li>discriminator训练的太好 会导致梯度消失，generator的loss降不下去</li>
+<li>discriminator训练的不好 generator的梯度不准，到处乱跑</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def JensonShannonDivergence(p,q):</span><br><span class="line">    p &#x3D; np.array(p)</span><br><span class="line">    q &#x3D; np.array(q)</span><br><span class="line">    M &#x3D; (p+q)&#x2F;2</span><br><span class="line">    return 0.5*np.sum(p*np.log(p&#x2F;M)) + 0.5*np.sum(q*np.log(q&#x2F;M))</span><br></pre></td></tr></table></figure>
+<h3 id="Earth-Mover-Distance-Wasserstein-Distance"><a href="#Earth-Mover-Distance-Wasserstein-Distance" class="headerlink" title="Earth-Mover Distance / Wasserstein Distance"></a>Earth-Mover Distance / Wasserstein Distance</h3><p>从一个分布变换到另一个分布的最小代价</p>
+<script type="math/tex; mode=display">W(p,q) = \inf_{\gamma\sim\prod(p,q)}\mathbb{E}_{(x,y)\sim\gamma}[||x-y||]</script><ul>
+<li>$\prod(p,q)$是p和q组合起来的所有可能的联合分布的集合（p的每一个搬到q的任意一个地方的组合），所以$\gamma$就是每一个可能的联合分布，</li>
+<li>||x-y||是cost，期望$\mathbb{E}_{(x,y)\sim\gamma}[||x-y||]$就是这些组合的搬运代价。</li>
+<li>$\inf_{\gamma\sim\prod(p,q)}$表示下确界，即小于这组数的值中那个最大的值。</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2021/01/30/transformer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/01/30/transformer/" itemprop="url">Transformer</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-01-30T14:17:58+08:00">
+                2021-01-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Transformer seems like a new promising land of </p>
+<h1 id="Attention"><a href="#Attention" class="headerlink" title="Attention"></a>Attention</h1>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/22/Pyro-SVI3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -270,7 +1555,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-22T12:17:31+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-22T20:17:31+08:00">
                 2020-03-22
               </time>
             
@@ -439,7 +1724,7 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/20/Pyro-SVI2/">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/21/Pyro-SVI2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Lifan Zhao">
@@ -458,7 +1743,7 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/03/20/Pyro-SVI2/" itemprop="url">Pyro SVI 第二部分：条件独立，二次取样和摊销</a></h1>
+                <a class="post-title-link" href="/2020/03/21/Pyro-SVI2/" itemprop="url">Pyro SVI 第二部分：条件独立，二次取样和摊销</a></h1>
         
 
         <div class="post-meta">
@@ -470,8 +1755,8 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-20T20:27:53+00:00">
-                2020-03-20
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-21T04:27:53+08:00">
+                2020-03-21
               </time>
             
 
@@ -512,7 +1797,7 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
           <h1 id="目标：拓展SVI到大数据集"><a href="#目标：拓展SVI到大数据集" class="headerlink" title="目标：拓展SVI到大数据集"></a>目标：拓展SVI到大数据集</h1><p>对于一个有N个观察的模型，跑<code>model</code>和<code>guide</code>，建立ELBO这两件事涉及了估计对数概率密度函数，而这个估计的复杂程度挺糟糕的。如果我们想要扩展到大数据集，这将是个问题。幸运的是，ELBO目标天然支持二次采样，只要我们的model/guide有一些可供我们使用的条件独立的结构。比方说，当观察对隐变量条件独立，ELBO中的对数似然就可以被近似为：<br></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2020/03/20/Pyro-SVI2/#more" rel="contents">
+            <a class="btn" href="/2020/03/21/Pyro-SVI2/#more" rel="contents">
               Read more &raquo;
             </a>
           </div>
@@ -594,7 +1879,7 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-20T12:34:17+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-20T12:34:17+08:00">
                 2020-03-20
               </time>
             
@@ -718,7 +2003,7 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-19T01:32:58+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-19T09:32:58+08:00">
                 2020-03-19
               </time>
             
@@ -844,7 +2129,7 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-18T09:45:37+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-18T17:45:37+08:00">
                 2020-03-18
               </time>
             
@@ -929,640 +2214,11 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Scaling/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Lifan Zhao">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lifan's Note">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/03/16/BlockChain-Scaling/" itemprop="url">区块链扩容</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T23:52:43+00:00">
-                2020-03-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="Off-Chain-Transcation"><a href="#Off-Chain-Transcation" class="headerlink" title="Off Chain Transcation"></a>Off Chain Transcation</h1><p>好处：</p>
-<ul>
-<li>没有共识的延迟和费用</li>
-<li>同时能保证无第三方保障的安全性</li>
-<li>可以向后兼容（反悔！）</li></ul>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/03/16/BlockChain-Scaling/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Security/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Lifan Zhao">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lifan's Note">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/03/16/BlockChain-Security/" itemprop="url">区块链安全</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T23:47:32+00:00">
-                2020-03-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p><img src="/2020/03/16/BlockChain-Security/Overview.png" alt><br></p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/03/16/BlockChain-Security/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Consensus/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Lifan Zhao">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lifan's Note">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/03/16/BlockChain-Consensus/" itemprop="url">区块链：共识机制</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T23:02:47+00:00">
-                2020-03-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>我们注意到一个事实：所有的区块都需要矿工去放到区块链上的。</p>
-<p>那么假设我们完成了一个交易，什么时候会被传到链上呢？有不同的做法</p>
-<ol>
-<li>Synchronous同步，即保证在t时刻后上传</li>
-<li>Asynchronous异步，即保证最终一定会上传</li>
-<li>Eventually Asynchronous最终同步，即给定一个变量t，保证在x+t时刻之前一定上传</li></ol>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/03/16/BlockChain-Consensus/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-SmartContract/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Lifan Zhao">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lifan's Note">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/03/16/BlockChain-SmartContract/" itemprop="url">区块链：智能合约</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T22:08:03+00:00">
-                2020-03-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>希望完成一些合约（操作内容大于等于交易），但不借助第三方的力量。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/03/16/BlockChain-SmartContract/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/16/BlockChain-Privacy/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Lifan Zhao">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lifan's Note">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/03/16/BlockChain-Privacy/" itemprop="url">区块链隐私</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T17:54:53+00:00">
-                2020-03-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="TxProbe"><a href="#TxProbe" class="headerlink" title="TxProbe"></a>TxProbe</h1><p>探测nodes之间的拓扑关系，即node A和node B是否连接。从CoinScope中同时给A和B发送txp和txf，然后双花一次txf，记作txm发送给node A，如果两者有通讯，那么txm将会出现在txm的孤儿列表里。<br></p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/03/16/BlockChain-Privacy/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="accessibility.next_page"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="accessibility.next_page"></i></a>
   </nav>
 
 
@@ -1611,7 +2267,7 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1624,7 +2280,7 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
@@ -1683,7 +2339,7 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

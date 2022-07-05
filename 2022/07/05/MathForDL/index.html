@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="deep learning,math," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Base Math Knowledge for Deep Learning范数具有“距离”概念的函数。一个满足半正定（非负），齐次$p(av)&#x3D;ap(v)$,和三角不等性$p(u+v)\leq p(u)+p(v)$的函数我们称之为距离&#x2F;半范数。而再保证 正定$p(v)&#x3D;0, \text{if}\ v&#x3D;\vec{0}$的额外性质，那么这个函数p就是范数。 p-norm p范数对应Lp-Norm，也就">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MathForDL">
+<meta property="og:url" content="http://humberthumbert.github.io/2022/07/05/MathForDL/index.html">
+<meta property="og:site_name" content="Lifan&#39;s Note">
+<meta property="og:description" content="Base Math Knowledge for Deep Learning范数具有“距离”概念的函数。一个满足半正定（非负），齐次$p(av)&#x3D;ap(v)$,和三角不等性$p(u+v)\leq p(u)+p(v)$的函数我们称之为距离&#x2F;半范数。而再保证 正定$p(v)&#x3D;0, \text{if}\ v&#x3D;\vec{0}$的额外性质，那么这个函数p就是范数。 p-norm p范数对应Lp-Norm，也就">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://math.jianshu.com/math?formula=L(%5Ctheta">
+<meta property="article:published_time" content="2022-07-05T14:35:03.000Z">
+<meta property="article:modified_time" content="2022-07-05T14:43:57.472Z">
+<meta property="article:author" content="Lifan Zhao">
+<meta property="article:tag" content="deep learning">
+<meta property="article:tag" content="math">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://math.jianshu.com/math?formula=L(%5Ctheta">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://humberthumbert.github.io/2022/07/05/MathForDL/"/>
+
+
+
+
+
+  <title>MathForDL | Lifan's Note</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Lifan's Note</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2022/07/05/MathForDL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MathForDL</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-07-05T22:35:03+08:00">
+                2022-07-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Base-Math-Knowledge-for-Deep-Learning"><a href="#Base-Math-Knowledge-for-Deep-Learning" class="headerlink" title="Base Math Knowledge for Deep Learning"></a>Base Math Knowledge for Deep Learning</h1><h2 id="范数"><a href="#范数" class="headerlink" title="范数"></a>范数</h2><p>具有“距离”概念的函数。一个满足半正定（非负），齐次$p(av)=ap(v)$,和三角不等性$p(u+v)\leq p(u)+p(v)$的函数我们称之为距离/半范数。而再保证 正定$p(v)=0, \text{if}\ v=\vec{0}$的额外性质，那么这个函数p就是范数。</p>
+<h3 id="p-norm-p范数"><a href="#p-norm-p范数" class="headerlink" title="p-norm p范数"></a>p-norm p范数</h3><p>对应Lp-Norm，也就是闵科夫斯基距离，一组距离的定义，当计算距离的时候$x=x_1-x_2$</p>
+<script type="math/tex; mode=display">||x||_p=(\sum_{i=1}^{n}|x_i|^p)^{\frac{1}{p}}</script><p>因此当p=1的时候就是L1-Norm，就是曼哈顿距离，即所有非零数的绝对值之和</p>
+<script type="math/tex; mode=display">||x||_1=\sum_{i=1}^{n}|x_i|</script><p>当p=2的时候就是L2-Norm，就是欧几里得距离，即所有数的平方和的开方</p>
+<script type="math/tex; mode=display">||x||_2=(\sum_{i=1}^{n}|x_i^2|)^{\frac{1}{2}}</script><p>当p=$+\infty$的时候，就是取x中绝对值最大的那个元素的绝对值,也就是切比雪夫距离</p>
+<script type="math/tex; mode=display">||x||_{+\infty}=\max_{i=1}^{n}(|x_i|)</script><p><a href>Lasso回归</a>  <a href>Ridge回归</a></p>
+<h2 id="Entropy"><a href="#Entropy" class="headerlink" title="Entropy"></a>Entropy</h2><p>$离散随机变量 X = \{x_1,x_2,…,x_n\}, 其概率为 p_i=p(X=x_i) $</p>
+<script type="math/tex; mode=display">H(X)=-\sum_{i=1}^np(x_i)log p(x_i)</script><p>x越不可能发生，则p(x)的概率越小，而其log p(x)的值则越大，意味着信息量越大，统计每件x的概率和信息。</p>
+<h3 id="联合熵"><a href="#联合熵" class="headerlink" title="联合熵"></a>联合熵</h3><p>对于服从联合分布为P(x,y)的一对离散随机变量(X,Y)，</p>
+<script type="math/tex; mode=display">H(X,Y) = -\sum_{x \in X}\sum_{ y\in Y}P(x,y) log P(x,y)</script><h3 id="条件熵"><a href="#条件熵" class="headerlink" title="条件熵"></a>条件熵</h3><script type="math/tex; mode=display">
+\begin{aligned}
+H(Y|X) &=\sum_x p(x) H(Y|X=x)\\
+&=-\sum_x p(x) \sum_y p(y|x) log p(y|x)\\
+&=-\sum_x\sum_y p(x,y) log p(y|x)\\
+&=-\sum_{x,y}p(x,y) log p(y|x)
+\end{aligned}</script><script type="math/tex; mode=display">H(Y|X) = H(X,Y)-H(X)</script><h3 id="Mutual-Information"><a href="#Mutual-Information" class="headerlink" title="Mutual Information"></a>Mutual Information</h3><p>互信息： 度量两个随机变量的“相关性”，随机事件X的不确定性或者熵H(X)，以及在知道随机事件Y条件下的不确定性（条件熵）的差异</p>
+<script type="math/tex; mode=display">I(X,Y) = H(X)-H(X|Y) = H(X) +H(Y)-H(X,Y)= \sum_{x,y}P(x,y) \frac{p(x,y)}{P(x)p(y)}</script><h3 id="KL-Divergence-相对熵"><a href="#KL-Divergence-相对熵" class="headerlink" title="KL Divergence/相对熵"></a>KL Divergence/相对熵</h3><p><strong>Equation</strong></p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+D_{KL}(p||q)
+&= H(p,q) - H(p)\\
+&= -\sum_x p(x)log q(x) - \sum_x -p(x)log p(x)\\
+&= -\sum_x p(x)(log q(x) - log p(x))\\
+&= -\sum_x p(x) log \frac{q(x)}{p(x)}
+\end{aligned}</script><ul>
+<li>度量两个随机变量的距离</li>
+<li>$D_{KL}(p||q) \neq D_{KL}(q||p)$</li>
+<li>$D_{KL}(p||q) &gt; 0$</li>
+<li>对于两个分布距离很远的分布，没有重叠时，$D_{KL}(p||q)=\sum 1\cdot \log \frac{1}{0}=+ \infin$，没有意义。</li>
+</ul>
+<h3 id="Cross-Entropy"><a href="#Cross-Entropy" class="headerlink" title="Cross Entropy"></a>Cross Entropy</h3><p>一个真实分布$p(x)$和一个非真实分布$q(x)$<br>要用非真实分布q(x)来表示来自真实分布p(x)的平均编码长度</p>
+<script type="math/tex; mode=display">H(p,q) = \sum_x p(x) log \frac{1}{q(x)}</script><p>我们希望生成数据和原始数据分布越接近越好，所以可以用KL散度，但又因为KL的一项只于p(x)有关，所以可以用交叉熵做loss评估模型、</p>
+<p><img src="https://math.jianshu.com/math?formula=L(%5Ctheta" alt>%3D%5Csum_%7Bi%3D1%7D%5E%7Bm%7D%5Cleft%5B-y%5E%7Bi%7D%20%5Clog%20h_%7B%5Ctheta%7D%5Cleft(x%5E%7Bi%7D%5Cright)%2B%5Cleft(1-y%5E%7Bi%7D%5Cright)%20%5Clog%20%5Cleft(1-h_%7B%5Ctheta%7D%5Cleft(x%5E%7Bi%7D%5Cright)%5Cright)%5Cright%5D)</p>
+<h3 id="Jensen-Shannon-Divergence"><a href="#Jensen-Shannon-Divergence" class="headerlink" title="Jensen-Shannon Divergence"></a>Jensen-Shannon Divergence</h3><p>是KL散度的一个变形</p>
+<script type="math/tex; mode=display">JS(p||q) = \frac{1}{2}D_{KL}(p(x)||\frac{p(x)+q(x)}{2})+\frac{1}{2}D_{KL}(q(x)||\frac{p(x)+q(x)}{2})</script><ul>
+<li>$JS(p||q) \in [0,1]$，相同是0，相反是1.</li>
+<li>$JS(p||q) = JS(q||p)$</li>
+<li>对于两个分布距离很远的分布，没有重叠时，$JS(p||q)=\sum 1\cdot \log \frac{1}{1/2}+\sum 1\cdot \log \frac{1}{1/2}=\log 2$. 当两个分布完全等于零是，JS=0<br>  因此得到<script type="math/tex; mode=display">
+JS(p||q)=\begin{cases}
+&log2 \text{ if } \theta\neq0\\
+&0 \text{ if } \theta=0
+\end{cases}</script>所以Vanilla GAN的生成器的梯度很有可能近似为0，导致梯度消失。那么</li>
+<li><strong>Vanilla GAN不稳定的原因</strong><ul>
+<li>discriminator训练的太好 会导致梯度消失，generator的loss降不下去</li>
+<li>discriminator训练的不好 generator的梯度不准，到处乱跑</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def JensonShannonDivergence(p,q):</span><br><span class="line">    p &#x3D; np.array(p)</span><br><span class="line">    q &#x3D; np.array(q)</span><br><span class="line">    M &#x3D; (p+q)&#x2F;2</span><br><span class="line">    return 0.5*np.sum(p*np.log(p&#x2F;M)) + 0.5*np.sum(q*np.log(q&#x2F;M))</span><br></pre></td></tr></table></figure>
+<h3 id="Earth-Mover-Distance-Wasserstein-Distance"><a href="#Earth-Mover-Distance-Wasserstein-Distance" class="headerlink" title="Earth-Mover Distance / Wasserstein Distance"></a>Earth-Mover Distance / Wasserstein Distance</h3><p>从一个分布变换到另一个分布的最小代价</p>
+<script type="math/tex; mode=display">W(p,q) = \inf_{\gamma\sim\prod(p,q)}\mathbb{E}_{(x,y)\sim\gamma}[||x-y||]</script><ul>
+<li>$\prod(p,q)$是p和q组合起来的所有可能的联合分布的集合（p的每一个搬到q的任意一个地方的组合），所以$\gamma$就是每一个可能的联合分布，</li>
+<li>||x-y||是cost，期望$\mathbb{E}_{(x,y)\sim\gamma}[||x-y||]$就是这些组合的搬运代价。</li>
+<li>$\inf_{\gamma\sim\prod(p,q)}$表示下确界，即小于这组数的值中那个最大的值。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+            <a href="/tags/math/" rel="tag"># math</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/01/30/transformer/" rel="next" title="Transformer">
+                <i class="fa fa-chevron-left"></i> Transformer
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/07/05/GAN2/" rel="prev" title="对抗生成网络 整理">
+                对抗生成网络 整理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Lifan Zhao" />
+            
+              <p class="site-author-name" itemprop="name">Lifan Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/humberthumbert" target="_blank" title="Github">
+                      
+                        <i class="fa fa-fw fa-github"></i>Github</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://linkedin.com/in/lifan-zhao" target="_blank" title="Linkedin">
+                      
+                        <i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lemonloic@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Base-Math-Knowledge-for-Deep-Learning"><span class="nav-number">1.</span> <span class="nav-text">Base Math Knowledge for Deep Learning</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#范数"><span class="nav-number">1.1.</span> <span class="nav-text">范数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#p-norm-p范数"><span class="nav-number">1.1.1.</span> <span class="nav-text">p-norm p范数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Entropy"><span class="nav-number">1.2.</span> <span class="nav-text">Entropy</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#联合熵"><span class="nav-number">1.2.1.</span> <span class="nav-text">联合熵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#条件熵"><span class="nav-number">1.2.2.</span> <span class="nav-text">条件熵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mutual-Information"><span class="nav-number">1.2.3.</span> <span class="nav-text">Mutual Information</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#KL-Divergence-相对熵"><span class="nav-number">1.2.4.</span> <span class="nav-text">KL Divergence&#x2F;相对熵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cross-Entropy"><span class="nav-number">1.2.5.</span> <span class="nav-text">Cross Entropy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Jensen-Shannon-Divergence"><span class="nav-number">1.2.6.</span> <span class="nav-text">Jensen-Shannon Divergence</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Earth-Mover-Distance-Wasserstein-Distance"><span class="nav-number">1.2.7.</span> <span class="nav-text">Earth-Mover Distance &#x2F; Wasserstein Distance</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lifan Zhao</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

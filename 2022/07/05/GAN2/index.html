@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="deep learning,GAN," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="GAN MetricsInception Score Concept 用图片分类器来评估生成图片的质量。清晰度：对于清楚的图片，分类器应该可以确定的判断该图的种类，那么其熵$p(y|x)$（即不确定性）比较小。多样性：对于所有生成的图片，每个种类应该均匀生成，所以$p(y)&#x3D;\sum p(y|x^{(i)})$ Equation： $IS(G)&#x3D;\exp(\mathbb{E}_{x\sim p_g">
+<meta property="og:type" content="article">
+<meta property="og:title" content="对抗生成网络 整理">
+<meta property="og:url" content="http://humberthumbert.github.io/2022/07/05/GAN2/index.html">
+<meta property="og:site_name" content="Lifan&#39;s Note">
+<meta property="og:description" content="GAN MetricsInception Score Concept 用图片分类器来评估生成图片的质量。清晰度：对于清楚的图片，分类器应该可以确定的判断该图的种类，那么其熵$p(y|x)$（即不确定性）比较小。多样性：对于所有生成的图片，每个种类应该均匀生成，所以$p(y)&#x3D;\sum p(y|x^{(i)})$ Equation： $IS(G)&#x3D;\exp(\mathbb{E}_{x\sim p_g">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://pic1.zhimg.com/v2-87fd8c791bb12747ef9fb39ab77c6354_r.jpg">
+<meta property="og:image" content="https://pic1.zhimg.com/80/v2-dd3887f6a4e37527cff4ec7cc32943a0_720w.jpg">
+<meta property="og:image" content="https://pic1.zhimg.com/80/v2-81ec56072828bfe0fd938ba1232936f4_720w.jpg">
+<meta property="og:image" content="https://pic2.zhimg.com/80/v2-a91e995b06a278ba5d05ec40ef9f7bad_720w.jpg">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190804132517275.jpg?x-oss-process%253Dimage%252Fwatermark%252Ctype_ZmFuZ3poZW5naGVpdGk%252Cshadow_10%252Ctext_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTQzODAxNjU%253D%252Csize_16%252Ccolor_FFFFFF%252Ct_70">
+<meta property="article:published_time" content="2022-07-05T14:38:38.000Z">
+<meta property="article:modified_time" content="2022-07-05T14:44:04.987Z">
+<meta property="article:author" content="Lifan Zhao">
+<meta property="article:tag" content="deep learning">
+<meta property="article:tag" content="GAN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pic1.zhimg.com/v2-87fd8c791bb12747ef9fb39ab77c6354_r.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://humberthumbert.github.io/2022/07/05/GAN2/"/>
+
+
+
+
+
+  <title>对抗生成网络 整理 | Lifan's Note</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Lifan's Note</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2022/07/05/GAN2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">对抗生成网络 整理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-07-05T22:38:38+08:00">
+                2022-07-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="GAN-Metrics"><a href="#GAN-Metrics" class="headerlink" title="GAN Metrics"></a>GAN Metrics</h1><h2 id="Inception-Score"><a href="#Inception-Score" class="headerlink" title="Inception Score"></a>Inception Score</h2><ul>
+<li><strong>Concept</strong> 用图片分类器来评估生成图片的质量。清晰度：对于清楚的图片，分类器应该可以确定的判断该图的种类，那么其熵$p(y|x)$（即不确定性）比较小。多样性：对于所有生成的图片，每个种类应该均匀生成，所以$p(y)=\sum p(y|x^{(i)})$</li>
+<li><p><strong>Equation</strong>： $IS(G)=\exp(\mathbb{E}_{x\sim p_g}D_{KL}(p(y|x)||p(y)))$</p>
+<ul>
+<li>$\mathbb{E}_{x\sim p_g}$: 循环所有样本</li>
+<li>$D_{KL}$: <a href="./MathForDL.md#relative-entropy--kl-divergence">KL散度</a></li>
+<li>$p(y|x)$: 对于图片x，属于所有类别的概率分布，对于给定图片x，表示为一个1000维向量</li>
+<li>$p(y)$: 边缘概率，具体实现为对于所有的验证图片x，计算得到$p(y|x)$，再求所有向量的平均值。</li>
+</ul>
+</li>
+<li><p><strong>IS 有什么问题</strong></p>
+<ol>
+<li>数据集，因为基于InceptionV3，只能使用ImageNet1000，所以不能直接生成图片套用在InceptionV3上。</li>
+<li>使用框架的不同，pytorch，tensorflow等，IS差别会很大</li>
+<li>IS高的图片不一定真实：因为是根据分类器来给分的，所以可以根据分类器的结果来刷分（提高全体图片的类别多样性，那么每一张图片的熵就会低）</li>
+<li>IS低的图片不一定虚假：如果图片的类不在1000类中则会低</li>
+<li>多样性检测有局限性：如果每个类只生成一个样子，依旧是mode collapses</li>
+<li>IS不能反映过拟合：如果模型完全记忆数据集，给出Train集的数据，IS也会很高。</li>
+</ol>
+</li>
+</ul>
+<h2 id="FID"><a href="#FID" class="headerlink" title="FID"></a>FID</h2><ul>
+<li><strong>Definition</strong>: The Frechet distance $d(\cdot,\cdot)$ between the Gaussian with mean $(m, \Sigma)$ obtained from $p(\cdot)$ and the Gaussian with mean $(m_r, \Sigma_w)$  obtained from $p_w$. 假设原始图片和生成图片都服从高斯分布，计算两个分布的均值和协方差，算均值和协方差的距离。</li>
+<li><strong>Equation</strong>: $d^2((m_g, \Sigma_g), (m_r, \Sigma_w) = ||m_g-m_r||^2_2 + Tr(\Sigma_g+\Sigma_w-2(\Sigma_g\Sigma_w)^{0.5})$</li>
+<li><p><strong>Method</strong>:</p>
+<pre><code>1. 加载图片[B,C,H,W], 文件数最好是bs的倍数否则会导致少读几个文件。
+2. Inception V3去除输出层，只取到最后一个pooling层，
+    得到[Bx2048x1x1] feature（如果输入图片尺寸不对，
+    增加一个adaptive_avg_pool2d到1x1)
+3. diff = m_g-m_r
+    diff.dot(diff)+np.trace(sigma_g)+np.trace(sigma_r)-2*linalg.sqrtm(simga_g.dot(sigma_r))
+</code></pre></li>
+<li><strong>FID 优缺点</strong><ol>
+<li>优点1：生成模型的训练集可以和InceptionV3不同</li>
+<li>优点2：刷分不会导致生成图片的质量变差</li>
+<li>缺点1：强假设 提取的图片特征符合Gaussian</li>
+<li>缺点2：无法反映过拟合的问题</li>
+</ol>
+</li>
+</ul>
+<h2 id="LPIPS-Learned-Perceptual-Image-Patch-Similarity"><a href="#LPIPS-Learned-Perceptual-Image-Patch-Similarity" class="headerlink" title="LPIPS(Learned Perceptual Image Patch Similarity)"></a>LPIPS(Learned Perceptual Image Patch Similarity)</h2><ul>
+<li>$d(x,x_0)=\sum_l \frac{1}{H_l W_l} \sum_{h,w}||w_l \bigodot (\hat{y}^l_{hw}-\hat{y_{0}}^l_{hw})||$</li>
+<li>通过预训练的VGG，AlexNet等网络，对一对图片x,x_0进行特征提取，对每层提取出来的特征计算归一化后相减得到diff并平方（？），将每层的diff过一个1x1的卷积（乘以w），并进行空间尺度上的平均，最后每层的输出相加。</li>
+<li>StarGANv2里使用LPIPS来测量多样性，数值越大说明越不相似。<ul>
+<li>对此存疑，原文中是通过训练一个simple network，将diff的结果输入到这个网络中让他判断是原图和distort图一对，来反过来finetune整个pretrained network。但是starganv2里好像直接采用了vgg的网络？</li>
+</ul>
+</li>
+</ul>
+<h2 id="Precision-and-Recall（Improved）"><a href="#Precision-and-Recall（Improved）" class="headerlink" title="Precision and Recall（Improved）"></a>Precision and Recall（Improved）</h2><ul>
+<li>Motivation: 因为IS，FID等只有一个维度的分数，所以无法区分不同失败的例子。（无法同时满足真实性和多样性两个指标）</li>
+<li>Definition: 对于参考分布P(X)和学习到的分布Q(Y)，<ul>
+<li>Precision: 生成的图片可以落在真实分布的流型上的比例<script type="math/tex; mode=display">\frac{1}{M}\sum_{j=1}^{M} 1_{Y_j \in \text{manifold}(X_1,...,X_N)}</script></li>
+<li>Density: 真实的图片覆盖生成分布的比例<script type="math/tex; mode=display">\frac{1}{N}\sum_{i=1}^{N} 1_{X_i \in \text{manifold}(Y_1,...,Y_M)}</script>其中N,M是真实和生成的数量，流型Manifold定义为：<script type="math/tex; mode=display">\text{manifold}(X_1,...,X_N)=\bigcup_{i=1}^{N}B(X_i,\text{NND}_k(X_i))</script>其中$B(x,r)$是以x为球心，r为半径的D维球形；$\text{NND}_k(X_i)$是$X_i$到除了自己以外第k近的邻居的距离。</li>
+</ul>
+</li>
+</ul>
+<h2 id="Density-and-Coverage"><a href="#Density-and-Coverage" class="headerlink" title="Density and Coverage"></a>Density and Coverage</h2><ul>
+<li><p>Motivation:precision和recall会受到outliers的影响且计算效率低。</p>
+<ul>
+<li>outlier: 在没有归一化操作前，一个outlier会使得得到的流型覆盖一大块在outlier附近的区域，从而让流型overestimate。<ul>
+<li>precision: 生成的样本可能落在overestimate的流型部分中从而让percision看起来更高。</li>
+<li>recall：因为模型倾向于生成不真实但不同的样本，所以生成流型也经常比真正的生成分布大。另外由于每个模型的fake manifold都不同，每次都需要重新计算流型。</li>
+</ul>
+</li>
+<li>computational inefficiency：需要两两计算距离，每个样本都需要计算$O(kM\log M)$</li>
+</ul>
+</li>
+<li><p>于是提出了Density和Coverage</p>
+<ul>
+<li>Density：计算有多少个真实样本的neighborhood sphere包含$Y_j$,<script type="math/tex; mode=display">\frac{1}{kM}\sum_{j=1}{M}\sum_{i=1}{N}1_{Y_j \in B(X_i, \text{NND}_k(X_i))}</script></li>
+<li>Coverage:计算所有真实样本中，neighborhood sphere包含至少一个生成样本的比例。<script type="math/tex; mode=display">\frac{1}{N}\sum_{i=1}^{N}1_{\exist j \text{s.t.} Y_j \in B(X_i, \text{NND}_k(X_i))}</script></li>
+</ul>
+</li>
+<li>mode collapse 和 mode dropping的区别？<ul>
+<li>mode collapse是 many z to ~one x</li>
+<li>mode dropping是 real data not inG(z)</li>
+</ul>
+</li>
+</ul>
+<h2 id="Perceptual-Path-Length"><a href="#Perceptual-Path-Length" class="headerlink" title="Perceptual Path Length"></a>Perceptual Path Length</h2><ul>
+<li>Idea： 除了清晰度和多样性，生成器<strong>能否很好的把不同图片的特征分离出来</strong>也是一个关注的指标。StyleGAN的作者希望当我们给定一个z from latent space的时候，$z_1$能控制人的头发，$z_2$能控制人的眉毛等等，当调整$z_1$时，生成的图片只会有头发的变换。</li>
+<li>Equation: <strong>PPL评估利用生成器从一个图片变到另一个图片的距离，越小越好</strong><script type="math/tex; mode=display">\text{PPL} = \mathbb{E}[ \frac{1}{\epsilon^2} d(G(slerp(z_1,z_2;t)), G(slerp(z_1,z_2;t+\epsilon))) ]</script><ul>
+<li>$\epsilon$ 细分的小段，1e-4</li>
+<li>$d(\cdot,\cdot)$ perceptual distance，用预训练的VGG来衡量</li>
+<li>slerp：spherical linear interpolation球面线性插值</li>
+<li>$t\sim U(0,1)$插值参数，服从均匀分布</li>
+</ul>
+</li>
+</ul>
+<h2 id="Generative-Adversarial-Network、"><a href="#Generative-Adversarial-Network、" class="headerlink" title="Generative Adversarial Network、"></a>Generative Adversarial Network、</h2><h3 id="WGAN"><a href="#WGAN" class="headerlink" title="WGAN"></a>WGAN</h3><p><a href="./MathForDL.md#jensen-shannon-divergence">书接JS散度</a><br>考虑到几乎不可能去便利所有的联合分布$\gamma$去计算距离$||x-y||$的期望$\mathbb{E}_{(x,y)\sim\gamma}[||x-y||]$，因此直接计算$W(p_r, p_g)$是不现实的，WGAN提出用 Kantorovich-Rubinstein 对偶性将W转化为：</p>
+<script type="math/tex; mode=display">W(p_r, p_g) = \frac{1}{K}\sup_{||f||_L \leq K} \mathbb{E}_{x\sim p_r}[f(x)]-\mathbb{E}_{x\sim p_g}[f(x)]</script><p>$\sup(\cdot)$是上确界，$||f||_L \leq K$表示函数$f: R\rightarrow R$满足K-阶Lipschitz连续性，即满足</p>
+<script type="math/tex; mode=display">|f(x_1-x_2)| \leq K\cdot |x_1-x_2|</script><p>于是，我们使用判别网络$D_\theta (x)$参数化$f(x)$函数，在$D_\theta$满足1阶Lipschitz约束的条件下，K=1，得到：</p>
+<script type="math/tex; mode=display">W(p_r, p_g) = \sup_{||D_\theta||_l \leq 1} \mathbb{E}_{x\sim p_r}[D_\theta(x)] - \mathbb{E}_{x\sim p_g}[D_\theta(x)]</script><p>因此求解$W(p_r, p_g)$的问题转化为：</p>
+<script type="math/tex; mode=display">\underset{\theta}{max}\mathbb{E}_{x\sim p_r}[D_\theta (x)] - \mathbb{E}_{x\sim p_g}[D_\theta (x)] \;\;\;\text{such that}\;\; \ ngledown_{\hat{x}}D(\hat{x}) \leq I</script><p>也就是在满足D(x)处处导数小于1的情况下求解最大值。所以在实际应用上作者的做法是，限制神经网络的所有参数$\theta$都不会超过某个范围[-c,c]，这样关于输入样本x的导数$\frac{\partial f_\theta}{\partial x}$也就不会超过这个范围，所以通过这个上届，满足小于某个K值的上确界。</p>
+<ul>
+<li>可以防止mode collapse，但不能提升图像质量。</li>
+</ul>
+<h3 id="WGAN-GP"><a href="#WGAN-GP" class="headerlink" title="WGAN-GP"></a>WGAN-GP</h3><p>添加了Gradient Penalty来迫使判别器满足1阶Lipschitz函数约束，同时发现在1周围工作效果更好</p>
+<script type="math/tex; mode=display">\text{GP} \triangleq \mathbb{E}_{\hat{x}\sim P_{\hat{x}}}[(||\triangledown_{\hat{x}}D(\hat{x})||_2 - 1)^2]</script><p>所以<strong>Discriminator的目标函数</strong>为：</p>
+<script type="math/tex; mode=display">\underset{\theta}{max} \mathcal{L}(G,D) =
+\mathbb{E}_{x_r\sim p_r}[D(x_r)] - \mathbb{E}_{x_f\sim p_g}[D(x_f)]
+-\lambda\mathbb{E}_{\hat{x}\sim P(\hat{x})}[(||\triangledown_{\hat{x}}D(\hat{x})||_2-1)^2]</script><p>第一项是EM距离，第二项是GP，其中$\hat{x}=tx_r+(1-t)x_f,\;\; t\in[0,1]$<br><strong>Generator的目标函数</strong>为：</p>
+<script type="math/tex; mode=display">
+\underset{\theta}{min} \mathcal{L}(G,D) =
+\mathbb{E}_{x_r\sim p_r}[D(x_r)] + \mathbb{E}_{x_f\sim p_g}[D(x_f)]</script><p>又第一项与G无关，可以省去得到</p>
+<script type="math/tex; mode=display">
+\underset{\theta}{min} \mathcal{L}(G,D) = -\mathbb{E}_{x_f\sim p_g}[D(x_f)] = -\mathbb{E}_{z\sim p_z(\cdot)}[D(G(z))]</script><ul>
+<li><p><strong>WGAN做了什么？</strong></p>
+<ul>
+<li>判别器去掉最后一层sigmoid</li>
+<li>discriminator和generator在算loss时没有log</li>
+<li>每次更新<strong>判别器</strong>的参数后把他们的绝对值clip到一个孤单常数c</li>
+<li>不使用Adam等基于动量的优化算法，推荐使用RMSProp，SGD也行</li>
+</ul>
+</li>
+<li><p><strong>为什么WGAN要把vanilla GAN的最后一层sigmoid拿掉</strong></p>
+<ul>
+<li>因为原始的GAN的目标是判断图片的真假，所以用sigmoid来获取类别的概率。WGAN中判别器作为EM距离的度量网络，其目标是衡量生成分布$p_g$和真实分布$p_r$之间的EM距离，属于实数空间，所以不需要加Sigmoid。</li>
+</ul>
+</li>
+</ul>
+<h3 id="Vanilla-GAN"><a href="#Vanilla-GAN" class="headerlink" title="Vanilla GAN"></a>Vanilla GAN</h3><ul>
+<li>Idea: 给定一个latent z使用generator来生成图片，使用discriminator来判断区分生成图片和真实图片，并返还gradient给Generator更新参数。Discriminator的目标是最大化区分真假的结果，Generator的目标是最小化其生成图片被判断为假的概率。最后两者大道纳什均衡。</li>
+<li><p>Equation:</p>
+<ul>
+<li><p>Discriminator:</p>
+<script type="math/tex; mode=display">\mathcal{L}(G,D)=\mathbb{E}_{x_r\sim p_r}[\log D(x_r)]+\mathbb{E}_{z\sim p_z}[\log(1-D(G(z)))]</script></li>
+<li><p>Generator:</p>
+<script type="math/tex; mode=display">\mathcal{L}(G,D)=\mathbb{E}_{z\sim p_z}[\log(1-D(G(z)))]【1】</script><ul>
+<li>因为$\log(1-D(G(x)))$的梯度很小，作者用了一个log D trick，将其替换为最大化$\log(D(G(x))$，其梯度更大，且和Discirminator学习的方向一致。</li>
+</ul>
+</li>
+<li><p>所以总的目标函数为：</p>
+<script type="math/tex; mode=display">
+\underset{G}{min}\ \underset{D}{max}\ V(G,D) =
+\mathbb{E}_{x_r\sim p_r}[\log D(x_r)]+
+\mathbb{E}_{z\sim p_z}[\log D(1-G(z))]</script></li>
+</ul>
+</li>
+<li><p><strong>Vanilla GAN的问题</strong></p>
+<ul>
+<li><p>判别器越好，生成器梯度消失越严重。</p>
+<ul>
+<li>当固定G的时候D Loss变为：$-P_r(x)\log(D(x))-P_g(x)\log(1-D(x))$<br>  令其关于D(x)的导数为0的道<script type="math/tex; mode=display">-\frac{P_r(x)}{D(x)}+ \frac{P_g(x)}{1-D(x)}=0\\
+  D^*(x) = \frac{P_r(x)}{P_r(x)+P_g(x)}【2】</script>论文里于是证明：当$P_r(x)=0$且$P_g(x)\neq0$时，最优判别器应该为给出0（也就是说判断生成的图片都为假）；而当$P_r(x)=P_g(x)$时，最优判别器应该给出0.5（也就是说无法判断谁真谁假）</li>
+</ul>
+<p>于是我们回头看Generator的loss，加上一项判断$x_r$的值对于gradient并无影响(最小化他等同于最小化之前的loss），得到：</p>
+<script type="math/tex; mode=display">\mathbb{E}_{x_r\sim p_r}[\log(D(x_r))]+\mathbb{E}_{z\sim p_z}[\log(1-D(G(z)))]</script><p>把公式【2】带回，得到</p>
+<script type="math/tex; mode=display">\mathbb{E}_{x_r\sim p_r}[\log \frac{P_r(x)}{\frac{1}{2}[P_r(x)+P_g(x)]}] + \mathbb{E}_{x_g\sim p_g}[\log \frac{P_g(x)}{\frac{1}{2}[P_g(x)+P_r(x)]}] -2\log2</script><p>根据JS散度:</p>
+<script type="math/tex; mode=display">2JS(P_r||P_g)-2\log2</script><p>在假设中JS散度对于有重叠的两个分布则公式是成立，但是因为GAN的z的取值有限（比如2^6维）而要生成的图片维度极高（比如256*256=2^16），则图片虽然在高维，但是其变化受到z值的限制，于是两个$p_r$和$p_g$的分布就很难会有重叠；如果没有重叠，那么JS散度就变成了0，而损失也就变成了-2log2，而梯度就变成了0。</p>
+</li>
+<li>最小化第二种生成器loss函数，会等价于最小化一个不合理的距离衡量，导致两个问题，一是梯度不稳定，二是mode collapse。<br>经过<a href="https://zhuanlan.zhihu.com/p/25071913" target="_blank" rel="noopener">推导</a>，最小化第二个G loss函数等同于最小化<script type="math/tex; mode=display">KL(P_g||P_r)-2JS(P_r||P_g)</script>一边是要最小化生成分布和真实分布的KL散度，另一边却又要最大化两者JS散度，于是会梯度不稳。另外，$KL(P_g||P_r)$项对生成的样本不真实时惩罚巨大，对没生成真实样本的情况惩罚微小，导致生成器偏向生成几种确定的样本，从而导致模式坍塌。</li>
+</ul>
+</li>
+</ul>
+<h3 id="LSGAN"><a href="#LSGAN" class="headerlink" title="LSGAN"></a>LSGAN</h3><script type="math/tex; mode=display">L_D^{LSGAN}=\mathbb{E}[(D(x)-1)^2]+\mathbb{E}[D(G(z))^2]</script><script type="math/tex; mode=display">L_G^{LSGAN}=\mathbb{E}[D(G(z)-1)^2]</script><p>  惩罚离群的点，让生成图像接近真实数据<br>  但是会使得生成图像失去多样性</p>
+<h3 id="DCGAN"><a href="#DCGAN" class="headerlink" title="DCGAN"></a>DCGAN</h3><ul>
+<li>把GAN的mlp转变为全卷积。Generator里用<a href="./DL-knowledge.md#transpose-convolution转置卷积反卷积">Conv2dTranspose</a>进行上采样，一步一步扩大图片尺寸。<ul>
+<li>Generator中使用ReLU作为<a href="./DL-knowledge.md#activation-激活函数">激活函数</a></li>
+</ul>
+</li>
+<li>Discriminator和Generator对称，取消pooling层，用带步长的卷积代替，一步一步缩小图片，最后判断图片真假。<ul>
+<li>Discriminator中使用Leaky ReLU。</li>
+</ul>
+</li>
+<li>Generator和Discriminator中使用BN层（稳定GAN的训练）<ul>
+<li>实验表示但不要对generator的输出层和discriminator的输入层使用BN，会不稳定</li>
+</ul>
+</li>
+<li>提出latent interpolation，对于z1，z2生成的两张图片x1，x2， 如果对z1，z2进行线性插值生成的图片应该显示从x1逐渐渐变到x2。如果图像发生急剧变化，则就是模型没有学到特征只是记住了图像。</li>
+<li>通过生成模型输入向量的加减发修改图像，类似word2vec，king-man+woman=queen</li>
+</ul>
+<h3 id="Improved-Techiques-for-Training-GANs"><a href="#Improved-Techiques-for-Training-GANs" class="headerlink" title="Improved Techiques for Training GANs"></a>Improved Techiques for Training GANs</h3><ul>
+<li>Feature matching: 因为generator和discriminator在进行min max的纳什均衡游戏，但是两者的目标函数又是凹函数，会导致两者loss此消彼长。提出使用discriminator作为feature extractor，然后将generator的目标改为$||\mathbb{E}_{x\sim p_r}f(x)-\mathbb{E}_{z\sim p_z}f(G(z))||_2^2$。<ul>
+<li>个人认为虽然在统计意义上是合理的，但是不是很make sense，在多轮epoch中一张图片会有不同z生成，势必导致G混淆latent的作用。</li>
+</ul>
+</li>
+<li>Minibatch Discriminator：认为mode collapse的原因和discriminator每次只看一张图片有关，由于每次只看一张图片，discriminator容易落入local minimal无法跳出。所以使用minibatch，对于discriminator中间的一层输出，每个图的特征$x_i\in minibatch$通过一个矩阵T，映射成一个矩阵。然后每个图对应的矩阵的第k行两两做L1距离的计算并求和，然后重新组成一个n x B的矩阵作为下一层的输入。<ul>
+<li>后来的文章基本没有用这个方法。</li>
+</ul>
+</li>
+<li>Historical averaging  生成和判别器的损失函数中添加一项正则项，$||\theta-\frac{1}{t}\sum_{i=1}^{t}\theta[i]||^2$，通过保证和之前的参数的抖动不过大来控制GAN的稳定性（后来的文章几乎也没见过，有使用衰减系数来记录参数的）</li>
+<li>One-side Label Smoothing</li>
+<li>Virtual Batch Normalization</li>
+<li>提出了<a href="./GAN.md#inception-score">IS</a> ，感觉是本文唯一被引用的原因。</li>
+</ul>
+<h3 id="Conditional-GAN"><a href="#Conditional-GAN" class="headerlink" title="Conditional GAN"></a>Conditional GAN</h3><p>在Vanilla GAN的基础上添加了条件概率，使得目标函数变为</p>
+<script type="math/tex; mode=display">V(G,D) = \min_{G} \max_{D}\mathbb{E}_{x\sim p_x}[\log D(x|y)] + \mathbb{E}_{x\sim p_g}[log(1-D(x|y))]</script><p>具体操作中就是</p>
+<ol>
+<li>把输入的z和类别c做concat，作为输入给generator</li>
+<li>把$x$和c作为输入给到判别器，让他判断（1）x是否是真实的，（2）x是否属于类别c</li>
+</ol>
+<h3 id="Pix2Pix"><a href="#Pix2Pix" class="headerlink" title="Pix2Pix"></a>Pix2Pix</h3><ul>
+<li>Generator：使用Unet结构，输入的轮廓图x进行encode，然后再decode成图片<ul>
+<li>Unet：输入和输出的图像的surface appearance应该不同，而潜在的结构（underlying structure）应该相似。对于I2IT的任务来说，输入和输出应该共享一些底层信息，因此使用Unet这种跳跃连接（skip connection）的方法，i层与n-i层concat。</li>
+</ul>
+</li>
+<li>Discriminator：使用条件判断器PatchGAN，将图片变成70x70的区块并判断每个区块的真假并统计。<ul>
+<li>因为L1和L2 loss重建的图像很模糊，并不能很好的恢复图像的高频部分（图像的边缘等），而对于低频部分（色块等）恢复良好，所以采用patch的方式分区块对局部进行判断。</li>
+</ul>
+</li>
+<li>Loss Function<script type="math/tex; mode=display">\arg\min_G \max_D \mathbb{E}_{x,y}[\log D(x,y)]+\mathbb{E}_{x,z}[\log(1-D(x,G(x,z)))]+\\\mathbb{E}_{x,y,z}[||y-G(x,z)||_1]</script></li>
+<li>作者认为L1 loss可以来补充低频信息，而GAN Loss可以来补充高频信息</li>
+<li>缺点：x到y之间是一对一的映射，应用范围有限，且test的数据与train数据差距较大时效果很差。</li>
+</ul>
+<h3 id="BicycleGAN"><a href="#BicycleGAN" class="headerlink" title="BicycleGAN"></a>BicycleGAN</h3><p>为了增加多样性</p>
+<ul>
+<li><p>VAE-GAN</p>
+<p><img src="https://pic1.zhimg.com/v2-87fd8c791bb12747ef9fb39ab77c6354_r.jpg" alt="VAE-GAN"><br>图片压缩成z，再还原成图片最后GAN loss判断</p>
+</li>
+<li><p>cVAE-GAN</p>
+<p><img src="https://pic1.zhimg.com/80/v2-dd3887f6a4e37527cff4ec7cc32943a0_720w.jpg" alt="cVAE-GAN"></p>
+<ul>
+<li><p>不变的是：</p>
+<ul>
+<li>L1 和 D的loss</li>
+<li>从 B到 z 再到B</li>
+</ul>
+</li>
+<li><p>在VAEGAN的基础上添加了</p>
+<ul>
+<li>压缩的z和随机采样的z做kl损失，使得压缩的z符合随机分布</li>
+<li>Generator take A and z as input</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>cGAN<ul>
+<li>将class和latent concat作为输入给generator</li>
+</ul>
+</li>
+<li>cLR-GAN<br><img src="https://pic1.zhimg.com/80/v2-81ec56072828bfe0fd938ba1232936f4_720w.jpg" alt="cLR-GAN"><ul>
+<li>不变的是：<ul>
+<li>A对应的就是y， z还是随机的变化，作为G的输入</li>
+<li>真实B和生成的B做D的判断</li>
+</ul>
+</li>
+<li>在cGAN的基础上添加了<ul>
+<li>Encoder，并重新压缩B得到$\hat{z}$和z做L1 loss</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Unet中z有两种concat的方法：<ul>
+<li><img src="https://pic2.zhimg.com/80/v2-a91e995b06a278ba5d05ec40ef9f7bad_720w.jpg" alt="unet concat"></li>
+</ul>
+</li>
+</ul>
+<h3 id="CycleGAN"><a href="#CycleGAN" class="headerlink" title="CycleGAN"></a>CycleGAN</h3><p>不再需要paired data，通过cycle consistency loss，即$A\underset{G_A}{\rightarrow} B \underset{G_B}{\rightarrow} \hat{A}$后求$||A-\hat{A}||_1$<br><img src="https://img-blog.csdnimg.cn/20190804132517275.jpg?x-oss-process%3Dimage%2Fwatermark%2Ctype_ZmFuZ3poZW5naGVpdGk%2Cshadow_10%2Ctext_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTQzODAxNjU%3D%2Csize_16%2Ccolor_FFFFFF%2Ct_70" alt="cyclegan"></p>
+<ul>
+<li>discriminator中使用了LSGAN的最小二乘损失<a href="./DL-knowledge.md#msemean-squared-error-loss">MSE</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+            <a href="/tags/GAN/" rel="tag"># GAN</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/07/05/MathForDL/" rel="next" title="MathForDL">
+                <i class="fa fa-chevron-left"></i> MathForDL
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/07/05/DL-knowledge/" rel="prev" title="Deep Learning基础知识 整理">
+                Deep Learning基础知识 整理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Lifan Zhao" />
+            
+              <p class="site-author-name" itemprop="name">Lifan Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/humberthumbert" target="_blank" title="Github">
+                      
+                        <i class="fa fa-fw fa-github"></i>Github</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://linkedin.com/in/lifan-zhao" target="_blank" title="Linkedin">
+                      
+                        <i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lemonloic@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#GAN-Metrics"><span class="nav-number">1.</span> <span class="nav-text">GAN Metrics</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Inception-Score"><span class="nav-number">1.1.</span> <span class="nav-text">Inception Score</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FID"><span class="nav-number">1.2.</span> <span class="nav-text">FID</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LPIPS-Learned-Perceptual-Image-Patch-Similarity"><span class="nav-number">1.3.</span> <span class="nav-text">LPIPS(Learned Perceptual Image Patch Similarity)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Precision-and-Recall（Improved）"><span class="nav-number">1.4.</span> <span class="nav-text">Precision and Recall（Improved）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Density-and-Coverage"><span class="nav-number">1.5.</span> <span class="nav-text">Density and Coverage</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Perceptual-Path-Length"><span class="nav-number">1.6.</span> <span class="nav-text">Perceptual Path Length</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Generative-Adversarial-Network、"><span class="nav-number">1.7.</span> <span class="nav-text">Generative Adversarial Network、</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#WGAN"><span class="nav-number">1.7.1.</span> <span class="nav-text">WGAN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WGAN-GP"><span class="nav-number">1.7.2.</span> <span class="nav-text">WGAN-GP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vanilla-GAN"><span class="nav-number">1.7.3.</span> <span class="nav-text">Vanilla GAN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LSGAN"><span class="nav-number">1.7.4.</span> <span class="nav-text">LSGAN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DCGAN"><span class="nav-number">1.7.5.</span> <span class="nav-text">DCGAN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Improved-Techiques-for-Training-GANs"><span class="nav-number">1.7.6.</span> <span class="nav-text">Improved Techiques for Training GANs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Conditional-GAN"><span class="nav-number">1.7.7.</span> <span class="nav-text">Conditional GAN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pix2Pix"><span class="nav-number">1.7.8.</span> <span class="nav-text">Pix2Pix</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BicycleGAN"><span class="nav-number">1.7.9.</span> <span class="nav-text">BicycleGAN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CycleGAN"><span class="nav-number">1.7.10.</span> <span class="nav-text">CycleGAN</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lifan Zhao</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

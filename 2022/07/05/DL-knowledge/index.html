@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="deep learning," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Basic ComponentLoss常见损失机器学习中监督学习的本质是给定一系列样本$(x_i,y_i)$，尝试学习$x\rightarrow y$的映射关系。损失函数是用来估量模型的输出$\hat{y}$和真实值$y$之间的差距，从而给模型的优化指引方向。 \hat{\theta}&#x3D;\argmin_{\theta}\frac{1}{N}\sum_{i&#x3D;1}^{N}L(y_i,f(x_i;\th">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Deep Learning基础知识 整理">
+<meta property="og:url" content="http://humberthumbert.github.io/2022/07/05/DL-knowledge/index.html">
+<meta property="og:site_name" content="Lifan&#39;s Note">
+<meta property="og:description" content="Basic ComponentLoss常见损失机器学习中监督学习的本质是给定一系列样本$(x_i,y_i)$，尝试学习$x\rightarrow y$的映射关系。损失函数是用来估量模型的输出$\hat{y}$和真实值$y$之间的差距，从而给模型的优化指引方向。 \hat{\theta}&#x3D;\argmin_{\theta}\frac{1}{N}\sum_{i&#x3D;1}^{N}L(y_i,f(x_i;\th">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-07-05T14:40:41.000Z">
+<meta property="article:modified_time" content="2022-07-05T14:45:44.147Z">
+<meta property="article:author" content="Lifan Zhao">
+<meta property="article:tag" content="deep learning">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://humberthumbert.github.io/2022/07/05/DL-knowledge/"/>
+
+
+
+
+
+  <title>Deep Learning基础知识 整理 | Lifan's Note</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Lifan's Note</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2022/07/05/DL-knowledge/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Deep Learning基础知识 整理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-07-05T22:40:41+08:00">
+                2022-07-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Basic-Component"><a href="#Basic-Component" class="headerlink" title="Basic Component"></a>Basic Component</h1><h2 id="Loss常见损失"><a href="#Loss常见损失" class="headerlink" title="Loss常见损失"></a>Loss常见损失</h2><p>机器学习中监督学习的本质是给定一系列样本$(x_i,y_i)$，尝试学习$x\rightarrow y$的映射关系。损失函数是用来估量<strong>模型的输出$\hat{y}$和真实值$y$之间的差距</strong>，从而给模型的优化指引方向。</p>
+<script type="math/tex; mode=display">\hat{\theta}=\argmin_{\theta}\frac{1}{N}\sum_{i=1}^{N}L(y_i,f(x_i;\theta+\lambda \Phi(\theta)))</script><p>其中，前面的均值函数为经验风险，$\mathcal{L}(y_i,f(x_i;\theta))$为损失函数，后面的项$\lambda \Phi(\theta)$为<strong>结构风险</strong>,$\Phi(\theta)$衡量模型复杂度。</p>
+<p>A loss function is a part of a cost function which is a type of an objective function.</p>
+<ul>
+<li>loss function：对单个训练样本而言</li>
+<li>cost fucntion：对整个训练集而言</li>
+<li>objective function：任意希望被优化的函数</li>
+</ul>
+<h3 id="MSE-Mean-Squared-Error-Loss"><a href="#MSE-Mean-Squared-Error-Loss" class="headerlink" title="MSE(Mean Squared Error) Loss"></a>MSE(Mean Squared Error) Loss</h3><p>就是L2 Loss</p>
+<script type="math/tex; mode=display">\mathcal{L}=\frac{1}{N}\sum_{i=1}^{N}(y_i-\hat{y_i})^2</script><ul>
+<li>推导：通过假设<strong>模型预测与真实值之间的误差</strong>服从<strong>高斯分布</strong>$(\mu=0,\sigma=1)$，那么对于任意$x_i$，模型生成他对应真实值$y_i$的概率为：<script type="math/tex; mode=display">p(y_i|x_i)=\frac{1}{\sqrt{2\pi}}\exp(-\frac{(y_i-\hat{y_i})^2}{2})</script>假设N个样本点相互独立，则这组$x$得到对于$y$的概率为他们的累乘：<script type="math/tex; mode=display">\mathcal{L}(x,y)=\prod_{i=1}^N \frac{1}{\sqrt{2\pi}}\exp(-\frac{(y_i-\hat{y_i})^2}{2})</script>两边取对数：<script type="math/tex; mode=display">\mathcal{LL}(x,y)=-\frac{N}{2}\log 2\pi-\frac{1}{2}\sum_{i=1}^N (y_i-\hat{y_i})^2</script>去掉第一项常数,转换成最小化负对数似然(Negative Log-Likelihood)就得到了：<script type="math/tex; mode=display">\mathcal{NLL}(x,y)=\sum_{i=1}^N (y_i-\hat{y_i})^2</script></li>
+<li>所以在假设成立的前提下使用是比较合适的，比如<strong>回归</strong>问题。而类似分类问题就不是一个好选择了。</li>
+</ul>
+<h3 id="MAE-Mean-Absolute-Error-Loss"><a href="#MAE-Mean-Absolute-Error-Loss" class="headerlink" title="MAE(Mean Absolute Error) Loss"></a>MAE(Mean Absolute Error) Loss</h3><p>就是L1 Loss</p>
+<script type="math/tex; mode=display">\mathcal{L} = \frac{1}{N}\sum_{i=1}^{N}|y_i-\hat{y_i}|</script><ul>
+<li>推导：假设<strong>模型预测和真实值之间的误差</strong>服从<strong>Laplace分布</strong>$(\mu=0,\beta=1)$，则对于一个$x_i$其输出值为$y_i$的概率为：<script type="math/tex; mode=display">p(y_i|x_i) = \frac{1}{2}\exp(-|y_i-\hat{y_i}|)</script>同上推导：<script type="math/tex; mode=display">\mathcal{L}(x,y)=\prod_{i=1}^N \frac{1}{2}\exp(-|y_i-\hat{y_i}|)\\
+\mathcal{LL}(x,y) = -\frac{N}{2}-\sum_{i=1}^N|y_i-\hat{y_i}|\\
+\mathcal{NLL}(x,y) = \sum_{i=1}^N|y_i-\hat{y_i}|</script></li>
+<li><strong>MSE和MAE的区别</strong><ul>
+<li>梯度不同，MSE为$-\hat{y_i}$，MAE为$\pm1$，对于梯度下降而言，MSE更好 </li>
+<li>MAE对异常点更鲁棒：平方项会拉大噪点的影响</li>
+</ul>
+</li>
+</ul>
+<h3 id="BCE-Binary-Cross-Entropy-Loss"><a href="#BCE-Binary-Cross-Entropy-Loss" class="headerlink" title="BCE(Binary Cross Entropy) Loss"></a>BCE(Binary Cross Entropy) Loss</h3><p>先通过<a href="./MathForDL.md#sigmoid">sigmoid</a>将输出$\hat{y_i}$限制在$(0,1)$之间，那么对于$x_i$其被判断为正例的概率为$p(y_i=1|x_i)=\hat{y_i}$，那么对应为负例的概率为$p(y_i=0|x_i)=1-\hat{y_i}$</p>
+<script type="math/tex; mode=display">p(y_i|x_i)=\hat{y_i}^{y_i} (1-\hat{y_i})^{1-y_i}</script><p>同上</p>
+<script type="math/tex; mode=display">\mathcal{L}(x,y)=\prod_{i=1}^N(\hat{y_i}^{y_i} (1-\hat{y_i})^{1-y_i})\\
+
+\mathcal{LL}(x,y)=\sum_{i=1}^N y_i \log(\hat{y_i})+ \sum_{i=1}^{N} (1-y_i)\log (1-\hat{y_i})\\</script><p>二元的cross entropy就是</p>
+<script type="math/tex; mode=display">\mathcal{NLL} = -y \log y - (1-y)\log (1-y)</script><h3 id="CE-Cross-Entropy-Loss"><a href="#CE-Cross-Entropy-Loss" class="headerlink" title="CE(Cross Entropy) Loss"></a>CE(Cross Entropy) Loss</h3><p>类似于二分类的BCE，此处的$y_i$变成了<strong>one-hot的向量</strong>，同时模型输出的压缩从Sigmoid函数<strong>变成了<a href="./MathForDL.md#softmax">Softmax函数</a></strong>，其压缩输出在(0,1)之间，且所有输出之和为1</p>
+<script type="math/tex; mode=display">p(y_i|x_i)=\prod_{k=1}^K(\hat{y_i}^k)^{y_i^k}</script><p>其中k属于class的种类数，</p>
+<script type="math/tex; mode=display">\mathcal{NLL}(x,y)=-\sum_{i=1}^N\sum_{k=1}^Ky_i^{k}\log(\hat{y_i}^k)</script><p>又由于$y_i$是one-hot向量，上式可以写成：</p>
+<script type="math/tex; mode=display">\mathcal{NLL} = \sum_{i=1}^{N}y_i^{c_i} \log y_i^{\hat{c}_i}</script><p>其中$c_i$是$x_i$的目标类。</p>
+<ul>
+<li>为什么分类中不使用MSE Loss？<ul>
+<li>因为输出的$\hat{y_i}$和真实值$y_i$需要在分类的类别中，其差值不是高斯分布所以效果很差。</li>
+</ul>
+</li>
+<li>为什么分类使用交叉熵损失？<ol>
+<li>最大似然来解释，即上面的推导</li>
+<li>KL散度，让输出分布和真实分布贴近可以用KL散度表示。$KL(y_i,\hat{y_i})=\sum_{k=1}^K y_i\log y_i-\sum_{k=1}^K y_i\log \hat{y_i}$,又第一项与优化无关，就变成了<a href="./MathForDL.md#cross-entropy">Cross Entropy</a> $-\sum_{k=1}^K y_i\log{\hat{y_i}}$</li>
+</ol>
+</li>
+</ul>
+<h3 id="Hinge-Loss"><a href="#Hinge-Loss" class="headerlink" title="Hinge Loss"></a>Hinge Loss</h3><script type="math/tex; mode=display">\mathcal{L}_{hinge}=\sum_{i=1}^N \max(0,1-sgn(y_i)\hat{y_i})</script><p>当y_i=1的时候，hinge loss会对判断为负的结果有较大惩罚，同时还会在[0,1]区间对判断为正，但是不确定的结果有较小惩罚。所以hinge loss会给出一个清晰的决策边界</p>
+<h3 id="Exponential-Loss"><a href="#Exponential-Loss" class="headerlink" title="Exponential Loss"></a>Exponential Loss</h3><script type="math/tex; mode=display">L(Y,f(X)) = \exp(-Y\ f(X))</script><p>Adaboost中使用</p>
+<h3 id="Log-Likelihood-Loss"><a href="#Log-Likelihood-Loss" class="headerlink" title="Log-Likelihood Loss"></a>Log-Likelihood Loss</h3><script type="math/tex; mode=display">L(Y,P(Y|X))=-log(P(Y|X))</script><p>非常好的表征概率分布，在很多场景尤其是多分类，如果需要知道结果属于每个类别的置信度，那它非常适合；健壮性不强，相比于hinge loss对噪声更敏感</p>
+<h3 id="Focal-Loss"><a href="#Focal-Loss" class="headerlink" title="Focal Loss"></a>Focal Loss</h3><p>由于在one-stage的object detection中windows的前景类别和背景的可能达到1：1000，使用CE Loss，主要的class的Loss会overwhelm数量少的class（也就是背景的判断影响了对前景的学习），所以在CE Loss的基础上改进：</p>
+<script type="math/tex; mode=display">L(Y,f(X))=\sum_{i=1}^K(1-f(x_i))^{\gamma}y^{c_i}\log(f(x_i))</script><h2 id="Activation-激活函数"><a href="#Activation-激活函数" class="headerlink" title="Activation 激活函数"></a>Activation 激活函数</h2><p>通过激活函数给网络添加增加非线性，使得NN可以学习到非线性的复杂函数</p>
+<ol>
+<li>连续并可导（允许少数点不可导）的分线性函数。可导的激活函数可以直接利用数值优化的方式来学习网络参数</li>
+<li>激活函数及其导函数要尽可能简单，有利于提高计算效率</li>
+<li>激活函数的导函数的值域要在一个合适的区间内，不能太大也不能太小，否则会影响训练的效率和稳定性（？ReLU）</li>
+</ol>
+<h3 id="常见激活函数"><a href="#常见激活函数" class="headerlink" title="常见激活函数"></a>常见激活函数</h3><ul>
+<li>tanh: $\tanh(x)=\frac{\exp(x)-\exp(-x)}{\exp(x)+\exp(-x)}$<ul>
+<li>zero-centered，[0,1]区分</li>
+</ul>
+</li>
+<li>Sigmoid:  $\sigma (x)=\frac{1}{1+e^{-x}}$<ul>
+<li>梯度消失，[0,1]区分</li>
+</ul>
+</li>
+<li>Softplus: $ln(1+e^{x}$<ul>
+<li>[0,inf]区分</li>
+</ul>
+</li>
+<li>Softmax: $\frac{e^{x_i}}{\sum_{j=1}^J e^{x_j} }\text{for} i=1,…,J$</li>
+<li>ReLU: $max(0, x)$<ul>
+<li>解决梯度消失的问题。[0,inf]区分</li>
+</ul>
+</li>
+<li>LeakyReLU: $\begin{cases} 0.01x &amp; \text{ if } x<0 \\ x & \text{ if }>0 \end{cases}$</0></li>
+<li>ELU： $f(x)=\begin{cases} x &amp;\text{if }x &gt;0 \\ \alpha(e^x-1) &amp;\text{if} x\leq 0 \end{cases}$<ul>
+<li>relu没有负值，导致激活值的均值不在零，在多层的激活函数累加下会导致bias shift。elu既利用了负值的信息，又让均值为0.</li>
+</ul>
+</li>
+</ul>
+<h2 id="Batch-Normalization"><a href="#Batch-Normalization" class="headerlink" title="Batch Normalization"></a>Batch Normalization</h2><h2 id="Convolution卷积"><a href="#Convolution卷积" class="headerlink" title="Convolution卷积"></a>Convolution卷积</h2><p> Input  $\begin{bmatrix} a &amp; b &amp; c \\ d &amp; e &amp; f \\ g &amp; h &amp; i \\ \end{bmatrix}$, kernel $\begin{bmatrix} 1 &amp; 2 \\ 3 &amp; 4 \\ \end{bmatrix}$</p>
+<p> Output的尺寸：$output = (input-kernel+2*padding)/stride+1$</p>
+<ul>
+<li><strong>为什么用卷积代替mlp</strong><ul>
+<li>全链接层参数太多，导致训练效率低下</li>
+<li>Convolution优点：<ul>
+<li>局部连接local connection：局部感知野：对于一个部分，左右移动一个pixel应该不影响结果（所以mlp中连接所有点的操作过于冗余），局部内的像素连接比较紧密，对较远的像素连接稀疏，通过多层全链接，深处的一个点就相当于原图的一块区域。</li>
+<li>权值共享weight sharing：减少了weights的数量，降低了网络复杂度。kernel中每一个channel可以理解为不同的特征提取方法，比如边缘检测的算子，这些channel可以通用在整个图片上。</li>
+<li>池化Pooling：降尺寸，减少计算量，特征压缩。通过pooling层，提取特征（max pooling最大的，avg pooling平均的）来减缓卷积层对位置的敏感性。（注：conv2d配合stride同样可以达到downsample的效果，且可能可以学到不一样的特征，而pooling的操作时固定的，但是其占用的计算量和存储量更小。有文章证明conv2d with stride更好）（注2:BP的时候，avg pooling将gradient平均到上一层的每个位置，max pooling将gradient传到最大的那个位置）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>1x1卷积和mlp层的关系</strong><ul>
+<li>对于1x1的输入而言，两者没有区别，而对于[b,c,h,w]的输入，1x1的卷积的输出尺寸不变，[b,c’,h,w]，c’可以进行升维或者降维。而对于MLP层来说，其输出维[b,c,1,1]。另外参数量在h x w的情况下会更多。</li>
+</ul>
+</li>
+<li><strong>空洞卷积</strong><ul>
+<li>对于每次stride，kernel对应的每一个点中间都要隔开dilation个点。以此希望在不改变参数量的情况下增加感受野。（卷积核填充0，或者输入等间隔采样）</li>
+<li>网格效应：局部信息丢失，远距离获取的信息没有相关性</li>
+</ul>
+</li>
+</ul>
+<h2 id="Transpose-Convolution转置卷积-反卷积"><a href="#Transpose-Convolution转置卷积-反卷积" class="headerlink" title="Transpose Convolution转置卷积/反卷积"></a>Transpose Convolution转置卷积/反卷积</h2><p>Input $\begin{bmatrix} a &amp; b &amp;c \\ d &amp; e &amp; f \\ g &amp; h &amp; i \end{bmatrix}$, kernel $\begin{bmatrix} 1 &amp; 2 &amp; 3 \\ 4 &amp; 5 &amp; 6 \\ 7 &amp; 8 &amp; 9 \end{bmatrix}$, 反卷积操作：</p>
+<p>$H_{out}=(H_{in}−1)×stride[0]−2×padding[0]+dilation[0]×(kernel_size[0]−1)+output_padding[0]+1$</p>
+<p>先将input两边补零（kernel_size-1)：</p>
+<script type="math/tex; mode=display">\begin{bmatrix} 
+0 &0 &0 &0 &0 &0 &0\\
+0 &0 &0 &0 &0 &0 &0\\
+0 &0 &a &b &c &0 &0\\
+0 &0 &d &e &f &0 &0\\
+0 &0 &g &h &i &0 &0\\
+0 &0 &0 &0 &0 &0 &0\\
+0 &0 &0 &0 &0 &0 &0\\
+\end{bmatrix}</script><p>如果stride &gt; 1:</p>
+<script type="math/tex; mode=display">\begin{bmatrix}
+0 &0 &0 &0 &0 &0 &0 &0 &0\\
+0 &0 &0 &0 &0 &0 &0 &0 &0\\
+0 &0 &a &0 &b &0 &c &0 &0\\
+0 &0 &0 &0 &0 &0 &0 &0 &0\\
+0 &0 &d &0 &e &0 &f &0 &0\\
+0 &0 &0 &0 &0 &0 &0 &0 &0\\
+0 &0 &g &0 &h &0 &i &0 &0\\
+0 &0 &0 &0 &0 &0 &0 &0 &0\\
+0 &0 &0 &0 &0 &0 &0 &0 &0\\
+\end{bmatrix}</script><p>把kernel 180度旋转：</p>
+<script type="math/tex; mode=display">\begin{bmatrix}
+9& 8& 7\\
+6& 5& 4\\
+3& 2& 1\\
+\end{bmatrix}</script><p>然后进行正常卷积。</p>
+<ul>
+<li><strong>ConvTranspose2d会导致什么？</strong><ul>
+<li><a href="https://distill.pub/2016/deconv-checkerboard/" target="_blank" rel="noopener">Checkerboard Artifact</a> 转置卷积因为stride=2和kernelsize的倍数关系，总会有些下层的点upsampling到上层的时候被多次计算，但是我们又不希望去专门设计不会overlap的filter这样会限制模型的自由度，所以提出了Nearest Neighbor Interpolation-Resize Deconvolution，Bilinear-Resize Deconvolution，虽然一定程度上能减轻棋盘格现象，但是不一定是最好的。</li>
+</ul>
+</li>
+</ul>
+<h2 id="Optimizer优化器"><a href="#Optimizer优化器" class="headerlink" title="Optimizer优化器"></a>Optimizer优化器</h2><p>待优化参数$\theta$，目标函数$f(\theta )$,学习率$\eta$</p>
+<p>每一次epoch t迭代优化：</p>
+<ol>
+<li>计算目标函数关于当前参数的梯度:$g_t=\triangledown_{\theta} f(\theta_{t})$</li>
+<li>根据历史梯度计算一阶动量和二阶动量：$m_t=\phi(g_1,g_2,…,g_t); V_t = \psi(g_1,g_2,…,g_t)$</li>
+<li>计算当前时刻的下降梯度： $\triangle\theta_t=-\eta\times m_t/\sqrt{V_t}$</li>
+<li>根据下降梯度进行更新：$\theta_{t+1}=\theta_t+\triangle\theta_t$</li>
+</ol>
+<h3 id="Stochastic-Gradient-Descendent随机梯度下降"><a href="#Stochastic-Gradient-Descendent随机梯度下降" class="headerlink" title="Stochastic Gradient Descendent随机梯度下降"></a>Stochastic Gradient Descendent随机梯度下降</h3><p>对于一个数据量大，复杂度高的模型，不可能一口气看完所有数据然后计算其梯度。所以才用了minibatch的方法，<strong>以一个minibatch的数据为单位，计算一个批次的梯度，然后再反向传播，并更新参数</strong></p>
+<script type="math/tex; mode=display">\mathcal{g}_t=\triangledown_{\theta_{t-1}}f(\theta_{t-1})</script><p>没有动量$m_t = g_t; V_t = I^2$，所以：</p>
+<script type="math/tex; mode=display">\triangle\theta_t = -\eta \times g_t</script><p>其中，$g_t$参数梯度，$\eta$学习率。</p>
+<ul>
+<li><strong>好处</strong><ul>
+<li>分担训练压力</li>
+<li>加速收敛，因为一个epoch中有多次更新梯度的机会。</li>
+</ul>
+</li>
+<li><strong>坏处</strong><ul>
+<li>开始的学习率难以确定</li>
+<li>容易陷入局部最优解：为了解决这个问题，通常我们会加入动量（momentum）保留一些历史的更新方向，希望<strong>增加优化的稳定性，降低陷入局部最优无法跳出的风险</strong><script type="math/tex; mode=display">m_t = \beta \times m_{t-1}+ (1-\beta)\times g_t\\
+  \triangle\theta_t = -\eta \times m_t</script><ul>
+<li>理论上，如果$m_t,m_{t-1}$的方向相同的话，梯度会变大，加快收敛。如果方向不同，则梯度会变小，抑制梯度更新的震荡增加稳定性。当训练结束的中后期，$g_t$可能趋近于0，动量可以使得梯度不为零从而跳出局部最优。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="AdaGrad"><a href="#AdaGrad" class="headerlink" title="AdaGrad"></a>AdaGrad</h3><p>自适应学习率：对于经常更新的参数，已经积累了大量关于他的只是，不希望被单个样本影响太大，希望学习率慢一点；对于偶尔更新的参数，了解的信息太少，希望从每个偶然出现的样本上多学一点，希望学习率快一些。那么应该<strong>如何度量历史更新频率</strong>呢？<strong><em>二阶动量</em></strong>，即迄今为止<strong>所有梯度值的平方和</strong>：</p>
+<script type="math/tex; mode=display">V_t = \sum_{\tau=1}^t g_\tau^2</script><p>那么我们得到:</p>
+<script type="math/tex; mode=display">\triangle\theta_t = -\eta\cdot m_t / \sqrt{V_t}</script><p>于是学习率变成了$\frac{\eta}{\sqrt{V_t}}$，更新的越多$\sqrt{V_t}$越大，学习率就越小。</p>
+<ul>
+<li>但是由于$\sqrt{V_t}$是单调递增的，最后会导致学习率递减至0，提前结束学习。</li>
+</ul>
+<h3 id="AdaDelta-RMSProp"><a href="#AdaDelta-RMSProp" class="headerlink" title="AdaDelta/RMSProp"></a>AdaDelta/RMSProp</h3><p>既然基于所有历史二阶动量的AdaGrad太过激进，那么何不只选择关注一段时期内，关注过去一段时间窗口的下降梯度。</p>
+<p>指数移动平局值：</p>
+<script type="math/tex; mode=display">V_t = \beta_2\cdot V_{t-1} + (1-\beta_2)g_t^2</script><h3 id="Adam-Adaptive-Momentum"><a href="#Adam-Adaptive-Momentum" class="headerlink" title="Adam(Adaptive + Momentum)"></a>Adam(Adaptive + Momentum)</h3><p>SGD的一阶动量：</p>
+<script type="math/tex; mode=display">m_t = \beta_1\cdot m_{t-1} + (1-\beta_1) \cdot g_t</script><p>加上AdaDelta的二阶动量：</p>
+<script type="math/tex; mode=display">V_t = \beta_2\cdot V_{t-1} + (1-\beta_2) g_t^2</script><p>得到</p>
+<script type="math/tex; mode=display">\triangle\theta_t = -\eta\cdot \frac{\beta_1\cdot m_{t-1} + (1-\beta_1) \cdot g_t}{\sqrt{\beta_2\cdot V_{t-1} + (1-\beta_2) g_t^2}}</script><h4 id="Some-Problem"><a href="#Some-Problem" class="headerlink" title="Some Problem"></a>Some Problem</h4><ul>
+<li>AdaGrad和SGD都会收敛，只是有会提前收敛的问题。但是AdaDelta和Adam由于用的是一段时间内的累积，<strong>$V_t$可能时大时小</strong>导致训练不稳定，模型无法收敛。可以通过$max(V_{t-1},Adam)$的方式保证收敛。</li>
+<li>自适应学习率算法可能会对前期出现的特征过拟合，后期才出现的特征很难纠正前期的拟合效果。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/07/05/GAN2/" rel="next" title="对抗生成网络 整理">
+                <i class="fa fa-chevron-left"></i> 对抗生成网络 整理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/07/05/ObjectDetection/" rel="prev" title="目标检测 整理">
+                目标检测 整理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Lifan Zhao" />
+            
+              <p class="site-author-name" itemprop="name">Lifan Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/humberthumbert" target="_blank" title="Github">
+                      
+                        <i class="fa fa-fw fa-github"></i>Github</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://linkedin.com/in/lifan-zhao" target="_blank" title="Linkedin">
+                      
+                        <i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lemonloic@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Basic-Component"><span class="nav-number">1.</span> <span class="nav-text">Basic Component</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Loss常见损失"><span class="nav-number">1.1.</span> <span class="nav-text">Loss常见损失</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MSE-Mean-Squared-Error-Loss"><span class="nav-number">1.1.1.</span> <span class="nav-text">MSE(Mean Squared Error) Loss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MAE-Mean-Absolute-Error-Loss"><span class="nav-number">1.1.2.</span> <span class="nav-text">MAE(Mean Absolute Error) Loss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BCE-Binary-Cross-Entropy-Loss"><span class="nav-number">1.1.3.</span> <span class="nav-text">BCE(Binary Cross Entropy) Loss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CE-Cross-Entropy-Loss"><span class="nav-number">1.1.4.</span> <span class="nav-text">CE(Cross Entropy) Loss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hinge-Loss"><span class="nav-number">1.1.5.</span> <span class="nav-text">Hinge Loss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exponential-Loss"><span class="nav-number">1.1.6.</span> <span class="nav-text">Exponential Loss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Log-Likelihood-Loss"><span class="nav-number">1.1.7.</span> <span class="nav-text">Log-Likelihood Loss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Focal-Loss"><span class="nav-number">1.1.8.</span> <span class="nav-text">Focal Loss</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Activation-激活函数"><span class="nav-number">1.2.</span> <span class="nav-text">Activation 激活函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#常见激活函数"><span class="nav-number">1.2.1.</span> <span class="nav-text">常见激活函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Batch-Normalization"><span class="nav-number">1.3.</span> <span class="nav-text">Batch Normalization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Convolution卷积"><span class="nav-number">1.4.</span> <span class="nav-text">Convolution卷积</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Transpose-Convolution转置卷积-反卷积"><span class="nav-number">1.5.</span> <span class="nav-text">Transpose Convolution转置卷积&#x2F;反卷积</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Optimizer优化器"><span class="nav-number">1.6.</span> <span class="nav-text">Optimizer优化器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Stochastic-Gradient-Descendent随机梯度下降"><span class="nav-number">1.6.1.</span> <span class="nav-text">Stochastic Gradient Descendent随机梯度下降</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AdaGrad"><span class="nav-number">1.6.2.</span> <span class="nav-text">AdaGrad</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AdaDelta-RMSProp"><span class="nav-number">1.6.3.</span> <span class="nav-text">AdaDelta&#x2F;RMSProp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Adam-Adaptive-Momentum"><span class="nav-number">1.6.4.</span> <span class="nav-text">Adam(Adaptive + Momentum)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Some-Problem"><span class="nav-number">1.6.4.1.</span> <span class="nav-text">Some Problem</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lifan Zhao</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>
