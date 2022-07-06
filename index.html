@@ -239,6 +239,138 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2022/07/06/ML-knowledge/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lifan Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lifan's Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2022/07/06/ML-knowledge/" itemprop="url">ML_knowledge</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-07-06T21:54:57+08:00">
+                2022-07-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Machine-Learning-Knowledge"><a href="#Machine-Learning-Knowledge" class="headerlink" title="Machine Learning Knowledge"></a>Machine Learning Knowledge</h1><h4 id="K-th-Nearest-Neighbor"><a href="#K-th-Nearest-Neighbor" class="headerlink" title="K-th Nearest Neighbor"></a>K-th Nearest Neighbor</h4><p>[Supervised, regression]</p>
+<p>已有一个带label的数据集，给定一个样本，求其label。计算与其他所有samples的距离，取前k近的samples，统计这k个samples的label，认为最多的那个为此样本的label。</p>
+<ul>
+<li>k的选择不能太大，否则没有意义（当k=n是就是一个统计）同时k也不能太小，否则就overfit（当k=1时就近选择，对于测试集没有帮助）；可以通过划分验证集的方式来找到合适的k</li>
+<li>数据的维度需要归一化，否则某个维度的距离会dominate其他的维度。</li>
+<li>时间复杂度高，kd tree</li>
+</ul>
+<h4 id="K-means-clustering"><a href="#K-means-clustering" class="headerlink" title="K-means clustering"></a>K-means clustering</h4><ol>
+<li>选择初始化的k个样本作为初始聚类中心$a=a_1,a_2,…,a_k$</li>
+<li>针对数据集中每个样本$x_i$计算它到k个聚类中心的距离并将其分到距离最小的聚类中心所对应的类中</li>
+<li>针对每个类别$a_j$，重新计算它的聚类中心$a_j=\frac{1}{|c_i|}\sum_{x\in c_i}x$（即属于该类的所有样本的质心）</li>
+<li>重复2，3两步操作，直到达到某个终止条件（迭代次数，最小误差变化等）</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2022/07/05/ObjectDetection/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -512,9 +644,77 @@ $$f(x,y) = \frac{y_2-y}{y_2-y_1}f(x，y_1) + \frac{y-y_1}{y_2-y_1}f(x,y2)$$
 </ul>
 </li>
 </ul>
-<h3 id="YOLO-v2"><a href="#YOLO-v2" class="headerlink" title="YOLO v2"></a>YOLO v2</h3><ol>
-<li>网络结构的改善：采用了darknet，</li>
+<h2 id="YOLOv2"><a href="#YOLOv2" class="headerlink" title="YOLOv2"></a>YOLOv2</h2><ul>
+<li><p><a href="./DL_knowledge.md#batch-normalization">Batch Normalization</a></p>
+<p>  对于每一层的输入都做了归一化。提升2%mAP.</p>
+</li>
+<li><p>High resolution classifer高分辨率图像分类器</p>
+<p>  采用224x224 ImageNet图像进行分类模型预训练160 epoch，再采用448x448的高分辨率样本对分类模型进行finetune(10个epoch)，使得网络特征逐渐适应448x448的分辨率，缓解了分辨率突然切换造成的影响。</p>
+</li>
+<li><p>Convolution with anchor boxes使用先验框</p>
+<p>  学习FasterRCNN预测anchor box的偏移量。<strong>在每个grid预先设定一组不同大小和宽高比的边框，来覆盖整个图像的不同位置和多种尺度</strong>，因为anchor bbox的大小都不同，所以不能再使用MLP，<em>8将全连接层和最后一个pooling层去掉*</em></p>
+<p>  将输入图片尺寸从448改为416，这样经过32倍downsample，可以得到13x13的feature map，使得特征图只有一个center cell（如果是偶数就会有四个）。</p>
+<pre><code>  - 为什么希望只有一个center cell？
+  - 因为大的object一般会占据图像中心，所以希望用一个center cell去预测。
+</code></pre><p>  最后recall提升7%，mAP只下降0.3%</p>
+</li>
+<li><p>Dimension clusters 聚类提取先验框的尺度信息</p>
+<p>  通过Training GT的bbox的<a href="./ML.md#k-means-clustering">k-means聚类分析</a>，自动寻找尽可能匹配样本的anchor box尺寸。传统欧式距离在bbox尺寸较大的时候误差也更大，而我们希望误差和bbox的尺寸没有太大关系，所以通过IoU定了如下距离函数：</p>
+<script type="math/tex; mode=display">d(box,centroid) = 1-IoU(box,centroid)</script><p>  其中centroid是聚类是被选中作为中心的边框，box是其他的边框，于是IoU越大，两者越接近。</p>
+</li>
+<li><p>Direct Location prediction 约束预测边框的位置<br>  借鉴于Faster RCNN的先验框方法，其位置预测公式：</p>
+<script type="math/tex; mode=display">\left\{\begin{matrix}
+  t_x = \frac{x-x_a}{w_a}\\
+  t_y = \frac{y-y_a}{h_a}
+  \end{matrix}\right .\Rightarrow
+  \left\{\begin{matrix}
+  x = (t_x*w_a)+x_a \\
+  y = (t_y*h_a)+y_a
+  \end{matrix}\right .</script><p>由于没有RPN网络去直接学习预测位移，所以在YOLO中直接取学习$t_x,t_y$，导致他们的取值没有任何约束，因此预测边框的中心可能出现在任何位置，<strong>训练早期阶段不容易稳定</strong>。YOLOv2调整了预测公式，将预测边框的中心约束在特定的grid网格内：</p>
+<script type="math/tex; mode=display">b_x=\sigma(t_x)+c_x\\
+b_y = \sigma(t_y)+c_y\\
+b_w = p_w e^{t_w}\\
+b_h = p_h e^{t_h}\\
+Pr(object)*IoU(b,object) = \sigma(t_o)</script><p><img src="https://img-blog.csdn.net/20170913081810622?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDM4MDE2NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt></p>
+<p>其中，</p>
+<ul>
+<li>$b_x,b_y,b_w,b_h$是预测边框的中心和宽高。</li>
+<li>$Pr(object)*IoU(b,object)$是预测边框的置信度，这里对预测参数$t_o$进行sigmoid变换后作为置信度的值。</li>
+<li>$c_x,c_y$是当前网格的左上角到图像左上角的距离，要先将网格大小归一化，即令一个网格的宽=1，高=1.</li>
+<li>$p_w,p_h$是先验框的宽高。</li>
+<li>$\sigma$是sigmoid函数。</li>
+<li>$t_x,t_y,t_h,t_w,t_o$是要学习的参数。<br>因为使用了限制让数值变得参数化，也让网络更容易学习，更稳定。</li>
+</ul>
+</li>
+<li><p>Fine-Grained Features（passthrough层检测细颗粒度特征）</p>
+</li>
+</ul>
+<p>图像中的对象会有大有小，输入图像经过多层网络特征提取，最后输出的feature map中较小的对象可能并不明显甚至被忽略掉了。于是引入了passthrough层：在最后一个pooling层之前，特征图大小为26x26x512，将其1拆4，让他们和经过pooling，conv后的feature map 13x13x1024直接concat，得到13x13x3072.</p>
+<ul>
+<li><p>Multi-Scale Training 多尺度图像训练<br>每10个batch，网络会随机选择一个新的图片尺寸，[320,608,32]，希望网络在不同的输入尺寸上都达到一个很好的预测效果。</p>
+</li>
+<li><p>Hierarchical classification分层分类<br>提出了一种在分类数据集和检测数据集上联合训练的机制：object detection的数据集取训练detection，classification的数据集只训练分类loss。</p>
+</li>
+</ul>
+<p>但是ImageNet有9000个种类，coco只有80种，作者使用multi-label模型，即假定一张图片可以有多个label，且不要求label间独立。采用以下策略重建了一个树形结构：</p>
+<ol>
+<li>遍历ImageNet的label，然后在WordNet中寻找该label到根节点的路径</li>
+<li>如果路径只有一条，那么就将该路径直接加入到分层数结构中</li>
+<li>否则，从所有路径中选择最短的一条加入到分层树中。</li>
 </ol>
+<p>这个分层树就称之为WordTree，作用在于将两种数据集按照层级进行结合。</p>
+<p><img src="https://pic2.zhimg.com/80/v2-c98e6eaaf44f0d03be1b5cf32a960fd1_720w.jpg" alt></p>
+<p>分类时的概率计算借用了决策树思想，某个节点的概率值等于该节点到根节点的所有条件概率之积。最终结果是一颗 WordTree （视觉名词组成的层次结构模型）。用WordTree执行分类时，预测每个节点的条件概率。如果想求得特定节点的绝对概率，只需要沿着路径做连续乘积。</p>
+<h2 id="YOLOv3"><a href="#YOLOv3" class="headerlink" title="YOLOv3"></a>YOLOv3</h2><p><img src="https://img-blog.csdnimg.cn/20201117210716527.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTYxNTE4Mg==,size_16,color_FFFFFF,t_70#pic_center" alt></p>
+<p><strong>从特征获取预测结果</strong></p>
+<p>多特征层进行目标提取，一共提取三个特征层，三个特征层位于darknet53的不同位置，分别位于中间层，中下层，底层，三个特征层的shape分别为（52，52，256），（26，26，512），（13，13，1024），这三个特征层后面用于与上采样后的其他特征层concat</p>
+<p>第三个特征层（13，13，1024）进行5次卷积处理（提取特征），处理完后一部分过卷积并上采样，另一部分用于输出该尺寸下的预测结果（13，13，75）。Conv2d 3x3 和Conv2d 1x1起到通道调整的作用，调整成输出需要的大小。</p>
+<p>上一步中上采样后得到（26，26，256）的特征层，然后与Darknet53网络中的特征层（26，26，512）进行Concat，得到的shape为（26，26，768），再进行5次卷积。同样一部分过卷积并上采样，另一部分用于输出对应的预测结果（26，26，75）。Conv2d 3x3 1x1同上。</p>
+<p>重复上一步，将上采样的特征与（52，52，256）的特征Concat，再次5次卷积得到shape为（52，52，128），并过Conv2d 3x3 1x1得到（52，52，75）</p>
+<ul>
+<li>如果物体在图中较大就用13x13检测，较小就用52x52来检测。</li>
+</ul>
+<p><strong>预测结果的解码</strong><br>和V2一样</p>
 
           
         
@@ -712,7 +912,42 @@ $$f(x,y) = \frac{y_2-y}{y_2-y_1}f(x，y_1) + \frac{y-y_1}{y_2-y_1}f(x,y2)$$
 </ul>
 </li>
 </ul>
-<h2 id="Batch-Normalization"><a href="#Batch-Normalization" class="headerlink" title="Batch Normalization"></a>Batch Normalization</h2><h2 id="Convolution卷积"><a href="#Convolution卷积" class="headerlink" title="Convolution卷积"></a>Convolution卷积</h2><p> Input  $\begin{bmatrix} a &amp; b &amp; c \\ d &amp; e &amp; f \\ g &amp; h &amp; i \\ \end{bmatrix}$, kernel $\begin{bmatrix} 1 &amp; 2 \\ 3 &amp; 4 \\ \end{bmatrix}$</p>
+<h2 id="Batch-Normalization"><a href="#Batch-Normalization" class="headerlink" title="Batch Normalization"></a>Batch Normalization</h2><p>在深层网络的训练过程中，由于网络中参数变化而引起内部节点数据分布发生变化的过程被称为<strong>Internal Covariate Shift</strong>。以MLP的一层线性变换为例：$Z^{[l]}=W^{[l]}\times input + b^{[l]}$，其中l代表层数；非线性变换为$A^{[l]}=g^{[l]}(Z^{[l]})$，g为激活函数。随着梯度下降，每一层的$W^{[l]},b^{[l]},Z^{[l]}$都会被更新，进而$A^{[l]}$也同样出现分布的改变。<strong>但是</strong>$A^{[l]}$作为第l+1层的输入，第l+1蹭的参数需要不断去适应新的数据分布的变化。</p>
+<ul>
+<li>上层网络需要不停调整来适应输入数据分布的变化，导致网络学习速度降低</li>
+<li>网络的训练过程容易陷入梯度饱和取，减缓网络收敛速度<ul>
+<li>解释：当我们采用sigmoiod这类饱和激活函数（saturated activation function）时，随着模型训练的进行，我们的参数$W^{[l]}$会逐渐更新并变大，$Z^{[l]}=W^{[l]}A^{[l-1]}+b^{[l]}$也会随之变大，随着网络层数的加深，$z^{[l]}$越来越大，而饱和激活函数在数值较大的区域的梯度逐渐变小直至接近于0，于是更新速度就会变慢。ReLU是解决这个问题的一个方法。</li>
+</ul>
+</li>
+</ul>
+<p>要解决ICS的问题，就要解决由于梯度更新带来的数据分布变化的问题。 机器学习中白化whitening 对输入数据分布进行变化</p>
+<ul>
+<li>使得输入特征分布具有相同的均值与方差。其中PCA白化保证了所有特征分布均值为0，方差为1；而ZCA白化则保证了所有特征分布均值为0，方差相同；</li>
+<li>去除特征之间的相关性。</li>
+<li><strong>但是</strong> 1. 白化计算成本太高，2. 白化过程改变了网络每一层的分布，从而影响了网络层中本身数据的表达能力。</li>
+</ul>
+<p>BN具体步骤：</p>
+<ol>
+<li>对每个特征进行独立的normalization，假设输入为$Z$，对于这个输入的第j个维度，<script type="math/tex; mode=display">\mu_j = \frac{1}{m}\sum_{i=1}^mZ_{j}^{(i)}\\
+\sigma_j^2 = \frac{1}{m}\sum_{i=1}^{m}(Z_j^{(i)}-\mu_j)^2\\
+\hat{Z_j} = \frac{Z_j-\mu_j}{\sqrt{\sigma_j^2+\epsilon}}</script></li>
+<li><p>Normalization操作虽然解决了ICS问题，让每一层网络的输入数据分布都变得稳定，但却<strong>导致数据表达能力的确实</strong>，另外因为所有输入均值为零，方差为1，集中在sigmoid和tanh的中间的线性区域，缺失非线性的表达能力。</p>
+<p>所以BN引入了两个可学习的参数$\gamma,\beta$，目的是恢复数据本身的表达能力，$\tilde{Z_j}=\gamma_j\hat{Z_j}+\beta_j$<br>3.在training的时候，每次过minibatch时，记录并更新每一层的$\mu_{batch}$和$\sigma^2_{batch}$</p>
+<script type="math/tex; mode=display">\mu_{test} = \mathbb{E}(\mu_{batch})\\
+\sigma^2_{test} = \frac{m}{m-1}\mathbb{E}(\sigma^2_{batch})\\
+BN(X_{test}) = \gamma\cdot \frac{X_{test}-\mu_{test}}{\sqrt{\sigma^2_{test}+\epsilon}}+\beta</script><p>所以pytorch的model.train()和model.eval()会影响bn层。</p>
+</li>
+</ol>
+<ul>
+<li>好处：<ul>
+<li>使得网络中每层输入数据的分布相对稳定，加速模型学习速度</li>
+<li>使得模型对网络中的参数不那么敏感，简化调参过程，学习稳定</li>
+<li>允许使用saturated activation function，缓解梯度消失</li>
+<li>有一定正则化效果，相当于对每个mini-batch加随机噪音。</li>
+</ul>
+</li>
+</ul>
+<h2 id="Convolution卷积"><a href="#Convolution卷积" class="headerlink" title="Convolution卷积"></a>Convolution卷积</h2><p> Input  $\begin{bmatrix} a &amp; b &amp; c \\ d &amp; e &amp; f \\ g &amp; h &amp; i \\ \end{bmatrix}$, kernel $\begin{bmatrix} 1 &amp; 2 \\ 3 &amp; 4 \\ \end{bmatrix}$</p>
 <p> Output的尺寸：$output = (input-kernel+2*padding)/stride+1$</p>
 <ul>
 <li><strong>为什么用卷积代替mlp</strong><ul>
@@ -2085,135 +2320,6 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://humberthumbert.github.io/2020/03/18/Probabilistic-Background/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Lifan Zhao">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lifan's Note">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/03/18/Probabilistic-Background/" itemprop="url">概率编程基础知识</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-18T09:45:37+08:00">
-                2020-03-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="一个栗子"><a href="#一个栗子" class="headerlink" title="一个栗子"></a>一个栗子</h1><p>比如我们有一袋子卡片，已知里面有一些卡片，而这些卡片中有一些可能被涂成了蓝色的，有一些可能是白色的，具体的数量和比例都不缺定。我们现在可以进行n次抽取，查看后放回袋子里。</p>
-<p>贝叶斯统计步骤</p>
-<ol>
-<li>设计模型 （conjecture）</li>
-<li>根据数据，进行条件判断 （update）</li>
-<li>评估模型 （critique）</li></ol>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/03/18/Probabilistic-Background/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2267,7 +2373,7 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-count">23</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2280,7 +2386,7 @@ baseline\;loss\equiv (\overline{f_{\phi}(z)}-b)^2</script><p>它将被用于神�
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

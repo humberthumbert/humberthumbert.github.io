@@ -87,7 +87,7 @@
 <meta property="og:description" content="Basic ComponentLoss常见损失机器学习中监督学习的本质是给定一系列样本$(x_i,y_i)$，尝试学习$x\rightarrow y$的映射关系。损失函数是用来估量模型的输出$\hat{y}$和真实值$y$之间的差距，从而给模型的优化指引方向。 \hat{\theta}&#x3D;\argmin_{\theta}\frac{1}{N}\sum_{i&#x3D;1}^{N}L(y_i,f(x_i;\th">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-07-05T14:40:41.000Z">
-<meta property="article:modified_time" content="2022-07-05T14:45:44.147Z">
+<meta property="article:modified_time" content="2022-07-06T13:53:44.648Z">
 <meta property="article:author" content="Lifan Zhao">
 <meta property="article:tag" content="deep learning">
 <meta name="twitter:card" content="summary">
@@ -388,7 +388,42 @@
 </ul>
 </li>
 </ul>
-<h2 id="Batch-Normalization"><a href="#Batch-Normalization" class="headerlink" title="Batch Normalization"></a>Batch Normalization</h2><h2 id="Convolution卷积"><a href="#Convolution卷积" class="headerlink" title="Convolution卷积"></a>Convolution卷积</h2><p> Input  $\begin{bmatrix} a &amp; b &amp; c \\ d &amp; e &amp; f \\ g &amp; h &amp; i \\ \end{bmatrix}$, kernel $\begin{bmatrix} 1 &amp; 2 \\ 3 &amp; 4 \\ \end{bmatrix}$</p>
+<h2 id="Batch-Normalization"><a href="#Batch-Normalization" class="headerlink" title="Batch Normalization"></a>Batch Normalization</h2><p>在深层网络的训练过程中，由于网络中参数变化而引起内部节点数据分布发生变化的过程被称为<strong>Internal Covariate Shift</strong>。以MLP的一层线性变换为例：$Z^{[l]}=W^{[l]}\times input + b^{[l]}$，其中l代表层数；非线性变换为$A^{[l]}=g^{[l]}(Z^{[l]})$，g为激活函数。随着梯度下降，每一层的$W^{[l]},b^{[l]},Z^{[l]}$都会被更新，进而$A^{[l]}$也同样出现分布的改变。<strong>但是</strong>$A^{[l]}$作为第l+1层的输入，第l+1蹭的参数需要不断去适应新的数据分布的变化。</p>
+<ul>
+<li>上层网络需要不停调整来适应输入数据分布的变化，导致网络学习速度降低</li>
+<li>网络的训练过程容易陷入梯度饱和取，减缓网络收敛速度<ul>
+<li>解释：当我们采用sigmoiod这类饱和激活函数（saturated activation function）时，随着模型训练的进行，我们的参数$W^{[l]}$会逐渐更新并变大，$Z^{[l]}=W^{[l]}A^{[l-1]}+b^{[l]}$也会随之变大，随着网络层数的加深，$z^{[l]}$越来越大，而饱和激活函数在数值较大的区域的梯度逐渐变小直至接近于0，于是更新速度就会变慢。ReLU是解决这个问题的一个方法。</li>
+</ul>
+</li>
+</ul>
+<p>要解决ICS的问题，就要解决由于梯度更新带来的数据分布变化的问题。 机器学习中白化whitening 对输入数据分布进行变化</p>
+<ul>
+<li>使得输入特征分布具有相同的均值与方差。其中PCA白化保证了所有特征分布均值为0，方差为1；而ZCA白化则保证了所有特征分布均值为0，方差相同；</li>
+<li>去除特征之间的相关性。</li>
+<li><strong>但是</strong> 1. 白化计算成本太高，2. 白化过程改变了网络每一层的分布，从而影响了网络层中本身数据的表达能力。</li>
+</ul>
+<p>BN具体步骤：</p>
+<ol>
+<li>对每个特征进行独立的normalization，假设输入为$Z$，对于这个输入的第j个维度，<script type="math/tex; mode=display">\mu_j = \frac{1}{m}\sum_{i=1}^mZ_{j}^{(i)}\\
+\sigma_j^2 = \frac{1}{m}\sum_{i=1}^{m}(Z_j^{(i)}-\mu_j)^2\\
+\hat{Z_j} = \frac{Z_j-\mu_j}{\sqrt{\sigma_j^2+\epsilon}}</script></li>
+<li><p>Normalization操作虽然解决了ICS问题，让每一层网络的输入数据分布都变得稳定，但却<strong>导致数据表达能力的确实</strong>，另外因为所有输入均值为零，方差为1，集中在sigmoid和tanh的中间的线性区域，缺失非线性的表达能力。</p>
+<p>所以BN引入了两个可学习的参数$\gamma,\beta$，目的是恢复数据本身的表达能力，$\tilde{Z_j}=\gamma_j\hat{Z_j}+\beta_j$<br>3.在training的时候，每次过minibatch时，记录并更新每一层的$\mu_{batch}$和$\sigma^2_{batch}$</p>
+<script type="math/tex; mode=display">\mu_{test} = \mathbb{E}(\mu_{batch})\\
+\sigma^2_{test} = \frac{m}{m-1}\mathbb{E}(\sigma^2_{batch})\\
+BN(X_{test}) = \gamma\cdot \frac{X_{test}-\mu_{test}}{\sqrt{\sigma^2_{test}+\epsilon}}+\beta</script><p>所以pytorch的model.train()和model.eval()会影响bn层。</p>
+</li>
+</ol>
+<ul>
+<li>好处：<ul>
+<li>使得网络中每层输入数据的分布相对稳定，加速模型学习速度</li>
+<li>使得模型对网络中的参数不那么敏感，简化调参过程，学习稳定</li>
+<li>允许使用saturated activation function，缓解梯度消失</li>
+<li>有一定正则化效果，相当于对每个mini-batch加随机噪音。</li>
+</ul>
+</li>
+</ul>
+<h2 id="Convolution卷积"><a href="#Convolution卷积" class="headerlink" title="Convolution卷积"></a>Convolution卷积</h2><p> Input  $\begin{bmatrix} a &amp; b &amp; c \\ d &amp; e &amp; f \\ g &amp; h &amp; i \\ \end{bmatrix}$, kernel $\begin{bmatrix} 1 &amp; 2 \\ 3 &amp; 4 \\ \end{bmatrix}$</p>
 <p> Output的尺寸：$output = (input-kernel+2*padding)/stride+1$</p>
 <ul>
 <li><strong>为什么用卷积代替mlp</strong><ul>
@@ -610,7 +645,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-count">23</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -623,7 +658,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

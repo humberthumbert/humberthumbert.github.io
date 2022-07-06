@@ -87,8 +87,11 @@
 <meta property="og:description" content="Object Detection目标检测Two Stage Objection DetectionRCNN将物体检测当做分类问题处理，即先提取一系列的候选区域，然后对候选区域进行分类。Two-staged  候选区域生成：region proposal，此时用的是selective search算法：先将图片分割成小区域，然后再合并包含同一物体可能性高的区域并输出，提取2000个候选区域，并对每一">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/20201210111829137.gif">
+<meta property="og:image" content="https://img-blog.csdn.net/20170913081810622?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDM4MDE2NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="https://pic2.zhimg.com/80/v2-c98e6eaaf44f0d03be1b5cf32a960fd1_720w.jpg">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201117210716527.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTYxNTE4Mg==,size_16,color_FFFFFF,t_70#pic_center">
 <meta property="article:published_time" content="2022-07-05T14:42:43.000Z">
-<meta property="article:modified_time" content="2022-07-05T17:28:31.328Z">
+<meta property="article:modified_time" content="2022-07-06T13:54:12.990Z">
 <meta property="article:author" content="Lifan Zhao">
 <meta property="article:tag" content="deep learning">
 <meta property="article:tag" content="object detection">
@@ -515,9 +518,77 @@ $$f(x,y) = \frac{y_2-y}{y_2-y_1}f(x，y_1) + \frac{y-y_1}{y_2-y_1}f(x,y2)$$
 </ul>
 </li>
 </ul>
-<h3 id="YOLO-v2"><a href="#YOLO-v2" class="headerlink" title="YOLO v2"></a>YOLO v2</h3><ol>
-<li>网络结构的改善：采用了darknet，</li>
+<h2 id="YOLOv2"><a href="#YOLOv2" class="headerlink" title="YOLOv2"></a>YOLOv2</h2><ul>
+<li><p><a href="./DL_knowledge.md#batch-normalization">Batch Normalization</a></p>
+<p>  对于每一层的输入都做了归一化。提升2%mAP.</p>
+</li>
+<li><p>High resolution classifer高分辨率图像分类器</p>
+<p>  采用224x224 ImageNet图像进行分类模型预训练160 epoch，再采用448x448的高分辨率样本对分类模型进行finetune(10个epoch)，使得网络特征逐渐适应448x448的分辨率，缓解了分辨率突然切换造成的影响。</p>
+</li>
+<li><p>Convolution with anchor boxes使用先验框</p>
+<p>  学习FasterRCNN预测anchor box的偏移量。<strong>在每个grid预先设定一组不同大小和宽高比的边框，来覆盖整个图像的不同位置和多种尺度</strong>，因为anchor bbox的大小都不同，所以不能再使用MLP，<em>8将全连接层和最后一个pooling层去掉*</em></p>
+<p>  将输入图片尺寸从448改为416，这样经过32倍downsample，可以得到13x13的feature map，使得特征图只有一个center cell（如果是偶数就会有四个）。</p>
+<pre><code>  - 为什么希望只有一个center cell？
+  - 因为大的object一般会占据图像中心，所以希望用一个center cell去预测。
+</code></pre><p>  最后recall提升7%，mAP只下降0.3%</p>
+</li>
+<li><p>Dimension clusters 聚类提取先验框的尺度信息</p>
+<p>  通过Training GT的bbox的<a href="./ML.md#k-means-clustering">k-means聚类分析</a>，自动寻找尽可能匹配样本的anchor box尺寸。传统欧式距离在bbox尺寸较大的时候误差也更大，而我们希望误差和bbox的尺寸没有太大关系，所以通过IoU定了如下距离函数：</p>
+<script type="math/tex; mode=display">d(box,centroid) = 1-IoU(box,centroid)</script><p>  其中centroid是聚类是被选中作为中心的边框，box是其他的边框，于是IoU越大，两者越接近。</p>
+</li>
+<li><p>Direct Location prediction 约束预测边框的位置<br>  借鉴于Faster RCNN的先验框方法，其位置预测公式：</p>
+<script type="math/tex; mode=display">\left\{\begin{matrix}
+  t_x = \frac{x-x_a}{w_a}\\
+  t_y = \frac{y-y_a}{h_a}
+  \end{matrix}\right .\Rightarrow
+  \left\{\begin{matrix}
+  x = (t_x*w_a)+x_a \\
+  y = (t_y*h_a)+y_a
+  \end{matrix}\right .</script><p>由于没有RPN网络去直接学习预测位移，所以在YOLO中直接取学习$t_x,t_y$，导致他们的取值没有任何约束，因此预测边框的中心可能出现在任何位置，<strong>训练早期阶段不容易稳定</strong>。YOLOv2调整了预测公式，将预测边框的中心约束在特定的grid网格内：</p>
+<script type="math/tex; mode=display">b_x=\sigma(t_x)+c_x\\
+b_y = \sigma(t_y)+c_y\\
+b_w = p_w e^{t_w}\\
+b_h = p_h e^{t_h}\\
+Pr(object)*IoU(b,object) = \sigma(t_o)</script><p><img src="https://img-blog.csdn.net/20170913081810622?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDM4MDE2NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt></p>
+<p>其中，</p>
+<ul>
+<li>$b_x,b_y,b_w,b_h$是预测边框的中心和宽高。</li>
+<li>$Pr(object)*IoU(b,object)$是预测边框的置信度，这里对预测参数$t_o$进行sigmoid变换后作为置信度的值。</li>
+<li>$c_x,c_y$是当前网格的左上角到图像左上角的距离，要先将网格大小归一化，即令一个网格的宽=1，高=1.</li>
+<li>$p_w,p_h$是先验框的宽高。</li>
+<li>$\sigma$是sigmoid函数。</li>
+<li>$t_x,t_y,t_h,t_w,t_o$是要学习的参数。<br>因为使用了限制让数值变得参数化，也让网络更容易学习，更稳定。</li>
+</ul>
+</li>
+<li><p>Fine-Grained Features（passthrough层检测细颗粒度特征）</p>
+</li>
+</ul>
+<p>图像中的对象会有大有小，输入图像经过多层网络特征提取，最后输出的feature map中较小的对象可能并不明显甚至被忽略掉了。于是引入了passthrough层：在最后一个pooling层之前，特征图大小为26x26x512，将其1拆4，让他们和经过pooling，conv后的feature map 13x13x1024直接concat，得到13x13x3072.</p>
+<ul>
+<li><p>Multi-Scale Training 多尺度图像训练<br>每10个batch，网络会随机选择一个新的图片尺寸，[320,608,32]，希望网络在不同的输入尺寸上都达到一个很好的预测效果。</p>
+</li>
+<li><p>Hierarchical classification分层分类<br>提出了一种在分类数据集和检测数据集上联合训练的机制：object detection的数据集取训练detection，classification的数据集只训练分类loss。</p>
+</li>
+</ul>
+<p>但是ImageNet有9000个种类，coco只有80种，作者使用multi-label模型，即假定一张图片可以有多个label，且不要求label间独立。采用以下策略重建了一个树形结构：</p>
+<ol>
+<li>遍历ImageNet的label，然后在WordNet中寻找该label到根节点的路径</li>
+<li>如果路径只有一条，那么就将该路径直接加入到分层数结构中</li>
+<li>否则，从所有路径中选择最短的一条加入到分层树中。</li>
 </ol>
+<p>这个分层树就称之为WordTree，作用在于将两种数据集按照层级进行结合。</p>
+<p><img src="https://pic2.zhimg.com/80/v2-c98e6eaaf44f0d03be1b5cf32a960fd1_720w.jpg" alt></p>
+<p>分类时的概率计算借用了决策树思想，某个节点的概率值等于该节点到根节点的所有条件概率之积。最终结果是一颗 WordTree （视觉名词组成的层次结构模型）。用WordTree执行分类时，预测每个节点的条件概率。如果想求得特定节点的绝对概率，只需要沿着路径做连续乘积。</p>
+<h2 id="YOLOv3"><a href="#YOLOv3" class="headerlink" title="YOLOv3"></a>YOLOv3</h2><p><img src="https://img-blog.csdnimg.cn/20201117210716527.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTYxNTE4Mg==,size_16,color_FFFFFF,t_70#pic_center" alt></p>
+<p><strong>从特征获取预测结果</strong></p>
+<p>多特征层进行目标提取，一共提取三个特征层，三个特征层位于darknet53的不同位置，分别位于中间层，中下层，底层，三个特征层的shape分别为（52，52，256），（26，26，512），（13，13，1024），这三个特征层后面用于与上采样后的其他特征层concat</p>
+<p>第三个特征层（13，13，1024）进行5次卷积处理（提取特征），处理完后一部分过卷积并上采样，另一部分用于输出该尺寸下的预测结果（13，13，75）。Conv2d 3x3 和Conv2d 1x1起到通道调整的作用，调整成输出需要的大小。</p>
+<p>上一步中上采样后得到（26，26，256）的特征层，然后与Darknet53网络中的特征层（26，26，512）进行Concat，得到的shape为（26，26，768），再进行5次卷积。同样一部分过卷积并上采样，另一部分用于输出对应的预测结果（26，26，75）。Conv2d 3x3 1x1同上。</p>
+<p>重复上一步，将上采样的特征与（52，52，256）的特征Concat，再次5次卷积得到shape为（52，52，128），并过Conv2d 3x3 1x1得到（52，52，75）</p>
+<ul>
+<li>如果物体在图中较大就用13x13检测，较小就用52x52来检测。</li>
+</ul>
+<p><strong>预测结果的解码</strong><br>和V2一样</p>
 
       
     </div>
@@ -559,6 +630,10 @@ $$f(x,y) = \frac{y_2-y}{y_2-y_1}f(x，y_1) + \frac{y-y_1}{y_2-y_1}f(x,y2)$$
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/07/06/ML-knowledge/" rel="prev" title="ML_knowledge">
+                ML_knowledge <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -639,7 +714,7 @@ $$f(x,y) = \frac{y_2-y}{y_2-y_1}f(x，y_1) + \frac{y-y_1}{y_2-y_1}f(x,y2)$$
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-count">23</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -652,7 +727,7 @@ $$f(x,y) = \frac{y_2-y}{y_2-y_1}f(x，y_1) + \frac{y-y_1}{y_2-y_1}f(x,y2)$$
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
@@ -707,7 +782,7 @@ $$f(x,y) = \frac{y_2-y}{y_2-y_1}f(x，y_1) + \frac{y-y_1}{y_2-y_1}f(x,y2)$$
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Object-Detection目标检测"><span class="nav-number">1.</span> <span class="nav-text">Object Detection目标检测</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Two-Stage-Objection-Detection"><span class="nav-number">1.1.</span> <span class="nav-text">Two Stage Objection Detection</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RCNN"><span class="nav-number">1.1.1.</span> <span class="nav-text">RCNN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Fast-RCNN"><span class="nav-number">1.1.2.</span> <span class="nav-text">Fast RCNN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Faster-RCNN"><span class="nav-number">1.1.3.</span> <span class="nav-text">Faster RCNN</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YOLO系列"><span class="nav-number">1.2.</span> <span class="nav-text">YOLO系列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#YOLO-v1"><span class="nav-number">1.2.1.</span> <span class="nav-text">YOLO v1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#YOLO-v2"><span class="nav-number">1.2.2.</span> <span class="nav-text">YOLO v2</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Object-Detection目标检测"><span class="nav-number">1.</span> <span class="nav-text">Object Detection目标检测</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Two-Stage-Objection-Detection"><span class="nav-number">1.1.</span> <span class="nav-text">Two Stage Objection Detection</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RCNN"><span class="nav-number">1.1.1.</span> <span class="nav-text">RCNN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Fast-RCNN"><span class="nav-number">1.1.2.</span> <span class="nav-text">Fast RCNN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Faster-RCNN"><span class="nav-number">1.1.3.</span> <span class="nav-text">Faster RCNN</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YOLO系列"><span class="nav-number">1.2.</span> <span class="nav-text">YOLO系列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#YOLO-v1"><span class="nav-number">1.2.1.</span> <span class="nav-text">YOLO v1</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YOLOv2"><span class="nav-number">1.3.</span> <span class="nav-text">YOLOv2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YOLOv3"><span class="nav-number">1.4.</span> <span class="nav-text">YOLOv3</span></a></li></ol></li></ol></div>
             
 
           </div>
